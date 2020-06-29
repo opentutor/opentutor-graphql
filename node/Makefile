@@ -3,7 +3,7 @@ PROJECT_ROOT?=$(shell git rev-parse --show-toplevel 2> /dev/null)
 PROJECT_NAME?=$(shell v='$(PROJECT_ROOT)'; echo "$${v\#\#*/}")
 SERVICE_NAME?=$(shell v='$(DIR)'; echo "$${v\#\#*/}")
 DIR=$(shell pwd)
-ENV?=test
+ENV?=dev
 ENV_PASSWORD_VAR=$(shell \
 	echo $(ENV) | \
 	tr [:lower:] [:upper:] | \

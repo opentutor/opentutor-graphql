@@ -18,27 +18,6 @@ describe('user-session', () => {
     await mongoUnit.drop();
   });
 
-  it('returns error when no username is given', async () => {
-    const response = await request(app)
-      .post('/graphql')
-      .send({
-        query: `query { 
-          userSession(username: "") { 
-            username
-            question {
-              text
-            }
-          } 
-        }`,
-      });
-
-    expect(response.status).to.equal(200);
-    expect(response.body).to.have.deep.nested.property(
-      'errors[0].message',
-      'user name cannot be null or empty'
-    );
-  });
-
   it('succeeds with valid username', async () => {
     const response = await request(app)
       .post('/graphql')
@@ -53,7 +32,7 @@ describe('user-session', () => {
         }`,
       });
 
-    const userSession = response.body.data.login;
+    const userSession = response.body.data.userSession;
     expect(response.status).to.equal(200);
     expect(userSession).to.eql({
       username: 'username1',

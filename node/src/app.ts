@@ -51,7 +51,6 @@ export default async function createApp(): Promise<Express> {
   app.use(require('./middlewares/send-404')());
   app.use(require('./middlewares/send-object')()); // special handling for mongoose objects (like convert to string array if array of objects with only id)
   app.use(require('./middlewares/fields-parser')()); // special handling for mongoose objects (like convert to string array if array of objects with only id)
-  app.use('/', require('./routes'));
   app.use(function(req: Request, res: Response) {
     // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
     // @ts-ignore-next-line
