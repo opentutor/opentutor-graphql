@@ -1,0 +1,6 @@
+.env
+.password
+node_modules
+*.log
+.DS_Store
+dist
