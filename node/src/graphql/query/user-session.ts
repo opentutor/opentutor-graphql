@@ -1,15 +1,18 @@
 import { GraphQLString } from 'graphql';
-import UserSessionType from '../types/user-session';
-import UserSessionSchema from '../../models/UserSession';
+import UserSessionType from 'graphql/types/user-session';
+import UserSessionSchema from 'models/UserSession';
+import findOne from './find-one';
 
-export const userSession = {
+export const userSession = findOne({
+  model: UserSessionSchema,
   type: UserSessionType,
-  args: {
-    username: { type: GraphQLString },
+  typeName: 'usersession',
+  argsConfig: {
+    sessionId: {
+      description: 'id of the session',
+      type: GraphQLString,
+    },
   },
-  resolve: async (root: any, args: { username: string }) => {
-    return await UserSessionSchema.findOne({ username: args.username });
-  },
-};
+});
 
 export default userSession;

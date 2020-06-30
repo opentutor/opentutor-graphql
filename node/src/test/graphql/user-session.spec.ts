@@ -4,7 +4,7 @@ import { Express } from 'express';
 import mongoUnit from 'mongo-unit';
 import request from 'supertest';
 
-describe('user-session', () => {
+describe('userSession', () => {
   let app: Express;
 
   beforeEach(async () => {
@@ -18,15 +18,40 @@ describe('user-session', () => {
     await mongoUnit.drop();
   });
 
-  it('succeeds with valid username', async () => {
+  it(`returns an error if invalid sessionId`, async () => {
     const response = await request(app)
       .post('/graphql')
       .send({
         query: `query { 
-          userSession(username: "username1") { 
+          userSession(sessionId: "invalidsession") { 
+            username
+          } 
+        }`,
+      });
+
+    expect(response.status).to.equal(200);
+    expect(response.body).to.have.deep.nested.property('errors[0].message');
+  });
+
+  it('succeeds with valid sessionId', async () => {
+    const response = await request(app)
+      .post('/graphql')
+      .send({
+        query: `query { 
+          userSession(sessionId: "session1") { 
             username
             question {
               text
+              expectations {
+                text
+              }
+            }
+            userResponses {
+              text
+              expectationScore {
+                classifierGrade
+                graderGrade
+              }
             }
           } 
         }`,
@@ -37,8 +62,28 @@ describe('user-session', () => {
     expect(userSession).to.eql({
       username: 'username1',
       question: {
-        text: 'question text',
+        text: 'question?',
+        expectations: [
+          { text: 'expected text 1' },
+          { text: 'expected text 2' },
+        ],
       },
+      userResponses: [
+        {
+          text: 'answer1',
+          expectationScore: {
+            classifierGrade: 'Good',
+            graderGrade: '',
+          },
+        },
+        {
+          text: 'answer2',
+          expectationScore: {
+            classifierGrade: 'Bad',
+            graderGrade: '',
+          },
+        },
+      ],
     });
   });
 });
