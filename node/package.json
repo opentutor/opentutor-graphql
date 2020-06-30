@@ -29,7 +29,6 @@
     "cors": "^2.8.5",
     "dateformat": "^3.0.3",
     "dotenv": "^8.2.0",
-    "dotenvenc": "^1.0.4",
     "es6-promisify": "^6.1.1",
     "express": "^4.17.1",
     "express-graphql": "^0.9.0",

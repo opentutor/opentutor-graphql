@@ -26,7 +26,7 @@ export default async function createApp(): Promise<Express> {
   }
   app.use(cors());
   app.use(
-    '/graphql',
+    '/grading',
     graphqlHTTP({
       schema: schema,
       graphiql: true,

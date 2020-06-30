@@ -20,7 +20,7 @@ describe('userSession', () => {
 
   it(`returns an error if invalid sessionId`, async () => {
     const response = await request(app)
-      .post('/graphql')
+      .post('/grading')
       .send({
         query: `query { 
           userSession(sessionId: "invalidsession") { 
@@ -35,7 +35,7 @@ describe('userSession', () => {
 
   it('succeeds with valid sessionId', async () => {
     const response = await request(app)
-      .post('/graphql')
+      .post('/grading')
       .send({
         query: `query { 
           userSession(sessionId: "session1") { 
