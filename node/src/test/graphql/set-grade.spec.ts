@@ -38,7 +38,7 @@ describe('setGrade', () => {
       .post('/graphql')
       .send({
         query: `mutation { 
-          setGrade(userAnswerIndex: 0, grade: "Bad") { 
+          setGrade(userAnswerIndex: 0, userExpectationIndex: 0, grade: "Bad") { 
             username
           } 
         }`,
@@ -53,7 +53,22 @@ describe('setGrade', () => {
       .post('/graphql')
       .send({
         query: `mutation { 
-          setGrade(sessionId: "session1", grade: "Bad") { 
+          setGrade(sessionId: "session1", userExpectationIndex: 0, grade: "Bad") { 
+            username
+          } 
+        }`,
+      });
+
+    expect(response.status).to.equal(200);
+    expect(response.body).to.have.deep.nested.property('errors[0].message');
+  });
+
+  it(`returns an error if no userExpectationIndex`, async () => {
+    const response = await request(app)
+      .post('/graphql')
+      .send({
+        query: `mutation { 
+          setGrade(sessionId: "session1", userAnswerIndex: 0, grade: "Bad") { 
             username
           } 
         }`,
@@ -68,7 +83,7 @@ describe('setGrade', () => {
       .post('/graphql')
       .send({
         query: `mutation { 
-          setGrade(sessionId: "session1", userAnswerIndex: 0) { 
+          setGrade(sessionId: "session1", userAnswerIndex: 0, userExpectationIndex: 0) { 
             username
           } 
         }`,
@@ -83,7 +98,7 @@ describe('setGrade', () => {
       .post('/graphql')
       .send({
         query: `mutation { 
-          setGrade(sessionId: "session1", userAnswerIndex: 0, grade: "Bad") { 
+          setGrade(sessionId: "session1", userAnswerIndex: 0, userExpectationIndex: 0, grade: "Bad") { 
             username
             question {
               text
@@ -93,7 +108,7 @@ describe('setGrade', () => {
             }
             userResponses {
               text
-              expectationScore {
+              expectationScores {
                 classifierGrade
                 graderGrade
               }
@@ -116,17 +131,21 @@ describe('setGrade', () => {
       userResponses: [
         {
           text: 'answer1',
-          expectationScore: {
-            classifierGrade: 'Good',
-            graderGrade: 'Bad',
-          },
+          expectationScores: [
+            {
+              classifierGrade: 'Good',
+              graderGrade: 'Bad',
+            },
+          ],
         },
         {
           text: 'answer2',
-          expectationScore: {
-            classifierGrade: 'Bad',
-            graderGrade: '',
-          },
+          expectationScores: [
+            {
+              classifierGrade: 'Bad',
+              graderGrade: '',
+            },
+          ],
         },
       ],
     });
@@ -137,7 +156,7 @@ describe('setGrade', () => {
       .post('/graphql')
       .send({
         query: `mutation { 
-          setGrade(sessionId: "session1", userAnswerIndex: 0, grade: "Bad") { 
+          setGrade(sessionId: "session1", userAnswerIndex: 0, userExpectationIndex: 0, grade: "Bad") { 
             username
             question {
               text
@@ -147,7 +166,7 @@ describe('setGrade', () => {
             }
             userResponses {
               text
-              expectationScore {
+              expectationScores {
                 classifierGrade
                 graderGrade
               }
@@ -170,7 +189,7 @@ describe('setGrade', () => {
             }
             userResponses {
               text
-              expectationScore {
+              expectationScores {
                 classifierGrade
                 graderGrade
               }
@@ -192,17 +211,21 @@ describe('setGrade', () => {
       userResponses: [
         {
           text: 'answer1',
-          expectationScore: {
-            classifierGrade: 'Good',
-            graderGrade: 'Bad',
-          },
+          expectationScores: [
+            {
+              classifierGrade: 'Good',
+              graderGrade: 'Bad',
+            },
+          ],
         },
         {
           text: 'answer2',
-          expectationScore: {
-            classifierGrade: 'Bad',
-            graderGrade: '',
-          },
+          expectationScores: [
+            {
+              classifierGrade: 'Bad',
+              graderGrade: '',
+            },
+          ],
         },
       ],
     });

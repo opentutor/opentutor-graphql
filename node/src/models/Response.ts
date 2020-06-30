@@ -3,12 +3,12 @@ import { ExpectationScore, ExpectationScoreSchema } from './ExpectationScore';
 
 export interface Response extends Document {
   text: string;
-  expectationScore: ExpectationScore;
+  expectationScores: [ExpectationScore];
 }
 
 export const ResponseSchema = new Schema({
   text: { type: String },
-  expectationScore: ExpectationScoreSchema,
+  expectationScores: [ExpectationScoreSchema],
 });
 
 export default mongoose.model<Response>('Response', ResponseSchema);

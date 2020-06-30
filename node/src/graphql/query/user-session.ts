@@ -1,6 +1,6 @@
 import { GraphQLString } from 'graphql';
-import UserSessionType from 'graphql/types/user-session';
-import UserSessionSchema from 'models/UserSession';
+import UserSessionType from '../types/user-session';
+import UserSessionSchema from '../../models/UserSession';
 import findOne from './find-one';
 
 export const userSession = findOne({

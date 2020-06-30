@@ -5,6 +5,7 @@ import { Response, ResponseSchema } from './Response';
 export interface UserSession extends Document {
   sessionId: string;
   username: string;
+  score: number;
   question: Question;
   userResponses: [Response];
 }
@@ -13,6 +14,7 @@ export interface UserSessionModel extends Model<UserSession> {
   setGrade(
     sessionId: string,
     userAnswerIndex: number,
+    userExpectationIndex: number,
     grade: string
   ): Promise<UserSessionModel>;
 }
@@ -21,6 +23,7 @@ export const UserSessionSchema = new Schema(
   {
     sessionId: { type: String, required: '{PATH} is required!' },
     username: { type: String },
+    score: { type: Number },
     question: { type: QuestionSchema },
     userResponses: [ResponseSchema],
   },
@@ -30,14 +33,14 @@ export const UserSessionSchema = new Schema(
 UserSessionSchema.statics.setGrade = async function(
   sessionId: string,
   userAnswerIndex: number,
+  userExpectationIndex: number,
   grade: string
 ) {
-  const userSessionModel = this;
   const changesAsSet: any = {};
   changesAsSet[
-    `userResponses.${userAnswerIndex}.expectationScore.graderGrade`
+    `userResponses.${userAnswerIndex}.expectationScores.${userExpectationIndex}.graderGrade`
   ] = grade;
-  return await userSessionModel.findOneAndUpdate(
+  return await this.findOneAndUpdate(
     sessionId,
     {
       $set: changesAsSet,

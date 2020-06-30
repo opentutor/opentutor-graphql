@@ -48,7 +48,7 @@ describe('userSession', () => {
             }
             userResponses {
               text
-              expectationScore {
+              expectationScores {
                 classifierGrade
                 graderGrade
               }
@@ -71,17 +71,21 @@ describe('userSession', () => {
       userResponses: [
         {
           text: 'answer1',
-          expectationScore: {
-            classifierGrade: 'Good',
-            graderGrade: '',
-          },
+          expectationScores: [
+            {
+              classifierGrade: 'Good',
+              graderGrade: '',
+            },
+          ],
         },
         {
           text: 'answer2',
-          expectationScore: {
-            classifierGrade: 'Bad',
-            graderGrade: '',
-          },
+          expectationScores: [
+            {
+              classifierGrade: 'Bad',
+              graderGrade: '',
+            },
+          ],
         },
       ],
     });
