@@ -38,7 +38,7 @@ describe('userSession', () => {
       .post('/grading-api')
       .send({
         query: `query { 
-          userSession(sessionId: "session1") { 
+          userSession(sessionId: "session 1") { 
             username
             question {
               text

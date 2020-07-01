@@ -53,7 +53,7 @@ describe('setGrade', () => {
       .post('/grading-api')
       .send({
         query: `mutation { 
-          setGrade(sessionId: "session1", userExpectationIndex: 0, grade: "Bad") { 
+          setGrade(sessionId: "session 1", userExpectationIndex: 0, grade: "Bad") { 
             username
           } 
         }`,
@@ -68,7 +68,7 @@ describe('setGrade', () => {
       .post('/grading-api')
       .send({
         query: `mutation { 
-          setGrade(sessionId: "session1", userAnswerIndex: 0, grade: "Bad") { 
+          setGrade(sessionId: "session 1", userAnswerIndex: 0, grade: "Bad") { 
             username
           } 
         }`,
@@ -83,7 +83,7 @@ describe('setGrade', () => {
       .post('/grading-api')
       .send({
         query: `mutation { 
-          setGrade(sessionId: "session1", userAnswerIndex: 0, userExpectationIndex: 0) { 
+          setGrade(sessionId: "session 1", userAnswerIndex: 0, userExpectationIndex: 0) { 
             username
           } 
         }`,
@@ -98,7 +98,7 @@ describe('setGrade', () => {
       .post('/grading-api')
       .send({
         query: `mutation { 
-          setGrade(sessionId: "session1", userAnswerIndex: 0, userExpectationIndex: 0, grade: "Bad") { 
+          setGrade(sessionId: "session 1", userAnswerIndex: 0, userExpectationIndex: 0, grade: "Bad") { 
             username
             question {
               text
@@ -156,7 +156,7 @@ describe('setGrade', () => {
       .post('/grading-api')
       .send({
         query: `mutation { 
-          setGrade(sessionId: "session1", userAnswerIndex: 0, userExpectationIndex: 0, grade: "Bad") { 
+          setGrade(sessionId: "session 1", userAnswerIndex: 0, userExpectationIndex: 0, grade: "Bad") { 
             username
             question {
               text
@@ -179,7 +179,7 @@ describe('setGrade', () => {
       .post('/grading-api')
       .send({
         query: `query { 
-          userSession(sessionId: "session1") { 
+          userSession(sessionId: "session 1") { 
             username
             question {
               text

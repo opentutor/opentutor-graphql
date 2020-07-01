@@ -3,6 +3,7 @@ import {
   GraphQLString,
   GraphQLObjectType,
   GraphQLID,
+  GraphQLFloat,
 } from 'graphql';
 import QuestionType from './question';
 import ResponseType from './response';
@@ -15,6 +16,7 @@ export const UserSessionType = new GraphQLObjectType({
     username: { type: GraphQLString },
     question: { type: QuestionType },
     userResponses: { type: GraphQLList(ResponseType) },
+    score: { type: GraphQLFloat },
   },
 });
 

@@ -4,7 +4,7 @@ const { ObjectId } = mongoose.Types;
 module.exports = {
   usersessions: [
     {
-      sessionId: 'session1',
+      sessionId: 'session 1',
       username: 'username1',
       question: {
         text: 'question?',
