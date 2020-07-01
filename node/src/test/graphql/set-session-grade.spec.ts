@@ -20,7 +20,7 @@ describe('setSessionGrade', () => {
 
   it(`returns an error if invalid sessionId`, async () => {
     const response = await request(app)
-      .post('/grading')
+      .post('/grading-api')
       .send({
         query: `mutation { 
           setSessionGrade(sessionId: "invalidsession") { 
@@ -35,7 +35,7 @@ describe('setSessionGrade', () => {
 
   it(`returns an error if no sessionId`, async () => {
     const response = await request(app)
-      .post('/grading')
+      .post('/grading-api')
       .send({
         query: `mutation { 
           setSessionGrade(grade: 0) { 
@@ -50,7 +50,7 @@ describe('setSessionGrade', () => {
 
   it(`returns an error if no grade`, async () => {
     const response = await request(app)
-      .post('/grading')
+      .post('/grading-api')
       .send({
         query: `mutation { 
           setSessionGrade(sessionId: "session 1") { 
@@ -65,7 +65,7 @@ describe('setSessionGrade', () => {
 
   it('returns updated session', async () => {
     const response = await request(app)
-      .post('/grading')
+      .post('/grading-api')
       .send({
         query: `mutation { 
           setSessionGrade(sessionId: "session 1", grade: 0) { 

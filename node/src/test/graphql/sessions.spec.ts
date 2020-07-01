@@ -20,7 +20,7 @@ describe('sessions', () => {
 
   it('gets a page of all sessions', async () => {
     const response = await request(app)
-      .post('/grading')
+      .post('/grading-api')
       .send({
         query:
           '{ sessions { edges { cursor node { sessionId classifierGrade grade } } pageInfo { hasNextPage } } }',
@@ -58,7 +58,7 @@ describe('sessions', () => {
 
   it('gets a page of 1 sessions', async () => {
     const response = await request(app)
-      .post('/grading')
+      .post('/grading-api')
       .send({
         query:
           '{ sessions(limit: 1) { edges { cursor node { sessionId classifierGrade grade } } pageInfo { hasNextPage } } }',
@@ -88,7 +88,7 @@ describe('sessions', () => {
 
   it('gets next page after cursor', async () => {
     const response = await request(app)
-      .post('/grading')
+      .post('/grading-api')
       .send({
         query:
           '{ sessions(limit: 1, cursor: "NWVmYjg5YzRmZTMzMTRmOWEwYzExZWVk") { edges { node { sessionId classifierGrade grade } } pageInfo { hasNextPage } } }',

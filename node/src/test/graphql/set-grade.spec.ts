@@ -20,7 +20,7 @@ describe('setGrade', () => {
 
   it(`returns an error if invalid sessionId`, async () => {
     const response = await request(app)
-      .post('/grading')
+      .post('/grading-api')
       .send({
         query: `mutation { 
           setGrade(sessionId: "invalidsession") { 
@@ -35,7 +35,7 @@ describe('setGrade', () => {
 
   it(`returns an error if no sessionId`, async () => {
     const response = await request(app)
-      .post('/grading')
+      .post('/grading-api')
       .send({
         query: `mutation { 
           setGrade(userAnswerIndex: 0, userExpectationIndex: 0, grade: "Bad") { 
@@ -50,7 +50,7 @@ describe('setGrade', () => {
 
   it(`returns an error if no userAnswerIndex`, async () => {
     const response = await request(app)
-      .post('/grading')
+      .post('/grading-api')
       .send({
         query: `mutation { 
           setGrade(sessionId: "session1", userExpectationIndex: 0, grade: "Bad") { 
@@ -65,7 +65,7 @@ describe('setGrade', () => {
 
   it(`returns an error if no userExpectationIndex`, async () => {
     const response = await request(app)
-      .post('/grading')
+      .post('/grading-api')
       .send({
         query: `mutation { 
           setGrade(sessionId: "session1", userAnswerIndex: 0, grade: "Bad") { 
@@ -80,7 +80,7 @@ describe('setGrade', () => {
 
   it(`returns an error if no grade`, async () => {
     const response = await request(app)
-      .post('/grading')
+      .post('/grading-api')
       .send({
         query: `mutation { 
           setGrade(sessionId: "session1", userAnswerIndex: 0, userExpectationIndex: 0) { 
@@ -95,7 +95,7 @@ describe('setGrade', () => {
 
   it('returns updated user session', async () => {
     const response = await request(app)
-      .post('/grading')
+      .post('/grading-api')
       .send({
         query: `mutation { 
           setGrade(sessionId: "session1", userAnswerIndex: 0, userExpectationIndex: 0, grade: "Bad") { 
@@ -153,7 +153,7 @@ describe('setGrade', () => {
 
   it('updates user session in database', async () => {
     await request(app)
-      .post('/grading')
+      .post('/grading-api')
       .send({
         query: `mutation { 
           setGrade(sessionId: "session1", userAnswerIndex: 0, userExpectationIndex: 0, grade: "Bad") { 
@@ -176,7 +176,7 @@ describe('setGrade', () => {
       });
 
     const response = await request(app)
-      .post('/grading')
+      .post('/grading-api')
       .send({
         query: `query { 
           userSession(sessionId: "session1") { 
