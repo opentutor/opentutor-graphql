@@ -10,6 +10,7 @@ export const SessionType = new GraphQLObjectType({
   fields: {
     id: { type: GraphQLID },
     sessionId: { type: GraphQLString },
+    username: { type: GraphQLString },
     classifierGrade: { type: GraphQLFloat },
     grade: { type: GraphQLFloat },
   },

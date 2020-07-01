@@ -16,7 +16,7 @@ export interface UserSessionModel extends Model<UserSession> {
     userAnswerIndex: number,
     userExpectationIndex: number,
     grade: string
-  ): Promise<UserSessionModel>;
+  ): Promise<UserSession>;
 }
 
 export const UserSessionSchema = new Schema(

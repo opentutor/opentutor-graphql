@@ -40,6 +40,7 @@ module.exports = {
     {
       _id: ObjectId('5efb89c4fe3314f9a0c11eed'),
       sessionId: 'session 1',
+      username: 'username1',
       classifierGrade: 1.0,
       grade: 1.0,
     },

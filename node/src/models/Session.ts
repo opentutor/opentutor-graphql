@@ -3,6 +3,7 @@ import { PaginatedResolveResult } from './PaginatedResolveResult';
 
 export interface Session extends Document {
   sessionId: string;
+  username: string;
   classifierGrade: number;
   grade: number;
 }
@@ -13,17 +14,36 @@ export interface SessionModel extends Model<Session> {
     options?: any,
     callback?: any
   ): Promise<PaginatedResolveResult<Session>>;
+
+  setGrade(sessionId: string, grade: number): Promise<Session>;
 }
 
 export const SessionSchema = new Schema(
   {
     sessionId: { type: String, required: '{PATH} is required!' },
+    username: { type: String },
     classifierGrade: { type: Number },
     grade: { type: Number },
   },
   { timestamps: true }
 );
-
 SessionSchema.plugin(require('mongoose-cursor-pagination').default);
+
+SessionSchema.statics.setGrade = async function(
+  sessionId: string,
+  grade: number
+) {
+  return await this.findOneAndUpdate(
+    sessionId,
+    {
+      $set: {
+        grade: grade,
+      },
+    },
+    {
+      new: true,
+    }
+  );
+};
 
 export default mongoose.model<Session, SessionModel>('Session', SessionSchema);

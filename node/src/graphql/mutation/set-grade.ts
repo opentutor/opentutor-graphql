@@ -10,15 +10,7 @@ export const setGrade = {
     userExpectationIndex: { type: GraphQLInt },
     grade: { type: GraphQLString },
   },
-  resolve: async (
-    root: any,
-    args: {
-      sessionId: string;
-      userAnswerIndex: number;
-      userExpectationIndex: number;
-      grade: string;
-    }
-  ) => {
+  resolve: async (root: any, args: any) => {
     if (args.sessionId === undefined) {
       throw new Error('missing required param sessionId');
     }
