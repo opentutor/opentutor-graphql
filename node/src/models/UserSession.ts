@@ -41,7 +41,9 @@ UserSessionSchema.statics.setGrade = async function(
     `userResponses.${userAnswerIndex}.expectationScores.${userExpectationIndex}.graderGrade`
   ] = grade;
   return await this.findOneAndUpdate(
-    sessionId,
+    {
+      sessionId: sessionId,
+    },
     {
       $set: changesAsSet,
     },

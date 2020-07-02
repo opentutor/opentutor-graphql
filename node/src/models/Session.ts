@@ -34,7 +34,9 @@ SessionSchema.statics.setGrade = async function(
   grade: number
 ) {
   return await this.findOneAndUpdate(
-    sessionId,
+    {
+      sessionId: sessionId,
+    },
     {
       $set: {
         grade: grade,
