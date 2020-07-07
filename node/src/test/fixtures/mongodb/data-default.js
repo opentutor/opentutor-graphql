@@ -34,6 +34,25 @@ module.exports = {
         },
       ],
     },
+    {
+      sessionId: 'session 2',
+      username: 'username2',
+      question: {
+        text: 'question',
+        expectations: [{ text: 'expectation text' }],
+      },
+      userResponses: [
+        {
+          text: 'answer1',
+          expectationScores: [
+            {
+              classifierGrade: 'Good',
+              graderGrade: '',
+            },
+          ],
+        },
+      ],
+    },
   ],
 
   sessions: [

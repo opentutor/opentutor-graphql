@@ -6,8 +6,16 @@ export interface ExpectationScore extends Document {
 }
 
 export const ExpectationScoreSchema = new Schema({
-  classifierGrade: { type: String },
-  graderGrade: { type: String },
+  classifierGrade: {
+    type: String,
+    enum: ['Good', 'Bad', 'Neutral'],
+    default: 'Neutral',
+  },
+  graderGrade: {
+    type: String,
+    enum: ['Good', 'Bad', 'Neutral', null],
+    default: null,
+  },
 });
 
 export default mongoose.model<ExpectationScore>(

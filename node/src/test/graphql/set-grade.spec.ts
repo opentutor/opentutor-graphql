@@ -100,6 +100,7 @@ describe('setGrade', () => {
         query: `mutation { 
           setGrade(sessionId: "session 1", userAnswerIndex: 0, userExpectationIndex: 0, grade: "Bad") { 
             username
+            score
             question {
               text
               expectations {
@@ -121,6 +122,7 @@ describe('setGrade', () => {
     expect(response.status).to.equal(200);
     expect(userSession).to.eql({
       username: 'username1',
+      score: null,
       question: {
         text: 'question?',
         expectations: [
@@ -158,19 +160,6 @@ describe('setGrade', () => {
         query: `mutation { 
           setGrade(sessionId: "session 1", userAnswerIndex: 0, userExpectationIndex: 0, grade: "Bad") { 
             username
-            question {
-              text
-              expectations {
-                text
-              }
-            }
-            userResponses {
-              text
-              expectationScores {
-                classifierGrade
-                graderGrade
-              }
-            }
           } 
         }`,
       });
@@ -181,6 +170,7 @@ describe('setGrade', () => {
         query: `query { 
           userSession(sessionId: "session 1") { 
             username
+            score
             question {
               text
               expectations {
@@ -201,6 +191,7 @@ describe('setGrade', () => {
     expect(response.status).to.equal(200);
     expect(userSession).to.eql({
       username: 'username1',
+      score: null,
       question: {
         text: 'question?',
         expectations: [
@@ -228,6 +219,166 @@ describe('setGrade', () => {
           ],
         },
       ],
+    });
+  });
+
+  it('calculates and updates GOOD score', async () => {
+    await request(app)
+      .post('/grading-api')
+      .send({
+        query: `mutation { 
+          setGrade(sessionId: "session 2", userAnswerIndex: 0, userExpectationIndex: 0, grade: "Good") { 
+            username
+          } 
+        }`,
+      });
+
+    const userSession = await request(app)
+      .post('/grading-api')
+      .send({
+        query: `query { 
+          userSession(sessionId: "session 2") { 
+            score
+          } 
+        }`,
+      });
+    expect(userSession.status).to.equal(200);
+    expect(userSession.body.data.userSession).to.eql({
+      score: 1,
+    });
+
+    const session = await request(app)
+      .post('/grading-api')
+      .send({
+        query: `query { 
+          session(sessionId: "session 2") { 
+            grade
+          } 
+        }`,
+      });
+    expect(session.status).to.equal(200);
+    expect(session.body.data.session).to.eql({
+      grade: 1,
+    });
+  });
+
+  it('calculates and updates BAD score', async () => {
+    await request(app)
+      .post('/grading-api')
+      .send({
+        query: `mutation { 
+          setGrade(sessionId: "session 2", userAnswerIndex: 0, userExpectationIndex: 0, grade: "Bad") { 
+            username
+          } 
+        }`,
+      });
+
+    const userSession = await request(app)
+      .post('/grading-api')
+      .send({
+        query: `query { 
+          userSession(sessionId: "session 2") { 
+            score
+          } 
+        }`,
+      });
+    expect(userSession.status).to.equal(200);
+    expect(userSession.body.data.userSession).to.eql({
+      score: 0,
+    });
+
+    const session = await request(app)
+      .post('/grading-api')
+      .send({
+        query: `query { 
+          session(sessionId: "session 2") { 
+            grade
+          } 
+        }`,
+      });
+    expect(session.status).to.equal(200);
+    expect(session.body.data.session).to.eql({
+      grade: 0,
+    });
+  });
+
+  it('calculates and updates NEUTRAL score', async () => {
+    await request(app)
+      .post('/grading-api')
+      .send({
+        query: `mutation { 
+          setGrade(sessionId: "session 2", userAnswerIndex: 0, userExpectationIndex: 0, grade: "Neutral") { 
+            username
+          } 
+        }`,
+      });
+
+    const userSession = await request(app)
+      .post('/grading-api')
+      .send({
+        query: `query { 
+          userSession(sessionId: "session 2") { 
+            score
+          } 
+        }`,
+      });
+    expect(userSession.status).to.equal(200);
+    expect(userSession.body.data.userSession).to.eql({
+      score: 0.5,
+    });
+
+    const session = await request(app)
+      .post('/grading-api')
+      .send({
+        query: `query { 
+          session(sessionId: "session 2") { 
+            grade
+          } 
+        }`,
+      });
+    expect(session.status).to.equal(200);
+    expect(session.body.data.session).to.eql({
+      grade: 0.5,
+    });
+  });
+
+  it('calculates and updates NO score', async () => {
+    await request(app)
+      .post('/grading-api')
+      .send({
+        query: `mutation { 
+          setGrade(sessionId: "session 2", userAnswerIndex: 0, userExpectationIndex: 0, grade: "") { 
+            username
+          } 
+        }`,
+      });
+
+    const userSession = await request(app)
+      .post('/grading-api')
+      .send({
+        query: `query { 
+          userSession(sessionId: "session 2") { 
+            score
+          } 
+        }`,
+      });
+    expect(userSession.status).to.equal(200);
+    expect(userSession.body.data.userSession).to.eql({
+      score: null,
+    });
+
+    const session = await request(app)
+      .post('/grading-api')
+      .send({
+        query: `query { 
+          session(sessionId: "session 2") { 
+            grade
+          } 
+        }`,
+      });
+    expect(session.status).to.equal(200);
+    expect(session.body.data.session).to.eql({
+      grade: null,
     });
   });
 });
