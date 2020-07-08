@@ -8,7 +8,7 @@ describe('session', () => {
   let app: Express;
 
   beforeEach(async () => {
-    await mongoUnit.load(require('../fixtures/mongodb/data-default.js'));
+    await mongoUnit.load(require('test/fixtures/mongodb/data-default.js'));
     app = await createApp();
     await appStart();
   });

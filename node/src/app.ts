@@ -13,7 +13,7 @@ export default async function createApp(): Promise<Express> {
   if (process.env.NODE_ENV !== 'production') {
     require('longjohn'); // full stack traces when testing
   }
-  const configureEnv = (await import('./utils/configure-env')).default;
+  const configureEnv = (await import('utils/configure-env')).default;
   configureEnv();
   if (process.env['APP_DISABLE_AUTO_START'] !== 'true') {
     await appStart();
@@ -64,7 +64,7 @@ export default async function createApp(): Promise<Express> {
 }
 
 export async function appStart() {
-  const mongooseConnect = (await import('./utils/mongoose-connect')).default;
+  const mongooseConnect = (await import('utils/mongoose-connect')).default;
   await mongooseConnect(process.env.MONGO_URI);
 }
 

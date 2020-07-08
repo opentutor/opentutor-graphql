@@ -1,7 +1,7 @@
 /**
  * Module dependencies.
  */
-import createApp from './app';
+import createApp from 'app';
 const debug = require('debug')('opentutor-grading:server');
 const http = require('http');
 
