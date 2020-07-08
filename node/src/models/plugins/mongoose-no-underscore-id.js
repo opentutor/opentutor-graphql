@@ -4,7 +4,7 @@
  */
 function noUnderscoreId(schema) {
   // Duplicate the ID field.
-  schema.virtual('id').get(function() {
+  schema.virtual('id').get(function () {
     return this._id;
   });
 

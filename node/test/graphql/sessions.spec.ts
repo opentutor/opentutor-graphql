@@ -1,4 +1,4 @@
-import createApp, { appStart, appStop } from '../../app';
+import createApp, { appStart, appStop } from 'app';
 import { expect } from 'chai';
 import { Express } from 'express';
 import mongoUnit from 'mongo-unit';
@@ -19,12 +19,10 @@ describe('sessions', () => {
   });
 
   it('gets a page of all sessions', async () => {
-    const response = await request(app)
-      .post('/grading-api')
-      .send({
-        query:
-          '{ sessions { edges { cursor node { sessionId classifierGrade grade } } pageInfo { hasNextPage } } }',
-      });
+    const response = await request(app).post('/grading-api').send({
+      query:
+        '{ sessions { edges { cursor node { sessionId classifierGrade grade } } pageInfo { hasNextPage } } }',
+    });
 
     expect(response.status).to.equal(200);
     expect(response.body).to.eql({
@@ -57,12 +55,10 @@ describe('sessions', () => {
   });
 
   it('gets a page of 1 sessions', async () => {
-    const response = await request(app)
-      .post('/grading-api')
-      .send({
-        query:
-          '{ sessions(limit: 1) { edges { cursor node { sessionId classifierGrade grade } } pageInfo { hasNextPage } } }',
-      });
+    const response = await request(app).post('/grading-api').send({
+      query:
+        '{ sessions(limit: 1) { edges { cursor node { sessionId classifierGrade grade } } pageInfo { hasNextPage } } }',
+    });
 
     expect(response.status).to.equal(200);
     expect(response.body).to.eql({
@@ -87,12 +83,10 @@ describe('sessions', () => {
   });
 
   it('gets next page after cursor', async () => {
-    const response = await request(app)
-      .post('/grading-api')
-      .send({
-        query:
-          '{ sessions(limit: 1, cursor: "NWVmYjg5YzRmZTMzMTRmOWEwYzExZWVk") { edges { node { sessionId classifierGrade grade } } pageInfo { hasNextPage } } }',
-      });
+    const response = await request(app).post('/grading-api').send({
+      query:
+        '{ sessions(limit: 1, cursor: "NWVmYjg5YzRmZTMzMTRmOWEwYzExZWVk") { edges { node { sessionId classifierGrade grade } } pageInfo { hasNextPage } } }',
+    });
 
     expect(response.status).to.equal(200);
     expect(response.body).to.eql({

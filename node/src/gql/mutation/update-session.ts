@@ -1,7 +1,6 @@
 import { GraphQLString } from 'graphql';
-import UserSessionType from '../types/user-session';
-import UserSessionSchema from '../../models/UserSession';
-import SessionSchema from '../../models/Session';
+import UserSessionType from 'gql/types/user-session';
+import { Session, UserSession } from 'models';
 
 export const updateSession = {
   type: UserSessionType,
@@ -18,7 +17,7 @@ export const updateSession = {
     }
     const userSession = JSON.parse(decodeURI(args.userSession));
 
-    await SessionSchema.findOneAndUpdate(
+    await Session.findOneAndUpdate(
       {
         sessionId: args.sessionId,
       },
@@ -34,7 +33,7 @@ export const updateSession = {
       }
     );
 
-    return await UserSessionSchema.findOneAndUpdate(
+    return await UserSession.findOneAndUpdate(
       {
         sessionId: args.sessionId,
       },

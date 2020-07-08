@@ -29,7 +29,7 @@ export const SessionSchema = new Schema(
 );
 SessionSchema.plugin(require('mongoose-cursor-pagination').default);
 
-SessionSchema.statics.setGrade = async function(
+SessionSchema.statics.setGrade = async function (
   sessionId: string,
   grade: number
 ) {

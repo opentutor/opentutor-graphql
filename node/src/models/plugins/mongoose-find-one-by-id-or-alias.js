@@ -11,7 +11,7 @@ function findOneByIdOrAlias(schema) {
    * @param callback - (optional) function(err, doc)
    * @return if callback passed, void if no callback passed, the query
    */
-  schema.statics.findOneByIdOrAlias = function(idOrAlias, fields, callback) {
+  schema.statics.findOneByIdOrAlias = function (idOrAlias, fields, callback) {
     if (typeof fields === 'function') {
       // Scenario: findWithLimit(conditions, callback)
       callback = fields;

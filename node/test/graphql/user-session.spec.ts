@@ -1,4 +1,4 @@
-import createApp, { appStart, appStop } from '../../app';
+import createApp, { appStart, appStop } from 'app';
 import { expect } from 'chai';
 import { Express } from 'express';
 import mongoUnit from 'mongo-unit';
@@ -19,25 +19,21 @@ describe('userSession', () => {
   });
 
   it(`returns an error if invalid sessionId`, async () => {
-    const response = await request(app)
-      .post('/grading-api')
-      .send({
-        query: `query { 
+    const response = await request(app).post('/grading-api').send({
+      query: `query { 
           userSession(sessionId: "invalidsession") { 
             username
           } 
         }`,
-      });
+    });
 
     expect(response.status).to.equal(200);
     expect(response.body).to.have.deep.nested.property('errors[0].message');
   });
 
   it('succeeds with valid sessionId', async () => {
-    const response = await request(app)
-      .post('/grading-api')
-      .send({
-        query: `query { 
+    const response = await request(app).post('/grading-api').send({
+      query: `query { 
           userSession(sessionId: "session 1") { 
             username
             question {
@@ -55,7 +51,7 @@ describe('userSession', () => {
             }
           } 
         }`,
-      });
+    });
 
     const userSession = response.body.data.userSession;
     expect(response.status).to.equal(200);

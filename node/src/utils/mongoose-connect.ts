@@ -16,8 +16,9 @@ export default async function mongooseConnect(uri: string) {
     process.env.MONGO_URI ||
     `mongodb://${requireEnv('MONGO_USER')}:${requireEnv(
       'MONGO_PASSWORD'
-    )}@${requireEnv('MONGO_HOST')}/${requireEnv('MONGO_DB')}${process.env
-      .MONGO_QUERY_STRING || ''}`;
+    )}@${requireEnv('MONGO_HOST')}/${requireEnv('MONGO_DB')}${
+      process.env.MONGO_QUERY_STRING || ''
+    }`;
   await mongoose.connect(mongoUri, {
     useNewUrlParser: true,
     useUnifiedTopology: true,

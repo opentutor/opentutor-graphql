@@ -31,7 +31,7 @@ export const UserSessionSchema = new Schema(
   { timestamps: true }
 );
 
-UserSessionSchema.statics.setGrade = async function(
+UserSessionSchema.statics.setGrade = async function (
   sessionId: string,
   userAnswerIndex: number,
   userExpectationIndex: number,
