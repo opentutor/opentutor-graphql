@@ -1,6 +1,7 @@
 import { GraphQLString } from 'graphql';
 import UserSessionType from 'gql/types/user-session';
 import { Session, UserSession } from 'models';
+import calculateScore from 'models/utils/calculate-score';
 
 export const updateSession = {
   type: UserSessionType,
@@ -16,6 +17,8 @@ export const updateSession = {
       throw new Error('missing required param userSession');
     }
     const userSession = JSON.parse(decodeURI(args.userSession));
+    const grade = calculateScore(userSession, 'graderGrade');
+    const classifierGrade = calculateScore(userSession, 'classifierGrade');
 
     await Session.findOneAndUpdate(
       {
@@ -23,8 +26,10 @@ export const updateSession = {
       },
       {
         $set: {
-          sessionId: args.sessionId,
+          sessionId: userSession.sessionId,
           username: userSession.username,
+          grade: grade,
+          classifierGrade: classifierGrade,
         },
       },
       {
@@ -40,6 +45,7 @@ export const updateSession = {
       {
         $set: {
           ...userSession,
+          score: grade,
         },
       },
       {

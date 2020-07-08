@@ -88,6 +88,7 @@ describe('updateSession', () => {
           } 
         }`,
       });
+
     expect(response.status).to.equal(200);
     expect(response.body.data.updateSession).to.eql({
       sessionId: 'new session',
@@ -229,7 +230,7 @@ describe('updateSession', () => {
     expect(response.body.data.session).to.eql({
       sessionId: 'new session',
       username: 'new username',
-      classifierGrade: null,
+      classifierGrade: 1,
       grade: null,
     });
   });
@@ -354,7 +355,58 @@ describe('updateSession', () => {
       sessionId: 'session 1',
       username: 'new username',
       classifierGrade: 1,
-      grade: 1,
+      grade: null,
+    });
+  });
+
+  it(`calculates grader and classifier scores`, async () => {
+    const userSession = encodeURI(
+      JSON.stringify({
+        sessionId: 'new session',
+        username: 'new username',
+        question: {
+          text: 'new question',
+          expectations: [{ text: 'new expected text' }],
+        },
+        userResponses: [
+          {
+            text: 'new answer',
+            expectationScores: [
+              {
+                classifierGrade: 'Good',
+                graderGrade: 'Bad',
+              },
+            ],
+          },
+        ],
+      })
+    );
+    const updated = await request(app)
+      .post('/grading-api')
+      .send({
+        query: `mutation { 
+            updateSession(sessionId: "new session", userSession: "${userSession}") { 
+              score
+            }
+          }`,
+      });
+    expect(updated.status).to.equal(200);
+    expect(updated.body.data.updateSession).to.eql({
+      score: 0,
+    });
+
+    const session = await request(app).post('/grading-api').send({
+      query: `query { 
+            session(sessionId: "new session") { 
+              classifierGrade
+              grade
+            } 
+          }`,
+    });
+    expect(session.status).to.equal(200);
+    expect(session.body.data.session).to.eql({
+      classifierGrade: 1,
+      grade: 0,
     });
   });
 });

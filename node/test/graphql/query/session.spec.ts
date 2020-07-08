@@ -35,7 +35,7 @@ describe('session', () => {
     const response = await request(app).post('/grading-api').send({
       query: `query { 
           session(sessionId: "session 1") { 
-              sessionId
+            sessionId
             username
             classifierGrade
             grade
