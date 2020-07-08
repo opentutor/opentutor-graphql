@@ -7,7 +7,7 @@ const mongoose = require('mongoose');
  * @returns the _id property of the given object or the object itself
  */
 function toIdPlugin(schema) {
-  const toId = obj => {
+  const toId = (obj) => {
     if (obj instanceof mongoose.Types.ObjectId) {
       return obj;
     }

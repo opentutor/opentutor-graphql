@@ -1,21 +1,19 @@
 import bodyParser from 'body-parser';
-import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express, { Request, Response, NextFunction, Express } from 'express';
-import expressValidator from 'express-validator';
-import graphqlHTTP from 'express-graphql';
+import { graphqlHTTP } from 'express-graphql';
 import mongoose from 'mongoose';
 import morgan from 'morgan';
 import path from 'path';
 
-import { logger } from './utils/logging';
-import schema from './graphql/schema';
+import { logger } from 'utils/logging';
+import schema from 'gql/schema';
 
 export default async function createApp(): Promise<Express> {
   if (process.env.NODE_ENV !== 'production') {
     require('longjohn'); // full stack traces when testing
   }
-  const configureEnv = (await import('./utils/configure-env')).default;
+  const configureEnv = (await import('utils/configure-env')).default;
   configureEnv();
   if (process.env['APP_DISABLE_AUTO_START'] !== 'true') {
     await appStart();
@@ -33,30 +31,8 @@ export default async function createApp(): Promise<Express> {
     })
   );
   app.use(bodyParser.json());
-  app.use(bodyParser.urlencoded({ extended: true }));
-  app.use(
-    expressValidator({
-      customValidators: {
-        isArray: function(value: any) {
-          return Array.isArray(value);
-        },
-        gte: function(param: any, num: any) {
-          return param >= num;
-        },
-      },
-    })
-  );
-  app.use(cookieParser());
   app.use(express.static(path.join(__dirname, 'public')));
-  app.use(require('./middlewares/send-404')());
-  app.use(require('./middlewares/send-object')()); // special handling for mongoose objects (like convert to string array if array of objects with only id)
-  app.use(require('./middlewares/fields-parser')()); // special handling for mongoose objects (like convert to string array if array of objects with only id)
-  app.use(function(req: Request, res: Response) {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-    // @ts-ignore-next-line
-    res.send404(); // replace this with an imported function that takes a Response as param
-  });
-  app.use(function(
+  app.use(function (
     err: any,
     req: Request,
     res: Response,
@@ -88,7 +64,7 @@ export default async function createApp(): Promise<Express> {
 }
 
 export async function appStart() {
-  const mongooseConnect = (await import('./utils/mongoose-connect')).default;
+  const mongooseConnect = (await import('utils/mongoose-connect')).default;
   await mongooseConnect(process.env.MONGO_URI);
 }
 

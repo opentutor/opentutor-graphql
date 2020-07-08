@@ -1,5 +1,5 @@
-import { appStop } from '../app';
-import { logger } from '../utils/logging';
+import { appStop } from 'app';
+import { logger } from 'utils/logging';
 import mongoUnit from 'mongo-unit';
 import { fixturePath } from './helpers';
 
@@ -20,7 +20,7 @@ after(async () => {
   }
 });
 
-mongoUnit.start().then(url => {
+mongoUnit.start().then((url) => {
   process.env.MONGO_URI = url; // this const process.env.DATABASE_URL = will keep link to fake mongo
   run(); // this line start mocha tests
 });

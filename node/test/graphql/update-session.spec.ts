@@ -1,4 +1,4 @@
-import createApp, { appStart, appStop } from '../../app';
+import createApp, { appStart, appStop } from 'app';
 import { expect } from 'chai';
 import { Express } from 'express';
 import mongoUnit from 'mongo-unit';
@@ -8,7 +8,7 @@ describe('updateSession', () => {
   let app: Express;
 
   beforeEach(async () => {
-    await mongoUnit.load(require('../fixtures/mongodb/data-default.js'));
+    await mongoUnit.load(require('test/fixtures/mongodb/data-default.js'));
     app = await createApp();
     await appStart();
   });
@@ -19,30 +19,26 @@ describe('updateSession', () => {
   });
 
   it(`returns an error if no sessionId`, async () => {
-    const response = await request(app)
-      .post('/grading-api')
-      .send({
-        query: `mutation { 
+    const response = await request(app).post('/grading-api').send({
+      query: `mutation { 
           updateSession(userSession: "") { 
             username
           } 
         }`,
-      });
+    });
 
     expect(response.status).to.equal(200);
     expect(response.body).to.have.deep.nested.property('errors[0].message');
   });
 
   it(`returns an error if no userSession`, async () => {
-    const response = await request(app)
-      .post('/grading-api')
-      .send({
-        query: `mutation { 
+    const response = await request(app).post('/grading-api').send({
+      query: `mutation { 
           updateSession(sessionId: "new session") { 
             username
           } 
         }`,
-      });
+    });
 
     expect(response.status).to.equal(200);
     expect(response.body).to.have.deep.nested.property('errors[0].message');
@@ -145,10 +141,8 @@ describe('updateSession', () => {
           }`,
       });
 
-    const response = await request(app)
-      .post('/grading-api')
-      .send({
-        query: `query { 
+    const response = await request(app).post('/grading-api').send({
+      query: `query { 
             userSession(sessionId: "new session") { 
               sessionId
               username
@@ -167,7 +161,7 @@ describe('updateSession', () => {
               }
             } 
           }`,
-      });
+    });
     expect(response.status).to.equal(200);
     expect(response.body.data.userSession).to.eql({
       sessionId: 'new session',
@@ -221,10 +215,8 @@ describe('updateSession', () => {
           }`,
       });
 
-    const response = await request(app)
-      .post('/grading-api')
-      .send({
-        query: `query { 
+    const response = await request(app).post('/grading-api').send({
+      query: `query { 
             session(sessionId: "new session") { 
               sessionId
               username
@@ -232,7 +224,7 @@ describe('updateSession', () => {
               grade
             } 
           }`,
-      });
+    });
     expect(response.status).to.equal(200);
     expect(response.body.data.session).to.eql({
       sessionId: 'new session',
@@ -273,10 +265,8 @@ describe('updateSession', () => {
           }`,
       });
 
-    const response = await request(app)
-      .post('/grading-api')
-      .send({
-        query: `query { 
+    const response = await request(app).post('/grading-api').send({
+      query: `query { 
             userSession(sessionId: "session 1") { 
               sessionId
               username
@@ -295,7 +285,7 @@ describe('updateSession', () => {
               }
             } 
           }`,
-      });
+    });
     expect(response.status).to.equal(200);
     expect(response.body.data.userSession).to.eql({
       sessionId: 'session 1',
@@ -349,10 +339,8 @@ describe('updateSession', () => {
           }`,
       });
 
-    const response = await request(app)
-      .post('/grading-api')
-      .send({
-        query: `query { 
+    const response = await request(app).post('/grading-api').send({
+      query: `query { 
             session(sessionId: "session 1") { 
               sessionId
               username
@@ -360,7 +348,7 @@ describe('updateSession', () => {
               grade
             } 
           }`,
-      });
+    });
     expect(response.status).to.equal(200);
     expect(response.body.data.session).to.eql({
       sessionId: 'session 1',

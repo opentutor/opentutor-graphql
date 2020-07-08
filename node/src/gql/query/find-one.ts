@@ -1,6 +1,6 @@
 import { GraphQLObjectType, GraphQLID, GraphQLScalarType } from 'graphql';
 import { Types } from 'mongoose';
-import { HasFindOne } from '../types/mongoose-type-helpers';
+import { HasFindOne } from 'gql/types/mongoose-type-helpers';
 
 export interface ArgsConfig {
   [name: string]: {

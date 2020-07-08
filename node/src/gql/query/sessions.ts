@@ -1,5 +1,5 @@
-import Session from '../../models/Session';
-import SessionType from '../types/session';
+import { Session } from 'models';
+import SessionType from 'gql/types/session';
 import findAll from './find-all';
 
 export const sessions = findAll({

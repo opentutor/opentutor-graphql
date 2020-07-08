@@ -3,8 +3,8 @@ import {
   makeConnection,
   cursorToId,
   PaginatedResolveArgs,
-} from '../types/connection';
-import { HasPaginate } from '..//types/mongoose-type-helpers';
+} from 'gql/types/connection';
+import { HasPaginate } from 'gql/types/mongoose-type-helpers';
 
 export function findAll<T>(config: {
   nodeType: GraphQLObjectType;

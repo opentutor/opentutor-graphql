@@ -1,6 +1,6 @@
 import { GraphQLString, GraphQLInt } from 'graphql';
-import UserSessionType from '../types/user-session';
-import UserSessionSchema from '../../models/UserSession';
+import UserSessionType from 'gql/types/user-session';
+import { UserSession } from 'models';
 
 export const setGrade = {
   type: UserSessionType,
@@ -23,7 +23,7 @@ export const setGrade = {
     if (args.grade === undefined) {
       throw new Error('missing required param grade');
     }
-    return await UserSessionSchema.setGrade(
+    return await UserSession.setGrade(
       args.sessionId,
       args.userAnswerIndex,
       args.userExpectationIndex,
