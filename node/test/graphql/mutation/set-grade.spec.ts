@@ -18,19 +18,6 @@ describe('setGrade', () => {
     await mongoUnit.drop();
   });
 
-  it(`returns an error if invalid sessionId`, async () => {
-    const response = await request(app).post('/grading-api').send({
-      query: `mutation { 
-          setGrade(sessionId: "invalidsession") { 
-            username
-          } 
-        }`,
-    });
-
-    expect(response.status).to.equal(200);
-    expect(response.body).to.have.deep.nested.property('errors[0].message');
-  });
-
   it(`returns an error if no sessionId`, async () => {
     const response = await request(app).post('/grading-api').send({
       query: `mutation { 
@@ -41,7 +28,10 @@ describe('setGrade', () => {
     });
 
     expect(response.status).to.equal(200);
-    expect(response.body).to.have.deep.nested.property('errors[0].message');
+    expect(response.body).to.have.deep.nested.property(
+      'errors[0].message',
+      'missing required param sessionId'
+    );
   });
 
   it(`returns an error if no userAnswerIndex`, async () => {
@@ -54,7 +44,10 @@ describe('setGrade', () => {
     });
 
     expect(response.status).to.equal(200);
-    expect(response.body).to.have.deep.nested.property('errors[0].message');
+    expect(response.body).to.have.deep.nested.property(
+      'errors[0].message',
+      'missing required param userAnswerIndex'
+    );
   });
 
   it(`returns an error if no userExpectationIndex`, async () => {
@@ -67,7 +60,10 @@ describe('setGrade', () => {
     });
 
     expect(response.status).to.equal(200);
-    expect(response.body).to.have.deep.nested.property('errors[0].message');
+    expect(response.body).to.have.deep.nested.property(
+      'errors[0].message',
+      'missing required param userExpectationIndex'
+    );
   });
 
   it(`returns an error if no grade`, async () => {
@@ -80,11 +76,30 @@ describe('setGrade', () => {
     });
 
     expect(response.status).to.equal(200);
-    expect(response.body).to.have.deep.nested.property('errors[0].message');
+    expect(response.body).to.have.deep.nested.property(
+      'errors[0].message',
+      'missing required param grade'
+    );
+  });
+
+  it(`returns an error if invalid sessionId`, async () => {
+    const response = await request(app).post('/grading-api').send({
+      query: `mutation { 
+        setGrade(sessionId: "111111111111111111111111", userAnswerIndex: 0, userExpectationIndex: 0, grade: "Bad") { 
+          username
+          } 
+        }`,
+    });
+
+    expect(response.status).to.equal(200);
+    expect(response.body).to.have.deep.nested.property(
+      'errors[0].message',
+      'failed to find userSession with sessionId 111111111111111111111111'
+    );
   });
 
   it('returns updated user session', async () => {
-    const response = await request(app).post('/grading-api').send({
+    const setGrade = await request(app).post('/grading-api').send({
       query: `mutation { 
           setGrade(sessionId: "session 1", userAnswerIndex: 0, userExpectationIndex: 0, grade: "Bad") { 
             username
@@ -106,9 +121,8 @@ describe('setGrade', () => {
         }`,
     });
 
-    const userSession = response.body.data.setGrade;
-    expect(response.status).to.equal(200);
-    expect(userSession).to.eql({
+    expect(setGrade.status).to.equal(200);
+    expect(setGrade.body.data.setGrade).to.eql({
       username: 'username1',
       score: null,
       question: {
@@ -150,7 +164,7 @@ describe('setGrade', () => {
         }`,
     });
 
-    const response = await request(app).post('/grading-api').send({
+    const userSession = await request(app).post('/grading-api').send({
       query: `query { 
           userSession(sessionId: "session 1") { 
             username
@@ -171,9 +185,8 @@ describe('setGrade', () => {
           } 
         }`,
     });
-    const userSession = response.body.data.userSession;
-    expect(response.status).to.equal(200);
-    expect(userSession).to.eql({
+    expect(userSession.status).to.equal(200);
+    expect(userSession.body.data.userSession).to.eql({
       username: 'username1',
       score: null,
       question: {

@@ -3,6 +3,7 @@ import { PaginatedResolveResult } from './PaginatedResolveResult';
 
 export interface Session extends Document {
   sessionId: string;
+  lessonId: string;
   username: string;
   classifierGrade: number;
   grade: number;
@@ -21,6 +22,7 @@ export interface SessionModel extends Model<Session> {
 export const SessionSchema = new Schema(
   {
     sessionId: { type: String, required: '{PATH} is required!' },
+    lessonId: { type: String },
     username: { type: String },
     classifierGrade: { type: Number },
     grade: { type: Number },

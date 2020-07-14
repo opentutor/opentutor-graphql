@@ -6,6 +6,7 @@ import calculateScore from 'models/utils/calculate-score';
 
 export interface UserSession extends Document {
   sessionId: string;
+  lessonId: string;
   username: string;
   score: number;
   question: Question;
@@ -24,6 +25,7 @@ export interface UserSessionModel extends Model<UserSession> {
 export const UserSessionSchema = new Schema(
   {
     sessionId: { type: String, required: '{PATH} is required!' },
+    lessonId: { type: String },
     username: { type: String },
     score: { type: Number },
     question: { type: QuestionSchema },
@@ -39,6 +41,10 @@ UserSessionSchema.statics.setGrade = async function (
   grade: string
 ) {
   const userSession = await this.findOne({ sessionId: sessionId });
+  if (!userSession) {
+    throw new Error(`failed to find userSession with sessionId ${sessionId}`);
+  }
+
   userSession.userResponses[userAnswerIndex].expectationScores[
     userExpectationIndex
   ].graderGrade = grade;

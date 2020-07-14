@@ -21,14 +21,17 @@ describe('session', () => {
   it(`returns an error if invalid sessionId`, async () => {
     const response = await request(app).post('/grading-api').send({
       query: `query { 
-          session(sessionId: "invalidsession") { 
+          session(sessionId: "111111111111111111111111") { 
             sessionId
           } 
         }`,
     });
 
     expect(response.status).to.equal(200);
-    expect(response.body).to.have.deep.nested.property('errors[0].message');
+    expect(response.body).to.have.deep.nested.property(
+      'errors[0].message',
+      'session not found for args "{"sessionId":"111111111111111111111111"}"'
+    );
   });
 
   it('succeeds with valid sessionId', async () => {
@@ -36,6 +39,9 @@ describe('session', () => {
       query: `query { 
           session(sessionId: "session 1") { 
             sessionId
+            lesson {
+              lessonId
+            }
             username
             classifierGrade
             grade
@@ -46,6 +52,9 @@ describe('session', () => {
     expect(response.status).to.equal(200);
     expect(response.body.data.session).to.eql({
       sessionId: 'session 1',
+      lesson: {
+        lessonId: 'lesson 1',
+      },
       username: 'username1',
       classifierGrade: 1.0,
       grade: 1.0,

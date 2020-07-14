@@ -28,7 +28,10 @@ describe('updateSession', () => {
     });
 
     expect(response.status).to.equal(200);
-    expect(response.body).to.have.deep.nested.property('errors[0].message');
+    expect(response.body).to.have.deep.nested.property(
+      'errors[0].message',
+      'missing required param sessionId'
+    );
   });
 
   it(`returns an error if no userSession`, async () => {
@@ -41,7 +44,10 @@ describe('updateSession', () => {
     });
 
     expect(response.status).to.equal(200);
-    expect(response.body).to.have.deep.nested.property('errors[0].message');
+    expect(response.body).to.have.deep.nested.property(
+      'errors[0].message',
+      'missing required param userSession'
+    );
   });
 
   it(`returns updated user session`, async () => {

@@ -8,6 +8,8 @@ import {
 import DateType from './date';
 import QuestionType from './question';
 import ResponseType from './response';
+import LessonType from './lesson';
+import { Lesson } from 'models';
 
 export const UserSessionType = new GraphQLObjectType({
   name: 'UserSession',
@@ -20,6 +22,12 @@ export const UserSessionType = new GraphQLObjectType({
     userResponses: { type: GraphQLList(ResponseType) },
     createdAt: { type: DateType },
     updatedAt: { type: DateType },
+    lesson: {
+      type: LessonType,
+      resolve: async function (session) {
+        return Lesson.findOne({ lessonId: session.lessonId });
+      },
+    },
   },
 });
 

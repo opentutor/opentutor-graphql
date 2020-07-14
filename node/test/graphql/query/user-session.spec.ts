@@ -21,21 +21,28 @@ describe('userSession', () => {
   it(`returns an error if invalid sessionId`, async () => {
     const response = await request(app).post('/grading-api').send({
       query: `query { 
-          userSession(sessionId: "invalidsession") { 
+          userSession(sessionId: "111111111111111111111111") { 
             username
           } 
         }`,
     });
 
     expect(response.status).to.equal(200);
-    expect(response.body).to.have.deep.nested.property('errors[0].message');
+    expect(response.body).to.have.deep.nested.property(
+      'errors[0].message',
+      'usersession not found for args "{"sessionId":"111111111111111111111111"}"'
+    );
   });
 
   it('succeeds with valid sessionId', async () => {
     const response = await request(app).post('/grading-api').send({
       query: `query { 
           userSession(sessionId: "session 1") { 
+            sessionId
             username
+            lesson {
+              lessonId
+            }
             question {
               text
               expectations {
@@ -56,6 +63,10 @@ describe('userSession', () => {
     const userSession = response.body.data.userSession;
     expect(response.status).to.equal(200);
     expect(userSession).to.eql({
+      sessionId: 'session 1',
+      lesson: {
+        lessonId: 'lesson 1',
+      },
       username: 'username1',
       question: {
         text: 'question?',

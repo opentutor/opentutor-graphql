@@ -27,6 +27,7 @@ export const updateSession = {
       {
         $set: {
           sessionId: userSession.sessionId,
+          lessonId: userSession.lessonId,
           username: userSession.username,
           grade: grade,
           classifierGrade: classifierGrade,

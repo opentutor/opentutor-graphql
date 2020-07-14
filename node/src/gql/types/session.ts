@@ -5,6 +5,8 @@ import {
   GraphQLID,
 } from 'graphql';
 import DateType from './date';
+import LessonType from './lesson';
+import { Lesson } from 'models';
 
 export const SessionType = new GraphQLObjectType({
   name: 'Session',
@@ -16,6 +18,12 @@ export const SessionType = new GraphQLObjectType({
     grade: { type: GraphQLFloat },
     createdAt: { type: DateType },
     updatedAt: { type: DateType },
+    lesson: {
+      type: LessonType,
+      resolve: async function (session) {
+        return Lesson.findOne({ lessonId: session.lessonId });
+      },
+    },
   },
 });
 
