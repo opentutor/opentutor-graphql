@@ -15,8 +15,11 @@ export const updateLesson = {
     if (args.lesson === undefined) {
       throw new Error('missing required param lesson');
     }
-    const lesson = JSON.parse(decodeURI(args.lesson));
+    if (!(await Lesson.findOne({ lessonId: args.lessonId }))) {
+      throw new Error(`cannot find lesson with lessonId ${args.lessonId}`);
+    }
 
+    const lesson = JSON.parse(decodeURI(args.lesson));
     return await Lesson.findOneAndUpdate(
       {
         lessonId: args.lessonId,
@@ -28,7 +31,6 @@ export const updateLesson = {
       },
       {
         new: true, // return the updated doc rather than pre update
-        upsert: true, // insert if no user lesson found
       }
     );
   },
