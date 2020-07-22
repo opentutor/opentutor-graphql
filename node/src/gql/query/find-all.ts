@@ -16,10 +16,15 @@ export function findAll<T>(config: {
     nodeType,
     resolve: async (resolveArgs: PaginatedResolveArgs) => {
       const { parent, args } = resolveArgs;
+      const sortBy: any = {};
+      sortBy[args.sortBy ? `${args.sortBy}` : '_id'] = args.sortDescending
+        ? -1
+        : 1;
+
       return await model.paginate(
         {},
         {
-          sort: { _id: 1 },
+          sort: sortBy,
           limit: Number(args.limit) || 100,
           startingAfter: args.cursor ? cursorToId(args.cursor) : undefined,
         }

@@ -33,7 +33,7 @@ module.exports = {
           ],
         },
       ],
-      conclusion: 'conclusion text',
+      conclusion: ['conclusion text'],
     },
     {
       _id: ObjectId('5f0cfea3395d762ca65405c4'),
@@ -51,7 +51,7 @@ module.exports = {
           ],
         },
       ],
-      conclusion: 'conclusion',
+      conclusion: ['conclusion'],
     },
   ],
 

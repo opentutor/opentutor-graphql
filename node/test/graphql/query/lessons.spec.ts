@@ -100,4 +100,34 @@ describe('lessons', () => {
       },
     });
   });
+
+  it('sorts lessons by name in descending order', async () => {
+    const response = await request(app).post('/grading-api').send({
+      query:
+        '{ lessons(sortBy: "name", sortDescending: true) { edges { node { lessonId } } pageInfo { hasNextPage } } }',
+    });
+
+    expect(response.status).to.equal(200);
+    expect(response.body).to.eql({
+      data: {
+        lessons: {
+          edges: [
+            {
+              node: {
+                lessonId: 'lesson 2',
+              },
+            },
+            {
+              node: {
+                lessonId: 'lesson 1',
+              },
+            },
+          ],
+          pageInfo: {
+            hasNextPage: false,
+          },
+        },
+      },
+    });
+  });
 });

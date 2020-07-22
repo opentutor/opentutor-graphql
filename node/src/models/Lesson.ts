@@ -11,7 +11,7 @@ export interface Lesson extends Document {
   intro: string;
   question: string;
   expectations: [LessonExpectation];
-  conclusion: string;
+  conclusion: [string];
 }
 
 export interface LessonModel extends Model<Lesson> {
@@ -29,7 +29,7 @@ export const LessonSchema = new Schema(
     intro: { type: String },
     question: { type: String },
     expectations: { type: [LessonExpectationSchema] },
-    conclusion: { type: String },
+    conclusion: { type: [String] },
   },
   { timestamps: true }
 );

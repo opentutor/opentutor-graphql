@@ -83,7 +83,7 @@ describe('lesson', () => {
           ],
         },
       ],
-      conclusion: 'conclusion text',
+      conclusion: ['conclusion text'],
     });
   });
 });

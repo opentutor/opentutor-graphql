@@ -71,6 +71,8 @@ export interface PaginatedResolveResult {
 export interface HasPaginationArgs {
   cursor?: string;
   limit?: number;
+  sortBy?: string;
+  sortDescending?: boolean;
 }
 
 export interface PaginatedResolveArgs {
@@ -101,9 +103,20 @@ export function makeConnection(args: MakeConnectionArgs) {
         description: `max items to return`,
         type: GraphQLInt,
       },
+      sortBy: {
+        description: `field to sort by`,
+        type: GraphQLString,
+      },
+      sortDescending: {
+        description: `sort in descending order`,
+        type: GraphQLBoolean,
+      },
       ...(additionalConnectionArgs || {}),
     },
-    resolve: async (parent: any, args: { cursor?: string; limit?: number }) => {
+    resolve: async (
+      parent: any,
+      args: { cursor?: string; limit?: number; sort?: string }
+    ) => {
       const paginateResult = await resolve({ parent, args });
       return {
         edges: paginateResult.items.map((m: any) => {
