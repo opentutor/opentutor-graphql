@@ -45,6 +45,30 @@ describe('sessions', () => {
               },
               cursor: 'NWVmYjg5YzRmZTMzMTRmOWEwYzExZWVl',
             },
+            {
+              node: {
+                sessionId: 'session 3',
+                classifierGrade: null,
+                grade: null,
+              },
+              cursor: 'NWYxOGVlN2I0OGY2NjU2N2VhY2M4ODI2',
+            },
+            {
+              node: {
+                sessionId: 'session 4',
+                classifierGrade: null,
+                grade: null,
+              },
+              cursor: 'NWYxOGVlN2I0OGY2NjU2N2VhY2M4ODI3',
+            },
+            {
+              node: {
+                sessionId: 'session 5',
+                classifierGrade: null,
+                grade: null,
+              },
+              cursor: 'NWYxOGVlN2I0OGY2NjU2N2VhY2M4ODI4',
+            },
           ],
           pageInfo: {
             hasNextPage: false,
@@ -102,7 +126,7 @@ describe('sessions', () => {
             },
           ],
           pageInfo: {
-            hasNextPage: false,
+            hasNextPage: true,
           },
         },
       },

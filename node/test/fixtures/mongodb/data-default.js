@@ -70,6 +70,21 @@ module.exports = {
       classifierGrade: 0.5,
       grade: 0.5,
     },
+    {
+      _id: ObjectId('5f18ee7b48f66567eacc8826'),
+      sessionId: 'session 3',
+      lessonId: 'lesson 1',
+    },
+    {
+      _id: ObjectId('5f18ee7b48f66567eacc8827'),
+      sessionId: 'session 4',
+      lessonId: 'lesson 1',
+    },
+    {
+      _id: ObjectId('5f18ee7b48f66567eacc8828'),
+      sessionId: 'session 5',
+      lessonId: 'lesson 1',
+    },
   ],
 
   usersessions: [
@@ -119,6 +134,51 @@ module.exports = {
             {
               classifierGrade: 'Good',
               graderGrade: '',
+            },
+          ],
+        },
+      ],
+    },
+    {
+      lessonId: 'lesson 1',
+      sessionId: 'session 3',
+      userResponses: [
+        {
+          text: 'a good answer',
+          expectationScores: [
+            {
+              classifierGrade: 'Good',
+              graderGrade: 'Good',
+            },
+          ],
+        },
+      ],
+    },
+    {
+      lessonId: 'lesson 1',
+      sessionId: 'session 4',
+      userResponses: [
+        {
+          text: 'a bad answer',
+          expectationScores: [
+            {
+              classifierGrade: 'Bad',
+              graderGrade: 'Bad',
+            },
+          ],
+        },
+      ],
+    },
+    {
+      lessonId: 'lesson 1',
+      sessionId: 'session 5',
+      userResponses: [
+        {
+          text: 'a neutral answer',
+          expectationScores: [
+            {
+              classifierGrade: 'Neutral',
+              graderGrade: 'Neutral',
             },
           ],
         },

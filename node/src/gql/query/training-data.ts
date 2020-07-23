@@ -4,14 +4,14 @@ import { UserSession as UserSessionType } from 'models/UserSession';
 import { Response } from 'models/Response';
 import { ExpectationScore } from 'models/ExpectationScore';
 
-export const trainingData = {
+export const lessonTrainingData = {
   type: GraphQLString,
   args: {
-    sessionId: { type: GraphQLString },
+    lessonId: { type: GraphQLString },
   },
   resolve: async (root: any, args: any) => {
     const userSessions = await UserSession.find({
-      args,
+      lessonId: args.lessonId,
     });
     let data = 'exp_num,text,label';
 
@@ -19,8 +19,8 @@ export const trainingData = {
       userSession.userResponses.forEach((response: Response) => {
         for (let i = 0; i < response.expectationScores.length; i++) {
           const score: ExpectationScore = response.expectationScores[i];
-          if (score.graderGrade !== null) {
-            data += `\n${i}${userSession.question.expectations[i].text}${score.graderGrade}`;
+          if (score.graderGrade) {
+            data += `\n${i},${response.text},${score.graderGrade}`;
           }
         }
       });
@@ -30,4 +30,4 @@ export const trainingData = {
   },
 };
 
-export default trainingData;
+export default lessonTrainingData;
