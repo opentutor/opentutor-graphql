@@ -37,7 +37,7 @@ describe('lesson', () => {
   it('succeeds with valid id', async () => {
     const response = await request(app).post('/grading-api').send({
       query: `query {
-        lesson(lessonId: "lesson 1") {
+        lesson(lessonId: "lesson1") {
           lessonId
           name
           intro
@@ -55,7 +55,7 @@ describe('lesson', () => {
 
     expect(response.status).to.equal(200);
     expect(response.body.data.lesson).to.eql({
-      lessonId: 'lesson 1',
+      lessonId: 'lesson1',
       name: 'lesson name',
       intro: 'intro text',
       question: 'question?',

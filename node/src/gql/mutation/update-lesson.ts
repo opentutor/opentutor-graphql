@@ -15,8 +15,15 @@ export const updateLesson = {
     if (args.lesson === undefined) {
       throw new Error('missing required param lesson');
     }
-
     const lesson = JSON.parse(decodeURI(args.lesson));
+
+    if (
+      !args.lessonId.match(/^[a-z0-9\-]+$/) ||
+      !lesson.lessonId.match(/^[a-z0-9\-]+$/)
+    ) {
+      throw new Error('lessonId must match [a-z0-9-]');
+    }
+
     return await Lesson.findOneAndUpdate(
       {
         lessonId: args.lessonId,

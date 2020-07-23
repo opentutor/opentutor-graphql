@@ -31,13 +31,13 @@ describe('lessons', () => {
           edges: [
             {
               node: {
-                lessonId: 'lesson 1',
+                lessonId: 'lesson1',
               },
               cursor: 'NWYwY2ZlYTMzOTVkNzYyY2E2NTQwNWMz',
             },
             {
               node: {
-                lessonId: 'lesson 2',
+                lessonId: 'lesson2',
               },
               cursor: 'NWYwY2ZlYTMzOTVkNzYyY2E2NTQwNWM0',
             },
@@ -63,7 +63,7 @@ describe('lessons', () => {
           edges: [
             {
               node: {
-                lessonId: 'lesson 1',
+                lessonId: 'lesson1',
               },
               cursor: 'NWYwY2ZlYTMzOTVkNzYyY2E2NTQwNWMz',
             },
@@ -89,7 +89,7 @@ describe('lessons', () => {
           edges: [
             {
               node: {
-                lessonId: 'lesson 2',
+                lessonId: 'lesson2',
               },
             },
           ],
@@ -114,12 +114,12 @@ describe('lessons', () => {
           edges: [
             {
               node: {
-                lessonId: 'lesson 2',
+                lessonId: 'lesson2',
               },
             },
             {
               node: {
-                lessonId: 'lesson 1',
+                lessonId: 'lesson1',
               },
             },
           ],

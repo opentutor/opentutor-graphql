@@ -36,7 +36,7 @@ describe('updateLesson', () => {
   it(`returns an error if no lesson`, async () => {
     const response = await request(app).post('/grading-api').send({
       query: `mutation { 
-          updateLesson(lessonId: "lesson 1") { 
+          updateLesson(lessonId: "lesson1") { 
             lessonId
           } 
         }`,
@@ -45,6 +45,98 @@ describe('updateLesson', () => {
     expect(response.body).to.have.deep.nested.property(
       'errors[0].message',
       'missing required param lesson'
+    );
+  });
+
+  it(`args.lessonId must be lowercase`, async () => {
+    const lesson = encodeURI(
+      JSON.stringify({
+        lessonId: 'a',
+      })
+    );
+    const response = await request(app)
+      .post('/grading-api')
+      .send({
+        query: `mutation { 
+          updateLesson(lessonId: "A", lesson: "${lesson}") {
+            lessonId
+          } 
+        }`,
+      });
+    expect(response.status).to.equal(200);
+    expect(response.status).to.equal(200);
+    expect(response.body).to.have.deep.nested.property(
+      'errors[0].message',
+      'lessonId must match [a-z0-9-]'
+    );
+  });
+
+  it(`lesson.lessonId must be lowercase`, async () => {
+    const lesson = encodeURI(
+      JSON.stringify({
+        lessonId: 'A',
+      })
+    );
+    const response = await request(app)
+      .post('/grading-api')
+      .send({
+        query: `mutation { 
+          updateLesson(lessonId: "a", lesson: "${lesson}") {
+            lessonId
+          } 
+        }`,
+      });
+    expect(response.status).to.equal(200);
+    expect(response.status).to.equal(200);
+    expect(response.body).to.have.deep.nested.property(
+      'errors[0].message',
+      'lessonId must match [a-z0-9-]'
+    );
+  });
+
+  it(`args.lessonId cannot contains special chars`, async () => {
+    const lesson = encodeURI(
+      JSON.stringify({
+        lessonId: 'a',
+      })
+    );
+    const response = await request(app)
+      .post('/grading-api')
+      .send({
+        query: `mutation { 
+          updateLesson(lessonId: "!", lesson: "${lesson}") {
+            lessonId
+          } 
+        }`,
+      });
+    expect(response.status).to.equal(200);
+    expect(response.status).to.equal(200);
+    expect(response.body).to.have.deep.nested.property(
+      'errors[0].message',
+      'lessonId must match [a-z0-9-]'
+    );
+  });
+
+  it(`lesson.lessonId cannot contain special chars`, async () => {
+    const lesson = encodeURI(
+      JSON.stringify({
+        lessonId: '!',
+      })
+    );
+    const response = await request(app)
+      .post('/grading-api')
+      .send({
+        query: `mutation { 
+          updateLesson(lessonId: "a", lesson: "${lesson}") {
+            lessonId
+          } 
+        }`,
+      });
+    expect(response.status).to.equal(200);
+    expect(response.status).to.equal(200);
+    expect(response.body).to.have.deep.nested.property(
+      'errors[0].message',
+      'lessonId must match [a-z0-9-]'
     );
   });
 
@@ -177,7 +269,7 @@ describe('updateLesson', () => {
   it(`returns updated lesson`, async () => {
     const lesson = encodeURI(
       JSON.stringify({
-        lessonId: 'lesson 1',
+        lessonId: 'lesson1',
         name: 'updated name',
         intro: 'updated intro',
         question: 'updated question',
@@ -198,7 +290,7 @@ describe('updateLesson', () => {
       .post('/grading-api')
       .send({
         query: `mutation { 
-          updateLesson(lessonId: "lesson 1", lesson: "${lesson}") {
+          updateLesson(lessonId: "lesson1", lesson: "${lesson}") {
             lessonId
             name
             intro
@@ -215,7 +307,7 @@ describe('updateLesson', () => {
       });
     expect(response.status).to.equal(200);
     expect(response.body.data.updateLesson).to.eql({
-      lessonId: 'lesson 1',
+      lessonId: 'lesson1',
       name: 'updated name',
       intro: 'updated intro',
       question: 'updated question',
@@ -236,7 +328,7 @@ describe('updateLesson', () => {
   it(`updates lesson in database`, async () => {
     const lesson = encodeURI(
       JSON.stringify({
-        lessonId: 'lesson 1',
+        lessonId: 'lesson1',
         name: 'updated name',
         intro: 'updated intro',
         question: 'updated question',
@@ -257,7 +349,7 @@ describe('updateLesson', () => {
       .post('/grading-api')
       .send({
         query: `mutation { 
-          updateLesson(lessonId: "lesson 1", lesson: "${lesson}") {
+          updateLesson(lessonId: "lesson1", lesson: "${lesson}") {
             lessonId
           } 
         }`,
@@ -265,7 +357,7 @@ describe('updateLesson', () => {
 
     const newLesson = await request(app).post('/grading-api').send({
       query: `query {
-        lesson(lessonId: "lesson 1") { 
+        lesson(lessonId: "lesson1") { 
           lessonId
           name
           intro
@@ -282,7 +374,7 @@ describe('updateLesson', () => {
     });
     expect(newLesson.status).to.equal(200);
     expect(newLesson.body.data.lesson).to.eql({
-      lessonId: 'lesson 1',
+      lessonId: 'lesson1',
       name: 'updated name',
       intro: 'updated intro',
       question: 'updated question',
@@ -311,7 +403,7 @@ describe('updateLesson', () => {
       .post('/grading-api')
       .send({
         query: `mutation { 
-          updateLesson(lessonId: "lesson 1", lesson: "${lesson}") {
+          updateLesson(lessonId: "lesson1", lesson: "${lesson}") {
             lessonId
             name
           } 
@@ -332,7 +424,7 @@ describe('updateLesson', () => {
 
     const oldLesson = await request(app).post('/grading-api').send({
       query: `query {
-        lesson(lessonId: "lesson 1") {
+        lesson(lessonId: "lesson1") {
           lessonId
         }
       }`,
@@ -340,7 +432,7 @@ describe('updateLesson', () => {
     expect(oldLesson.status).to.equal(200);
     expect(oldLesson.body).to.have.deep.nested.property(
       'errors[0].message',
-      'lesson not found for args "{"lessonId":"lesson 1"}"'
+      'lesson not found for args "{"lessonId":"lesson1"}"'
     );
   });
 });

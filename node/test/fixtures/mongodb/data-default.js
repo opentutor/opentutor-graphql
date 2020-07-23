@@ -5,7 +5,7 @@ module.exports = {
   lessons: [
     {
       _id: ObjectId('5f0cfea3395d762ca65405c3'),
-      lessonId: 'lesson 1',
+      lessonId: 'lesson1',
       name: 'lesson name',
       intro: 'intro text',
       question: 'question?',
@@ -37,7 +37,7 @@ module.exports = {
     },
     {
       _id: ObjectId('5f0cfea3395d762ca65405c4'),
-      lessonId: 'lesson 2',
+      lessonId: 'lesson2',
       name: 'name',
       intro: 'intro',
       question: 'question',
@@ -59,7 +59,7 @@ module.exports = {
     {
       _id: ObjectId('5efb89c4fe3314f9a0c11eed'),
       sessionId: 'session 1',
-      lessonId: 'lesson 1',
+      lessonId: 'lesson1',
       username: 'username1',
       classifierGrade: 1.0,
       grade: 1.0,
@@ -73,24 +73,24 @@ module.exports = {
     {
       _id: ObjectId('5f18ee7b48f66567eacc8826'),
       sessionId: 'session 3',
-      lessonId: 'lesson 1',
+      lessonId: 'lesson1',
     },
     {
       _id: ObjectId('5f18ee7b48f66567eacc8827'),
       sessionId: 'session 4',
-      lessonId: 'lesson 1',
+      lessonId: 'lesson1',
     },
     {
       _id: ObjectId('5f18ee7b48f66567eacc8828'),
       sessionId: 'session 5',
-      lessonId: 'lesson 1',
+      lessonId: 'lesson1',
     },
   ],
 
   usersessions: [
     {
       sessionId: 'session 1',
-      lessonId: 'lesson 1',
+      lessonId: 'lesson1',
       username: 'username1',
       question: {
         text: 'question?',
@@ -140,7 +140,7 @@ module.exports = {
       ],
     },
     {
-      lessonId: 'lesson 1',
+      lessonId: 'lesson1',
       sessionId: 'session 3',
       userResponses: [
         {
@@ -155,7 +155,7 @@ module.exports = {
       ],
     },
     {
-      lessonId: 'lesson 1',
+      lessonId: 'lesson1',
       sessionId: 'session 4',
       userResponses: [
         {
@@ -170,7 +170,7 @@ module.exports = {
       ],
     },
     {
-      lessonId: 'lesson 1',
+      lessonId: 'lesson1',
       sessionId: 'session 5',
       userResponses: [
         {

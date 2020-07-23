@@ -53,7 +53,7 @@ describe('session', () => {
     expect(response.body.data.session).to.eql({
       sessionId: 'session 1',
       lesson: {
-        lessonId: 'lesson 1',
+        lessonId: 'lesson1',
       },
       username: 'username1',
       classifierGrade: 1.0,

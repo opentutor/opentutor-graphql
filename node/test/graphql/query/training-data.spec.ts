@@ -21,7 +21,7 @@ describe('lesson training data', () => {
   it(`return all training data for lesson`, async () => {
     const response = await request(app).post('/grading-api').send({
       query: `query {
-        lessonTrainingData(lessonId: "lesson 1")
+        lessonTrainingData(lessonId: "lesson1")
       }`,
     });
 

@@ -65,7 +65,7 @@ describe('userSession', () => {
     expect(userSession).to.eql({
       sessionId: 'session 1',
       lesson: {
-        lessonId: 'lesson 1',
+        lessonId: 'lesson1',
       },
       username: 'username1',
       question: {
