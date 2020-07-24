@@ -3,7 +3,7 @@ import lesson from './lesson';
 import lessons from './lessons';
 import session from './session';
 import sessions from './sessions';
-import lessonTrainingData from './training-data';
+import trainingData from './training-data';
 import userSession from './user-session';
 
 export default new GraphQLObjectType({
@@ -11,7 +11,7 @@ export default new GraphQLObjectType({
   fields: {
     lesson,
     lessons,
-    lessonTrainingData,
+    trainingData,
     session,
     sessions,
     userSession,

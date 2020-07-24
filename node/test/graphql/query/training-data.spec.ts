@@ -4,7 +4,7 @@ import { Express } from 'express';
 import mongoUnit from 'mongo-unit';
 import request from 'supertest';
 
-describe('lesson training data', () => {
+describe('training data', () => {
   let app: Express;
 
   beforeEach(async () => {
@@ -21,13 +21,18 @@ describe('lesson training data', () => {
   it(`return all training data for lesson`, async () => {
     const response = await request(app).post('/grading-api').send({
       query: `query {
-        lessonTrainingData(lessonId: "lesson1")
+        trainingData(lessonId: "lesson1") {
+          training
+          config
+        }
       }`,
     });
-
     expect(response.status).to.equal(200);
-    expect(response.body.data.lessonTrainingData).to.eql(
+    expect(response.body.data.trainingData.training).to.eql(
       'exp_num,text,label\n0,a good answer,Good\n0,a bad answer,Bad\n0,a neutral answer,Neutral'
+    );
+    expect(response.body.data.trainingData.config).to.eql(
+      'question: "question?"'
     );
   });
 });
