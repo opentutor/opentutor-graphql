@@ -1,19 +1,26 @@
 import mongoose, { Schema, Document, Model } from 'mongoose';
 import { Response, ResponseSchema } from './Response';
 import { Question, QuestionSchema } from './Question';
-import Session from './Session';
+import { PaginatedResolveResult } from './PaginatedResolveResult';
 import calculateScore from 'models/utils/calculate-score';
 
 export interface UserSession extends Document {
   sessionId: string;
   lessonId: string;
   username: string;
-  score: number;
+  graderGrade: number;
+  classifierGrade: number;
   question: Question;
   userResponses: [Response];
 }
 
 export interface UserSessionModel extends Model<UserSession> {
+  paginate(
+    query?: any,
+    options?: any,
+    callback?: any
+  ): Promise<PaginatedResolveResult<UserSession>>;
+
   setGrade(
     sessionId: string,
     userAnswerIndex: number,
@@ -25,14 +32,16 @@ export interface UserSessionModel extends Model<UserSession> {
 export const UserSessionSchema = new Schema(
   {
     sessionId: { type: String, required: '{PATH} is required!' },
-    lessonId: { type: String },
+    lessonId: { type: String, required: '{PATH} is required!' },
     username: { type: String },
-    score: { type: Number },
+    graderGrade: { type: Number },
+    classifierGrade: { type: Number },
     question: { type: QuestionSchema },
     userResponses: [ResponseSchema],
   },
   { timestamps: true }
 );
+UserSessionSchema.plugin(require('mongoose-cursor-pagination').default);
 
 UserSessionSchema.statics.setGrade = async function (
   sessionId: string,
@@ -51,13 +60,12 @@ UserSessionSchema.statics.setGrade = async function (
 
   const score = calculateScore(userSession);
   userSession.score = score;
-  await Session.setGrade(sessionId, score);
 
   const changesAsSet: any = {};
   changesAsSet[
     `userResponses.${userAnswerIndex}.expectationScores.${userExpectationIndex}.graderGrade`
   ] = grade;
-  changesAsSet['score'] = score;
+  changesAsSet['graderGrade'] = score;
 
   return await this.findOneAndUpdate(
     {

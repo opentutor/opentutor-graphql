@@ -55,40 +55,9 @@ module.exports = {
     },
   ],
 
-  sessions: [
-    {
-      _id: ObjectId('5efb89c4fe3314f9a0c11eed'),
-      sessionId: 'session 1',
-      lessonId: 'lesson1',
-      username: 'username1',
-      classifierGrade: 1.0,
-      grade: 1.0,
-    },
-    {
-      _id: ObjectId('5efb89c4fe3314f9a0c11eee'),
-      sessionId: 'session 2',
-      classifierGrade: 0.5,
-      grade: 0.5,
-    },
-    {
-      _id: ObjectId('5f18ee7b48f66567eacc8826'),
-      sessionId: 'session 3',
-      lessonId: 'lesson1',
-    },
-    {
-      _id: ObjectId('5f18ee7b48f66567eacc8827'),
-      sessionId: 'session 4',
-      lessonId: 'lesson1',
-    },
-    {
-      _id: ObjectId('5f18ee7b48f66567eacc8828'),
-      sessionId: 'session 5',
-      lessonId: 'lesson1',
-    },
-  ],
-
   usersessions: [
     {
+      _id: ObjectId('5f20c63646f6110a6a5b2134'),
       sessionId: 'session 1',
       lessonId: 'lesson1',
       username: 'username1',
@@ -121,11 +90,12 @@ module.exports = {
       ],
     },
     {
+      _id: ObjectId('5f20c63646f6110a6a5b2135'),
       sessionId: 'session 2',
       username: 'username2',
       question: {
         text: 'question',
-        expectations: [{ text: 'expectation text' }],
+        expectations: [{ text: 'expectation 1' }, { text: 'expectation 2' }],
       },
       userResponses: [
         {
@@ -135,11 +105,16 @@ module.exports = {
               classifierGrade: 'Good',
               graderGrade: '',
             },
+            {
+              classifierGrade: 'Bad',
+              graderGrade: '',
+            },
           ],
         },
       ],
     },
     {
+      _id: ObjectId('5f20c63646f6110a6a5b2136'),
       lessonId: 'lesson1',
       sessionId: 'session 3',
       userResponses: [
@@ -155,6 +130,7 @@ module.exports = {
       ],
     },
     {
+      _id: ObjectId('5f20c63646f6110a6a5b2137'),
       lessonId: 'lesson1',
       sessionId: 'session 4',
       userResponses: [
@@ -170,6 +146,7 @@ module.exports = {
       ],
     },
     {
+      _id: ObjectId('5f20c63646f6110a6a5b2138'),
       lessonId: 'lesson1',
       sessionId: 'session 5',
       userResponses: [

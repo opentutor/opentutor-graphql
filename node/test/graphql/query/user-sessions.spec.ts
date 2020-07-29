@@ -4,7 +4,7 @@ import { Express } from 'express';
 import mongoUnit from 'mongo-unit';
 import request from 'supertest';
 
-describe('sessions', () => {
+describe('userSessions', () => {
   let app: Express;
 
   beforeEach(async () => {
@@ -18,56 +18,46 @@ describe('sessions', () => {
     await mongoUnit.drop();
   });
 
-  it('gets a page of all sessions', async () => {
+  it('gets a page of all userSessions', async () => {
     const response = await request(app).post('/grading-api').send({
       query:
-        '{ sessions { edges { cursor node { sessionId classifierGrade grade } } pageInfo { hasNextPage } } }',
+        '{ userSessions { edges { cursor node { sessionId } } pageInfo { hasNextPage } } }',
     });
-
     expect(response.status).to.equal(200);
+    console.log(response.body);
     expect(response.body).to.eql({
       data: {
-        sessions: {
+        userSessions: {
           edges: [
             {
               node: {
                 sessionId: 'session 1',
-                classifierGrade: 1.0,
-                grade: 1.0,
               },
-              cursor: 'NWVmYjg5YzRmZTMzMTRmOWEwYzExZWVk',
+              cursor: 'NWYyMGM2MzY0NmY2MTEwYTZhNWIyMTM0',
             },
             {
               node: {
                 sessionId: 'session 2',
-                classifierGrade: 0.5,
-                grade: 0.5,
               },
-              cursor: 'NWVmYjg5YzRmZTMzMTRmOWEwYzExZWVl',
+              cursor: 'NWYyMGM2MzY0NmY2MTEwYTZhNWIyMTM1',
             },
             {
               node: {
                 sessionId: 'session 3',
-                classifierGrade: null,
-                grade: null,
               },
-              cursor: 'NWYxOGVlN2I0OGY2NjU2N2VhY2M4ODI2',
+              cursor: 'NWYyMGM2MzY0NmY2MTEwYTZhNWIyMTM2',
             },
             {
               node: {
                 sessionId: 'session 4',
-                classifierGrade: null,
-                grade: null,
               },
-              cursor: 'NWYxOGVlN2I0OGY2NjU2N2VhY2M4ODI3',
+              cursor: 'NWYyMGM2MzY0NmY2MTEwYTZhNWIyMTM3',
             },
             {
               node: {
                 sessionId: 'session 5',
-                classifierGrade: null,
-                grade: null,
               },
-              cursor: 'NWYxOGVlN2I0OGY2NjU2N2VhY2M4ODI4',
+              cursor: 'NWYyMGM2MzY0NmY2MTEwYTZhNWIyMTM4',
             },
           ],
           pageInfo: {
@@ -78,24 +68,22 @@ describe('sessions', () => {
     });
   });
 
-  it('gets a page of 1 sessions', async () => {
+  it('gets a page of 1 userSessions', async () => {
     const response = await request(app).post('/grading-api').send({
       query:
-        '{ sessions(limit: 1) { edges { cursor node { sessionId classifierGrade grade } } pageInfo { hasNextPage } } }',
+        '{ userSessions(limit: 1) { edges { cursor node { sessionId } } pageInfo { hasNextPage } } }',
     });
 
     expect(response.status).to.equal(200);
     expect(response.body).to.eql({
       data: {
-        sessions: {
+        userSessions: {
           edges: [
             {
               node: {
                 sessionId: 'session 1',
-                classifierGrade: 1.0,
-                grade: 1.0,
               },
-              cursor: 'NWVmYjg5YzRmZTMzMTRmOWEwYzExZWVk',
+              cursor: 'NWYyMGM2MzY0NmY2MTEwYTZhNWIyMTM0',
             },
           ],
           pageInfo: {
@@ -109,19 +97,17 @@ describe('sessions', () => {
   it('gets next page after cursor', async () => {
     const response = await request(app).post('/grading-api').send({
       query:
-        '{ sessions(limit: 1, cursor: "NWVmYjg5YzRmZTMzMTRmOWEwYzExZWVk") { edges { node { sessionId classifierGrade grade } } pageInfo { hasNextPage } } }',
+        '{ userSessions(limit: 1, cursor: "NWYyMGM2MzY0NmY2MTEwYTZhNWIyMTM0") { edges { node { sessionId } } pageInfo { hasNextPage } } }',
     });
 
     expect(response.status).to.equal(200);
     expect(response.body).to.eql({
       data: {
-        sessions: {
+        userSessions: {
           edges: [
             {
               node: {
                 sessionId: 'session 2',
-                classifierGrade: 0.5,
-                grade: 0.5,
               },
             },
           ],

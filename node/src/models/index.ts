@@ -12,8 +12,6 @@ import Question from './Question';
 export { default as Question } from './Question';
 import Response from './Response';
 export { default as Response } from './Response';
-import Session from './Session';
-export { default as Session } from './Session';
 import UserSession from './UserSession';
 export { default as UserSession } from './UserSession';
 
@@ -25,6 +23,5 @@ export default {
   LessonExpectation,
   Question,
   Response,
-  Session,
   UserSession,
 };

@@ -1,10 +1,9 @@
 import { GraphQLObjectType } from 'graphql';
 import lesson from './lesson';
 import lessons from './lessons';
-import session from './session';
-import sessions from './sessions';
 import trainingData from './training-data';
 import userSession from './user-session';
+import userSessions from './user-sessions';
 
 export default new GraphQLObjectType({
   name: 'Query',
@@ -12,8 +11,7 @@ export default new GraphQLObjectType({
     lesson,
     lessons,
     trainingData,
-    session,
-    sessions,
     userSession,
+    userSessions,
   },
 });

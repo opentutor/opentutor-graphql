@@ -1,6 +1,6 @@
 import { GraphQLString } from 'graphql';
 import UserSessionType from 'gql/types/user-session';
-import { Session, UserSession } from 'models';
+import { UserSession } from 'models';
 import calculateScore from 'models/utils/calculate-score';
 
 export const updateSession = {
@@ -17,27 +17,15 @@ export const updateSession = {
       throw new Error('missing required param userSession');
     }
     const userSession = JSON.parse(decodeURI(args.userSession));
+    if (!userSession.sessionId) {
+      throw new Error('userSession is missing a sessionId');
+    }
+    if (!userSession.lessonId) {
+      throw new Error('userSession is missing a lessonId');
+    }
+
     const grade = calculateScore(userSession, 'graderGrade');
     const classifierGrade = calculateScore(userSession, 'classifierGrade');
-
-    await Session.findOneAndUpdate(
-      {
-        sessionId: args.sessionId,
-      },
-      {
-        $set: {
-          sessionId: userSession.sessionId,
-          lessonId: userSession.lessonId,
-          username: userSession.username,
-          grade: grade,
-          classifierGrade: classifierGrade,
-        },
-      },
-      {
-        new: true, // return the updated doc rather than pre update
-        upsert: true, // insert if no session found
-      }
-    );
 
     return await UserSession.findOneAndUpdate(
       {
@@ -46,7 +34,8 @@ export const updateSession = {
       {
         $set: {
           ...userSession,
-          score: grade,
+          graderGrade: grade,
+          classifierGrade: classifierGrade,
         },
       },
       {

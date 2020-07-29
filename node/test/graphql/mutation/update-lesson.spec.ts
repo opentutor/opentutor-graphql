@@ -94,7 +94,7 @@ describe('updateLesson', () => {
     );
   });
 
-  it(`args.lessonId cannot contains special chars`, async () => {
+  it(`args.lessonId cannot contain special chars`, async () => {
     const lesson = encodeURI(
       JSON.stringify({
         lessonId: 'a',
