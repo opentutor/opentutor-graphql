@@ -33,6 +33,11 @@ export const LessonSchema = new Schema(
   },
   { timestamps: true }
 );
+LessonSchema.index({
+  _id: -1,
+  name: 1,
+  createdAt: -1,
+});
 LessonSchema.plugin(require('mongoose-cursor-pagination').default);
 
 export default mongoose.model<Lesson, LessonModel>('Lesson', LessonSchema);
