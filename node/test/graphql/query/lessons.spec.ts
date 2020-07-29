@@ -33,13 +33,13 @@ describe('lessons', () => {
               node: {
                 lessonId: 'lesson1',
               },
-              cursor: 'NWYwY2ZlYTMzOTVkNzYyY2E2NTQwNWMz',
+              cursor: '5f0cfea3395d762ca65405c3',
             },
             {
               node: {
                 lessonId: 'lesson2',
               },
-              cursor: 'NWYwY2ZlYTMzOTVkNzYyY2E2NTQwNWM0',
+              cursor: '5f0cfea3395d762ca65405c4',
             },
           ],
           pageInfo: {
@@ -65,7 +65,7 @@ describe('lessons', () => {
               node: {
                 lessonId: 'lesson1',
               },
-              cursor: 'NWYwY2ZlYTMzOTVkNzYyY2E2NTQwNWMz',
+              cursor: '5f0cfea3395d762ca65405c3',
             },
           ],
           pageInfo: {
@@ -79,7 +79,7 @@ describe('lessons', () => {
   it('gets next page after cursor', async () => {
     const response = await request(app).post('/grading-api').send({
       query:
-        '{ lessons(limit: 1, cursor: "NWYwY2ZlYTMzOTVkNzYyY2E2NTQwNWMz") { edges { node { lessonId } } pageInfo { hasNextPage } } }',
+        '{ lessons(limit: 1, cursor: "5f0cfea3395d762ca65405c3") { edges { node { lessonId } } pageInfo { hasNextPage } } }',
     });
 
     expect(response.status).to.equal(200);

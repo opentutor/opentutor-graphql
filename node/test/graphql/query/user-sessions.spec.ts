@@ -33,31 +33,31 @@ describe('userSessions', () => {
               node: {
                 sessionId: 'session 1',
               },
-              cursor: 'NWYyMGM2MzY0NmY2MTEwYTZhNWIyMTM0',
+              cursor: '5f20c63646f6110a6a5b2134',
             },
             {
               node: {
                 sessionId: 'session 2',
               },
-              cursor: 'NWYyMGM2MzY0NmY2MTEwYTZhNWIyMTM1',
+              cursor: '5f20c63646f6110a6a5b2135',
             },
             {
               node: {
                 sessionId: 'session 3',
               },
-              cursor: 'NWYyMGM2MzY0NmY2MTEwYTZhNWIyMTM2',
+              cursor: '5f20c63646f6110a6a5b2136',
             },
             {
               node: {
                 sessionId: 'session 4',
               },
-              cursor: 'NWYyMGM2MzY0NmY2MTEwYTZhNWIyMTM3',
+              cursor: '5f20c63646f6110a6a5b2137',
             },
             {
               node: {
                 sessionId: 'session 5',
               },
-              cursor: 'NWYyMGM2MzY0NmY2MTEwYTZhNWIyMTM4',
+              cursor: '5f20c63646f6110a6a5b2138',
             },
           ],
           pageInfo: {
@@ -83,7 +83,7 @@ describe('userSessions', () => {
               node: {
                 sessionId: 'session 1',
               },
-              cursor: 'NWYyMGM2MzY0NmY2MTEwYTZhNWIyMTM0',
+              cursor: '5f20c63646f6110a6a5b2134',
             },
           ],
           pageInfo: {
@@ -97,7 +97,7 @@ describe('userSessions', () => {
   it('gets next page after cursor', async () => {
     const response = await request(app).post('/grading-api').send({
       query:
-        '{ userSessions(limit: 1, cursor: "NWYyMGM2MzY0NmY2MTEwYTZhNWIyMTM0") { edges { node { sessionId } } pageInfo { hasNextPage } } }',
+        '{ userSessions(limit: 1, cursor: "5f20c63646f6110a6a5b2134") { edges { node { sessionId } } pageInfo { hasNextPage } } }',
     });
 
     expect(response.status).to.equal(200);

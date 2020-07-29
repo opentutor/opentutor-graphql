@@ -5,7 +5,6 @@ import {
   GraphQLObjectType,
   GraphQLString,
 } from 'graphql';
-import { Document } from 'mongoose';
 
 export const PageInfoType = new GraphQLObjectType({
   name: 'PageInfo',
@@ -53,14 +52,6 @@ export function makeConnectionType(nodeType: GraphQLObjectType) {
       },
     })
   );
-}
-
-export function itemToCursor(item: Document): string | null {
-  return item ? Buffer.from(`${item.id}`).toString('base64') : null;
-}
-
-export function cursorToId(cursor: string): string {
-  return Buffer.from(cursor, 'base64').toString('ascii');
 }
 
 export interface PaginatedResolveResult {
@@ -122,7 +113,7 @@ export function makeConnection(args: MakeConnectionArgs) {
         edges: paginateResult.items.map((m: any) => {
           return {
             node: m,
-            cursor: itemToCursor(m),
+            cursor: m.id,
           };
         }),
         pageInfo: {
@@ -130,9 +121,7 @@ export function makeConnection(args: MakeConnectionArgs) {
           endCursor:
             Array.isArray(paginateResult.items) &&
             paginateResult.items.length > 0
-              ? itemToCursor(
-                  paginateResult.items[paginateResult.items.length - 1]
-                )
+              ? paginateResult.items[paginateResult.items.length - 1].id
               : null,
         },
       };

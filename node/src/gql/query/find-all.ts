@@ -1,9 +1,5 @@
 import { GraphQLObjectType } from 'graphql';
-import {
-  makeConnection,
-  cursorToId,
-  PaginatedResolveArgs,
-} from 'gql/types/connection';
+import { makeConnection, PaginatedResolveArgs } from 'gql/types/connection';
 import { HasPaginate } from 'gql/types/mongoose-type-helpers';
 
 export function findAll<T>(config: {
@@ -20,13 +16,12 @@ export function findAll<T>(config: {
       sortBy[args.sortBy ? `${args.sortBy}` : '_id'] = args.sortDescending
         ? -1
         : 1;
-
       return await model.paginate(
         {},
         {
           sort: sortBy,
           limit: Number(args.limit) || 100,
-          startingAfter: args.cursor ? cursorToId(args.cursor) : undefined,
+          startingAfter: args.cursor,
         }
       );
     },
