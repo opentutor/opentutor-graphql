@@ -18,101 +18,87 @@ describe('userSessions', () => {
     await mongoUnit.drop();
   });
 
-  it('gets a page of all userSessions', async () => {
+  it('gets a default page of userSessions', async () => {
     const response = await request(app).post('/grading-api').send({
       query:
-        '{ userSessions { edges { cursor node { sessionId } } pageInfo { hasNextPage } } }',
+        '{ userSessions { items { sessionId } pageInfo { hasPrevPage hasNextPage page limit } } }',
     });
     expect(response.status).to.equal(200);
-    console.log(response.body);
     expect(response.body).to.eql({
       data: {
         userSessions: {
-          edges: [
+          items: [
             {
-              node: {
-                sessionId: 'session 1',
-              },
-              cursor: '5f20c63646f6110a6a5b2134',
+              sessionId: 'session 1',
             },
             {
-              node: {
-                sessionId: 'session 2',
-              },
-              cursor: '5f20c63646f6110a6a5b2135',
+              sessionId: 'session 2',
             },
             {
-              node: {
-                sessionId: 'session 3',
-              },
-              cursor: '5f20c63646f6110a6a5b2136',
+              sessionId: 'session 3',
             },
             {
-              node: {
-                sessionId: 'session 4',
-              },
-              cursor: '5f20c63646f6110a6a5b2137',
+              sessionId: 'session 4',
             },
             {
-              node: {
-                sessionId: 'session 5',
-              },
-              cursor: '5f20c63646f6110a6a5b2138',
+              sessionId: 'session 5',
             },
           ],
           pageInfo: {
+            hasPrevPage: false,
             hasNextPage: false,
+            page: 1,
+            limit: 100,
           },
         },
       },
     });
   });
 
-  it('gets a page of 1 userSessions', async () => {
+  it('gets a page of 1 userSession', async () => {
     const response = await request(app).post('/grading-api').send({
       query:
-        '{ userSessions(limit: 1) { edges { cursor node { sessionId } } pageInfo { hasNextPage } } }',
+        '{ userSessions(limit: 1) { items { sessionId } pageInfo { hasPrevPage hasNextPage page limit } } }',
     });
-
     expect(response.status).to.equal(200);
     expect(response.body).to.eql({
       data: {
         userSessions: {
-          edges: [
+          items: [
             {
-              node: {
-                sessionId: 'session 1',
-              },
-              cursor: '5f20c63646f6110a6a5b2134',
+              sessionId: 'session 1',
             },
           ],
           pageInfo: {
+            hasPrevPage: false,
             hasNextPage: true,
+            page: 1,
+            limit: 1,
           },
         },
       },
     });
   });
 
-  it('gets next page after cursor', async () => {
+  it('gets next page of 1 userSession', async () => {
     const response = await request(app).post('/grading-api').send({
       query:
-        '{ userSessions(limit: 1, cursor: "5f20c63646f6110a6a5b2134") { edges { node { sessionId } } pageInfo { hasNextPage } } }',
+        '{ userSessions(limit: 1, page: 2) { items { sessionId } pageInfo { hasPrevPage hasNextPage page limit } } }',
     });
-
     expect(response.status).to.equal(200);
     expect(response.body).to.eql({
       data: {
         userSessions: {
-          edges: [
+          items: [
             {
-              node: {
-                sessionId: 'session 2',
-              },
+              sessionId: 'session 2',
             },
           ],
           pageInfo: {
+            hasPrevPage: true,
             hasNextPage: true,
+            page: 2,
+            limit: 1,
           },
         },
       },

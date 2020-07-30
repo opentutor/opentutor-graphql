@@ -6,48 +6,32 @@ import {
   GraphQLString,
 } from 'graphql';
 
-export const PageInfoType = new GraphQLObjectType({
-  name: 'PageInfo',
-  fields: {
-    endCursor: { type: GraphQLString },
-    hasNextPage: { type: GraphQLBoolean },
-  },
-});
-
 const TYPE_REGISTRY: { [type: string]: GraphQLObjectType } = {};
 export function registerType(type: GraphQLObjectType) {
   TYPE_REGISTRY[type.name] = type;
   return type;
 }
 
-export function makeEdgeType(nodeType: GraphQLObjectType) {
-  const name = `${nodeType.name}Edge`;
-  if (TYPE_REGISTRY[name]) {
-    return TYPE_REGISTRY[name];
-  }
-
-  return registerType(
-    new GraphQLObjectType({
-      name,
-      fields: {
-        node: { type: nodeType },
-        cursor: { type: GraphQLString },
-      },
-    })
-  );
-}
+export const PageInfoType = new GraphQLObjectType({
+  name: 'PageInfo',
+  fields: {
+    hasPrevPage: { type: GraphQLBoolean },
+    hasNextPage: { type: GraphQLBoolean },
+    page: { type: GraphQLInt },
+    limit: { type: GraphQLInt },
+  },
+});
 
 export function makeConnectionType(nodeType: GraphQLObjectType) {
   const name = `${nodeType.name}Connection`;
   if (TYPE_REGISTRY[name]) {
     return TYPE_REGISTRY[name];
   }
-
   return registerType(
     new GraphQLObjectType({
       name,
       fields: {
-        edges: { type: new GraphQLList(makeEdgeType(nodeType)) },
+        items: { type: new GraphQLList(nodeType) },
         pageInfo: { type: PageInfoType },
       },
     })
@@ -55,15 +39,22 @@ export function makeConnectionType(nodeType: GraphQLObjectType) {
 }
 
 export interface PaginatedResolveResult {
-  items: any[];
-  hasMore: boolean;
+  docs: any[];
+  totalDocs: number;
+  limit: number;
+  page: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  nextPage: number;
+  hasPrevPage: boolean;
+  prevPage: number;
+  pagingCounter: number;
 }
 
 export interface HasPaginationArgs {
-  cursor?: string;
+  page?: number;
   limit?: number;
-  sortBy?: string;
-  sortDescending?: boolean;
+  sort?: string;
 }
 
 export interface PaginatedResolveArgs {
@@ -78,51 +69,42 @@ export interface PaginatedResolveFunction {
 export interface MakeConnectionArgs {
   nodeType: GraphQLObjectType;
   resolve: PaginatedResolveFunction;
-  additionalConnectionArgs?: any;
 }
 
 export function makeConnection(args: MakeConnectionArgs) {
-  const { additionalConnectionArgs, nodeType, resolve } = args;
+  const { nodeType, resolve } = args;
   return {
     type: makeConnectionType(nodeType),
     args: {
-      cursor: {
-        description: `start after this item`,
-        type: GraphQLString,
+      page: {
+        description: `page number`,
+        type: GraphQLInt,
       },
       limit: {
         description: `max items to return`,
         type: GraphQLInt,
       },
-      sortBy: {
-        description: `field to sort by`,
+      sort: {
+        description: `field and order to sort by`,
         type: GraphQLString,
       },
-      sortDescending: {
-        description: `sort in descending order`,
-        type: GraphQLBoolean,
-      },
-      ...(additionalConnectionArgs || {}),
     },
     resolve: async (
       parent: any,
-      args: { cursor?: string; limit?: number; sort?: string }
+      args: {
+        page?: number;
+        limit?: number;
+        sort?: string;
+      }
     ) => {
       const paginateResult = await resolve({ parent, args });
       return {
-        edges: paginateResult.items.map((m: any) => {
-          return {
-            node: m,
-            cursor: m.id,
-          };
-        }),
+        items: paginateResult.docs,
         pageInfo: {
-          hasNextPage: paginateResult.hasMore,
-          endCursor:
-            Array.isArray(paginateResult.items) &&
-            paginateResult.items.length > 0
-              ? paginateResult.items[paginateResult.items.length - 1].id
-              : null,
+          hasPrevPage: paginateResult.hasPrevPage,
+          hasNextPage: paginateResult.hasNextPage,
+          page: paginateResult.page,
+          limit: paginateResult.limit,
         },
       };
     },

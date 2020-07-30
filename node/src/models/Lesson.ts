@@ -33,11 +33,14 @@ export const LessonSchema = new Schema(
   },
   { timestamps: true }
 );
+
 LessonSchema.index({
-  _id: -1,
   name: 1,
-  createdAt: -1,
+  lessonId: 1,
+  createdAt: 1,
+  updatedAt: 1,
+  _id: 1,
 });
-LessonSchema.plugin(require('mongoose-cursor-pagination').default);
+LessonSchema.plugin(require('mongoose-paginate-v2'));
 
 export default mongoose.model<Lesson, LessonModel>('Lesson', LessonSchema);

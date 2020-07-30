@@ -18,113 +18,106 @@ describe('lessons', () => {
     await mongoUnit.drop();
   });
 
-  it('gets a page of all lessons', async () => {
+  it('gets a default page of lessons', async () => {
     const response = await request(app).post('/grading-api').send({
       query:
-        '{ lessons { edges { cursor node { lessonId } } pageInfo { hasNextPage } } }',
+        '{ lessons { items { id } pageInfo { hasPrevPage hasNextPage page limit } } }',
     });
-
     expect(response.status).to.equal(200);
     expect(response.body).to.eql({
       data: {
         lessons: {
-          edges: [
+          items: [
             {
-              node: {
-                lessonId: 'lesson1',
-              },
-              cursor: '5f0cfea3395d762ca65405c3',
+              id: '5f0cfea3395d762ca65405c3',
             },
             {
-              node: {
-                lessonId: 'lesson2',
-              },
-              cursor: '5f0cfea3395d762ca65405c4',
+              id: '5f0cfea3395d762ca65405c4',
             },
           ],
           pageInfo: {
+            hasPrevPage: false,
             hasNextPage: false,
+            page: 1,
+            limit: 100,
           },
         },
       },
     });
   });
 
-  it('gets a page of 1 lessons', async () => {
+  it('gets a page of lessons with limit', async () => {
     const response = await request(app).post('/grading-api').send({
       query:
-        '{ lessons(limit: 1) { edges { cursor node { lessonId } } pageInfo { hasNextPage } } }',
+        '{ lessons(limit: 1) { items { id } pageInfo { hasPrevPage hasNextPage page limit } } }',
     });
-
     expect(response.status).to.equal(200);
     expect(response.body).to.eql({
       data: {
         lessons: {
-          edges: [
+          items: [
             {
-              node: {
-                lessonId: 'lesson1',
-              },
-              cursor: '5f0cfea3395d762ca65405c3',
+              id: '5f0cfea3395d762ca65405c3',
             },
           ],
           pageInfo: {
+            hasPrevPage: false,
             hasNextPage: true,
+            page: 1,
+            limit: 1,
           },
         },
       },
     });
   });
 
-  it('gets next page after cursor', async () => {
+  it('gets next page of lessons with limit', async () => {
     const response = await request(app).post('/grading-api').send({
       query:
-        '{ lessons(limit: 1, cursor: "5f0cfea3395d762ca65405c3") { edges { node { lessonId } } pageInfo { hasNextPage } } }',
+        '{ lessons(limit: 1, page: 2) { items { id } pageInfo { hasPrevPage hasNextPage page limit } } }',
     });
-
     expect(response.status).to.equal(200);
     expect(response.body).to.eql({
       data: {
         lessons: {
-          edges: [
+          items: [
             {
-              node: {
-                lessonId: 'lesson2',
-              },
+              id: '5f0cfea3395d762ca65405c4',
             },
           ],
           pageInfo: {
+            hasPrevPage: true,
             hasNextPage: false,
+            page: 2,
+            limit: 1,
           },
         },
       },
     });
   });
 
-  it('sorts lessons by name in descending order', async () => {
+  it('gets a page of lessons sorted by descending name', async () => {
     const response = await request(app).post('/grading-api').send({
       query:
-        '{ lessons(sortBy: "name", sortDescending: true) { edges { node { lessonId } } pageInfo { hasNextPage } } }',
+        '{ lessons(sort: "-name") { items { id } pageInfo { hasPrevPage hasNextPage page limit } } }',
     });
-
     expect(response.status).to.equal(200);
     expect(response.body).to.eql({
       data: {
         lessons: {
-          edges: [
+          items: [
             {
-              node: {
-                lessonId: 'lesson2',
-              },
+              id: '5f0cfea3395d762ca65405c4',
             },
             {
-              node: {
-                lessonId: 'lesson1',
-              },
+              id: '5f0cfea3395d762ca65405c3',
             },
           ],
           pageInfo: {
+            hasPrevPage: false,
             hasNextPage: false,
+            page: 1,
+            limit: 100,
           },
         },
       },

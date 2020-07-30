@@ -2,9 +2,9 @@ import { GraphQLObjectType } from 'graphql';
 import { makeConnection, PaginatedResolveArgs } from 'gql/types/connection';
 import { HasPaginate } from 'gql/types/mongoose-type-helpers';
 
-export function findAll<T>(config: {
+export function findAll(config: {
   nodeType: GraphQLObjectType;
-  model: HasPaginate<T>;
+  model: HasPaginate;
 }) {
   const { nodeType, model } = config;
 
@@ -12,16 +12,13 @@ export function findAll<T>(config: {
     nodeType,
     resolve: async (resolveArgs: PaginatedResolveArgs) => {
       const { parent, args } = resolveArgs;
-      const sortBy: any = {};
-      sortBy[args.sortBy ? `${args.sortBy}` : '_id'] = args.sortDescending
-        ? -1
-        : 1;
+      console.log(`paginate page=${args.page} l`);
       return await model.paginate(
         {},
         {
-          sort: sortBy,
+          page: args.page || 1,
           limit: Number(args.limit) || 100,
-          startingAfter: args.cursor,
+          sort: args.sort || '',
         }
       );
     },

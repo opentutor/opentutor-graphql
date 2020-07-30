@@ -41,15 +41,18 @@ export const UserSessionSchema = new Schema(
   },
   { timestamps: true }
 );
+
 UserSessionSchema.index({
-  _id: -1,
   sessionId: 1,
   lessonId: 1,
   username: 1,
-  graderGrade: -1,
-  createdAt: -1,
+  graderGrade: 1,
+  classifierGrade: 1,
+  createdAt: 1,
+  updatedAt: 1,
+  _id: 1,
 });
-UserSessionSchema.plugin(require('mongoose-cursor-pagination').default);
+UserSessionSchema.plugin(require('mongoose-paginate-v2'));
 
 UserSessionSchema.statics.setGrade = async function (
   sessionId: string,

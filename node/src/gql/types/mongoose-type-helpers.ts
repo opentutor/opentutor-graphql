@@ -12,7 +12,7 @@ export interface HasFindById<T> {
   findById(id: string): Executable<T>;
 }
 
-export interface HasPaginate<T> {
+export interface HasPaginate {
   paginate(
     query?: any,
     options?: any,
@@ -23,4 +23,4 @@ export interface HasPaginate<T> {
 export type MongooseModel<T> = HasFindOne<T> & HasFindById<T>;
 export type PaginatableMongooseModel<T> = HasFindOne<T> &
   HasFindById<T> &
-  HasPaginate<T>;
+  HasPaginate;
