@@ -44,12 +44,12 @@ LICENSE_HEADER:
 .PHONY: license
 license: LICENSE LICENSE_HEADER
 	cd node \
-	&& $(MAKE) license
+	&& npm run license:fix
 
 .PHONY: test-license
 test-license: LICENSE LICENSE_HEADER
 	cd node \
-	&& $(MAKE) test-license
+	&& npm run test:license
 
 node_modules/license-check-and-add:
 	npm ci
