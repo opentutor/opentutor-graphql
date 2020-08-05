@@ -17,7 +17,9 @@
     "test:audit": "npm audit --audit-level=moderate --production",
     "test:format": "prettier --check '**/*.{js,jsx,json,ts,tsx}'",
     "test:lint": "eslint src --ext ts --ext js",
-    "test:types": "tsc --noEmit"
+    "test:types": "tsc --noEmit",
+    "license:fix": "license-check-and-add remove -f license-config.json && license-check-and-add add -f license-config.json",
+    "test:license": "license-check-and-add check -f license-config.json"
   },
   "author": "CVM",
   "license": "ISC",
@@ -49,6 +51,7 @@
     "eslint": "^7.4.0",
     "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-prettier": "^3.1.4",
+    "license-check-and-add": "^3.0.4",
     "mocha": "^8.0.1",
     "mocha-logger": "^1.0.6",
     "mocha-prepare": "^0.1.0",
