@@ -18,8 +18,8 @@ import Question from './Question';
 export { default as Question } from './Question';
 import Response from './Response';
 export { default as Response } from './Response';
-import UserSession from './UserSession';
-export { default as UserSession } from './UserSession';
+import Session from './Session';
+export { default as Session } from './Session';
 
 export default {
   Expectation,
@@ -29,5 +29,5 @@ export default {
   LessonExpectation,
   Question,
   Response,
-  UserSession,
+  Session,
 };

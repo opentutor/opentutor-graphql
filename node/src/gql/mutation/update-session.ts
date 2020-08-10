@@ -5,41 +5,41 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import { GraphQLString } from 'graphql';
-import UserSessionType from 'gql/types/user-session';
-import { UserSession } from 'models';
+import SessionType from 'gql/types/session';
+import { Session } from 'models';
 import calculateScore from 'models/utils/calculate-score';
 
 export const updateSession = {
-  type: UserSessionType,
+  type: SessionType,
   args: {
     sessionId: { type: GraphQLString },
-    userSession: { type: GraphQLString },
+    session: { type: GraphQLString },
   },
   resolve: async (root: any, args: any) => {
     if (args.sessionId === undefined) {
       throw new Error('missing required param sessionId');
     }
-    if (args.userSession === undefined) {
-      throw new Error('missing required param userSession');
+    if (args.session === undefined) {
+      throw new Error('missing required param session');
     }
-    const userSession = JSON.parse(decodeURI(args.userSession));
-    if (!userSession.sessionId) {
-      throw new Error('userSession is missing a sessionId');
+    const session = JSON.parse(decodeURI(args.session));
+    if (!session.sessionId) {
+      throw new Error('session is missing a sessionId');
     }
-    if (!userSession.lessonId) {
-      throw new Error('userSession is missing a lessonId');
+    if (!session.lessonId) {
+      throw new Error('session is missing a lessonId');
     }
 
-    const grade = calculateScore(userSession, 'graderGrade');
-    const classifierGrade = calculateScore(userSession, 'classifierGrade');
+    const grade = calculateScore(session, 'graderGrade');
+    const classifierGrade = calculateScore(session, 'classifierGrade');
 
-    return await UserSession.findOneAndUpdate(
+    return await Session.findOneAndUpdate(
       {
         sessionId: args.sessionId,
       },
       {
         $set: {
-          ...userSession,
+          ...session,
           graderGrade: grade,
           classifierGrade: classifierGrade,
         },

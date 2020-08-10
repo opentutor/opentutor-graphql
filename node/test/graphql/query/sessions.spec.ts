@@ -10,7 +10,7 @@ import { Express } from 'express';
 import mongoUnit from 'mongo-unit';
 import request from 'supertest';
 
-describe('userSessions', () => {
+describe('sessions', () => {
   let app: Express;
 
   beforeEach(async () => {
@@ -24,16 +24,16 @@ describe('userSessions', () => {
     await mongoUnit.drop();
   });
 
-  it('gets a page of all userSessions', async () => {
+  it('gets a page of all sessions', async () => {
     const response = await request(app).post('/grading-api').send({
       query:
-        '{ userSessions { edges { cursor node { sessionId } } pageInfo { hasNextPage } } }',
+        '{ sessions { edges { cursor node { sessionId } } pageInfo { hasNextPage } } }',
     });
     expect(response.status).to.equal(200);
     console.log(response.body);
     expect(response.body).to.eql({
       data: {
-        userSessions: {
+        sessions: {
           edges: [
             {
               node: {
@@ -74,16 +74,16 @@ describe('userSessions', () => {
     });
   });
 
-  it('gets a page of 1 userSessions', async () => {
+  it('gets a page of 1 sessions', async () => {
     const response = await request(app).post('/grading-api').send({
       query:
-        '{ userSessions(limit: 1) { edges { cursor node { sessionId } } pageInfo { hasNextPage } } }',
+        '{ sessions(limit: 1) { edges { cursor node { sessionId } } pageInfo { hasNextPage } } }',
     });
 
     expect(response.status).to.equal(200);
     expect(response.body).to.eql({
       data: {
-        userSessions: {
+        sessions: {
           edges: [
             {
               node: {
@@ -103,13 +103,13 @@ describe('userSessions', () => {
   it('gets next page after cursor', async () => {
     const response = await request(app).post('/grading-api').send({
       query:
-        '{ userSessions(limit: 1, cursor: "5f20c63646f6110a6a5b2134") { edges { node { sessionId } } pageInfo { hasNextPage } } }',
+        '{ sessions(limit: 1, cursor: "5f20c63646f6110a6a5b2134") { edges { node { sessionId } } pageInfo { hasNextPage } } }',
     });
 
     expect(response.status).to.equal(200);
     expect(response.body).to.eql({
       data: {
-        userSessions: {
+        sessions: {
           edges: [
             {
               node: {

@@ -5,11 +5,11 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import { GraphQLString, GraphQLInt } from 'graphql';
-import UserSessionType from 'gql/types/user-session';
-import { UserSession } from 'models';
+import SessionType from 'gql/types/session';
+import { Session } from 'models';
 
 export const setGrade = {
-  type: UserSessionType,
+  type: SessionType,
   args: {
     sessionId: { type: GraphQLString },
     userAnswerIndex: { type: GraphQLInt },
@@ -29,7 +29,7 @@ export const setGrade = {
     if (args.grade === undefined) {
       throw new Error('missing required param grade');
     }
-    return await UserSession.setGrade(
+    return await Session.setGrade(
       args.sessionId,
       args.userAnswerIndex,
       args.userExpectationIndex,

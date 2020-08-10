@@ -100,11 +100,11 @@ describe('setGrade', () => {
     expect(response.status).to.equal(200);
     expect(response.body).to.have.deep.nested.property(
       'errors[0].message',
-      'failed to find userSession with sessionId 111111111111111111111111'
+      'failed to find session with sessionId 111111111111111111111111'
     );
   });
 
-  it('returns updated user session', async () => {
+  it('returns updated session', async () => {
     const setGrade = await request(app).post('/grading-api').send({
       query: `mutation { 
           setGrade(sessionId: "session 1", userAnswerIndex: 0, userExpectationIndex: 0, grade: "Bad") { 
@@ -163,7 +163,7 @@ describe('setGrade', () => {
     });
   });
 
-  it('updates user session in database', async () => {
+  it('updates session in database', async () => {
     await request(app).post('/grading-api').send({
       query: `mutation { 
           setGrade(sessionId: "session 1", userAnswerIndex: 0, userExpectationIndex: 0, grade: "Bad") { 
@@ -172,9 +172,9 @@ describe('setGrade', () => {
         }`,
     });
 
-    const userSession = await request(app).post('/grading-api').send({
+    const session = await request(app).post('/grading-api').send({
       query: `query { 
-          userSession(sessionId: "session 1") { 
+          session(sessionId: "session 1") { 
             username
             graderGrade
             classifierGrade
@@ -194,8 +194,8 @@ describe('setGrade', () => {
           } 
         }`,
     });
-    expect(userSession.status).to.equal(200);
-    expect(userSession.body.data.userSession).to.eql({
+    expect(session.status).to.equal(200);
+    expect(session.body.data.session).to.eql({
       username: 'username1',
       graderGrade: null,
       classifierGrade: null,
@@ -238,15 +238,15 @@ describe('setGrade', () => {
         }`,
     });
 
-    const userSession = await request(app).post('/grading-api').send({
+    const session = await request(app).post('/grading-api').send({
       query: `query { 
-          userSession(sessionId: "session 2") { 
+          session(sessionId: "session 2") { 
             graderGrade
           } 
         }`,
     });
-    expect(userSession.status).to.equal(200);
-    expect(userSession.body.data.userSession).to.eql({
+    expect(session.status).to.equal(200);
+    expect(session.body.data.session).to.eql({
       graderGrade: 1,
     });
   });
@@ -260,15 +260,15 @@ describe('setGrade', () => {
         }`,
     });
 
-    const userSession = await request(app).post('/grading-api').send({
+    const session = await request(app).post('/grading-api').send({
       query: `query { 
-          userSession(sessionId: "session 2") { 
+          session(sessionId: "session 2") { 
             graderGrade
           } 
         }`,
     });
-    expect(userSession.status).to.equal(200);
-    expect(userSession.body.data.userSession).to.eql({
+    expect(session.status).to.equal(200);
+    expect(session.body.data.session).to.eql({
       graderGrade: 0,
     });
   });
@@ -282,15 +282,15 @@ describe('setGrade', () => {
         }`,
     });
 
-    const userSession = await request(app).post('/grading-api').send({
+    const session = await request(app).post('/grading-api').send({
       query: `query { 
-          userSession(sessionId: "session 2") { 
+          session(sessionId: "session 2") { 
             graderGrade
           } 
         }`,
     });
-    expect(userSession.status).to.equal(200);
-    expect(userSession.body.data.userSession).to.eql({
+    expect(session.status).to.equal(200);
+    expect(session.body.data.session).to.eql({
       graderGrade: 0.5,
     });
   });
@@ -304,15 +304,15 @@ describe('setGrade', () => {
         }`,
     });
 
-    const userSession = await request(app).post('/grading-api').send({
+    const session = await request(app).post('/grading-api').send({
       query: `query { 
-          userSession(sessionId: "session 2") { 
+          session(sessionId: "session 2") { 
             graderGrade
           } 
         }`,
     });
-    expect(userSession.status).to.equal(200);
-    expect(userSession.body.data.userSession).to.eql({
+    expect(session.status).to.equal(200);
+    expect(session.body.data.session).to.eql({
       graderGrade: null,
     });
   });

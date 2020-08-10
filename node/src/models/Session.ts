@@ -10,7 +10,7 @@ import { Question, QuestionSchema } from './Question';
 import { PaginatedResolveResult } from './PaginatedResolveResult';
 import calculateScore from 'models/utils/calculate-score';
 
-export interface UserSession extends Document {
+export interface Session extends Document {
   sessionId: string;
   lessonId: string;
   username: string;
@@ -20,22 +20,22 @@ export interface UserSession extends Document {
   userResponses: [Response];
 }
 
-export interface UserSessionModel extends Model<UserSession> {
+export interface SessionModel extends Model<Session> {
   paginate(
     query?: any,
     options?: any,
     callback?: any
-  ): Promise<PaginatedResolveResult<UserSession>>;
+  ): Promise<PaginatedResolveResult<Session>>;
 
   setGrade(
     sessionId: string,
     userAnswerIndex: number,
     userExpectationIndex: number,
     grade: string
-  ): Promise<UserSession>;
+  ): Promise<Session>;
 }
 
-export const UserSessionSchema = new Schema(
+export const SessionSchema = new Schema(
   {
     sessionId: { type: String, required: '{PATH} is required!' },
     lessonId: { type: String, required: '{PATH} is required!' },
@@ -47,7 +47,7 @@ export const UserSessionSchema = new Schema(
   },
   { timestamps: true }
 );
-UserSessionSchema.index({
+SessionSchema.index({
   _id: -1,
   sessionId: 1,
   lessonId: 1,
@@ -55,25 +55,25 @@ UserSessionSchema.index({
   graderGrade: -1,
   createdAt: -1,
 });
-UserSessionSchema.plugin(require('mongoose-cursor-pagination').default);
+SessionSchema.plugin(require('mongoose-cursor-pagination').default);
 
-UserSessionSchema.statics.setGrade = async function (
+SessionSchema.statics.setGrade = async function (
   sessionId: string,
   userAnswerIndex: number,
   userExpectationIndex: number,
   grade: string
 ) {
-  const userSession = await this.findOne({ sessionId: sessionId });
-  if (!userSession) {
-    throw new Error(`failed to find userSession with sessionId ${sessionId}`);
+  const session = await this.findOne({ sessionId: sessionId });
+  if (!session) {
+    throw new Error(`failed to find session with sessionId ${sessionId}`);
   }
 
-  userSession.userResponses[userAnswerIndex].expectationScores[
+  session.userResponses[userAnswerIndex].expectationScores[
     userExpectationIndex
   ].graderGrade = grade;
 
-  const score = calculateScore(userSession);
-  userSession.score = score;
+  const score = calculateScore(session);
+  session.score = score;
 
   const changesAsSet: any = {};
   changesAsSet[
@@ -94,7 +94,4 @@ UserSessionSchema.statics.setGrade = async function (
   );
 };
 
-export default mongoose.model<UserSession, UserSessionModel>(
-  'UserSession',
-  UserSessionSchema
-);
+export default mongoose.model<Session, SessionModel>('Session', SessionSchema);

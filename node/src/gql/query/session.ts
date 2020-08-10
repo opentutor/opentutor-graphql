@@ -5,14 +5,14 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import { GraphQLString } from 'graphql';
-import UserSessionType from 'gql/types/user-session';
-import { UserSession } from 'models';
+import SessionType from 'gql/types/session';
+import { Session } from 'models';
 import findOne from './find-one';
 
-export const userSession = findOne({
-  model: UserSession,
-  type: UserSessionType,
-  typeName: 'usersession',
+export const session = findOne({
+  model: Session,
+  type: SessionType,
+  typeName: 'session',
   argsConfig: {
     sessionId: {
       description: 'id of the session',
@@ -21,4 +21,4 @@ export const userSession = findOne({
   },
 });
 
-export default userSession;
+export default session;

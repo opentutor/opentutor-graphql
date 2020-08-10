@@ -10,7 +10,7 @@ import { Express } from 'express';
 import mongoUnit from 'mongo-unit';
 import request from 'supertest';
 
-describe('userSession', () => {
+describe('session', () => {
   let app: Express;
 
   beforeEach(async () => {
@@ -27,7 +27,7 @@ describe('userSession', () => {
   it(`returns an error if invalid sessionId`, async () => {
     const response = await request(app).post('/grading-api').send({
       query: `query { 
-          userSession(sessionId: "111111111111111111111111") { 
+          session(sessionId: "111111111111111111111111") { 
             username
           } 
         }`,
@@ -36,39 +36,39 @@ describe('userSession', () => {
     expect(response.status).to.equal(200);
     expect(response.body).to.have.deep.nested.property(
       'errors[0].message',
-      'usersession not found for args "{"sessionId":"111111111111111111111111"}"'
+      'session not found for args "{"sessionId":"111111111111111111111111"}"'
     );
   });
 
   it('succeeds with valid sessionId', async () => {
     const response = await request(app).post('/grading-api').send({
       query: `query { 
-          userSession(sessionId: "session 1") { 
-            sessionId
-            username
-            lesson {
-              lessonId
-            }
-            question {
+        session(sessionId: "session 1") { 
+          sessionId
+          username
+          lesson {
+            lessonId
+          }
+          question {
+            text
+            expectations {
               text
-              expectations {
-                text
-              }
             }
-            userResponses {
-              text
-              expectationScores {
-                classifierGrade
-                graderGrade
-              }
+          }
+          userResponses {
+            text
+            expectationScores {
+              classifierGrade
+              graderGrade
             }
-          } 
-        }`,
+          }
+        } 
+      }`,
     });
 
-    const userSession = response.body.data.userSession;
+    const session = response.body.data.session;
     expect(response.status).to.equal(200);
-    expect(userSession).to.eql({
+    expect(session).to.eql({
       sessionId: 'session 1',
       lesson: {
         lessonId: 'lesson1',

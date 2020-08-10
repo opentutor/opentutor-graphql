@@ -61,7 +61,7 @@ module.exports = {
     },
   ],
 
-  usersessions: [
+  sessions: [
     {
       _id: ObjectId('5f20c63646f6110a6a5b2134'),
       sessionId: 'session 1',

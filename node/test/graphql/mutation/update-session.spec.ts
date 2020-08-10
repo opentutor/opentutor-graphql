@@ -27,7 +27,7 @@ describe('updateSession', () => {
   it(`returns an error if no sessionId`, async () => {
     const response = await request(app).post('/grading-api').send({
       query: `mutation { 
-          updateSession(userSession: "") { 
+          updateSession(session: "") { 
             username
           } 
         }`,
@@ -39,7 +39,7 @@ describe('updateSession', () => {
     );
   });
 
-  it(`returns an error if no userSession`, async () => {
+  it(`returns an error if no session`, async () => {
     const response = await request(app).post('/grading-api').send({
       query: `mutation { 
           updateSession(sessionId: "new session") { 
@@ -50,12 +50,12 @@ describe('updateSession', () => {
     expect(response.status).to.equal(200);
     expect(response.body).to.have.deep.nested.property(
       'errors[0].message',
-      'missing required param userSession'
+      'missing required param session'
     );
   });
 
-  it(`returns an error if userSession has no lessonId`, async () => {
-    const userSession = encodeURI(
+  it(`returns an error if session has no lessonId`, async () => {
+    const session = encodeURI(
       JSON.stringify({
         sessionId: 'new session',
       })
@@ -64,7 +64,7 @@ describe('updateSession', () => {
       .post('/grading-api')
       .send({
         query: `mutation { 
-          updateSession(sessionId: "new session", userSession: "${userSession}") { 
+          updateSession(sessionId: "new session", session: "${session}") { 
             sessionId
           } 
         }`,
@@ -72,12 +72,12 @@ describe('updateSession', () => {
     expect(response.status).to.equal(200);
     expect(response.body).to.have.deep.nested.property(
       'errors[0].message',
-      'userSession is missing a lessonId'
+      'session is missing a lessonId'
     );
   });
 
-  it(`returns an error if userSession has no sessionId`, async () => {
-    const userSession = encodeURI(
+  it(`returns an error if session has no sessionId`, async () => {
+    const session = encodeURI(
       JSON.stringify({
         lessonId: 'lesson1',
       })
@@ -86,7 +86,7 @@ describe('updateSession', () => {
       .post('/grading-api')
       .send({
         query: `mutation { 
-          updateSession(sessionId: "new session", userSession: "${userSession}") { 
+          updateSession(sessionId: "new session", session: "${session}") { 
             sessionId
           } 
         }`,
@@ -94,12 +94,12 @@ describe('updateSession', () => {
     expect(response.status).to.equal(200);
     expect(response.body).to.have.deep.nested.property(
       'errors[0].message',
-      'userSession is missing a sessionId'
+      'session is missing a sessionId'
     );
   });
 
-  it(`returns updated user session`, async () => {
-    const userSession = encodeURI(
+  it(`returns updated session`, async () => {
+    const session = encodeURI(
       JSON.stringify({
         lessonId: 'lesson1',
         sessionId: 'new session',
@@ -124,7 +124,7 @@ describe('updateSession', () => {
       .post('/grading-api')
       .send({
         query: `mutation { 
-          updateSession(sessionId: "new session", userSession: "${userSession}") { 
+          updateSession(sessionId: "new session", session: "${session}") { 
             sessionId
             username
             lesson {
@@ -171,8 +171,8 @@ describe('updateSession', () => {
     });
   });
 
-  it(`adds new userSession to database`, async () => {
-    const userSession = encodeURI(
+  it(`adds new session to database`, async () => {
+    const session = encodeURI(
       JSON.stringify({
         lessonId: 'lesson1',
         sessionId: 'new session',
@@ -197,7 +197,7 @@ describe('updateSession', () => {
       .post('/grading-api')
       .send({
         query: `mutation { 
-            updateSession(sessionId: "new session", userSession: "${userSession}") { 
+            updateSession(sessionId: "new session", session: "${session}") { 
               username
             } 
           }`,
@@ -205,7 +205,7 @@ describe('updateSession', () => {
 
     const response = await request(app).post('/grading-api').send({
       query: `query { 
-            userSession(sessionId: "new session") { 
+            session(sessionId: "new session") { 
               sessionId
               username
               question {
@@ -225,7 +225,7 @@ describe('updateSession', () => {
           }`,
     });
     expect(response.status).to.equal(200);
-    expect(response.body.data.userSession).to.eql({
+    expect(response.body.data.session).to.eql({
       sessionId: 'new session',
       username: 'new username',
       question: {
@@ -246,8 +246,8 @@ describe('updateSession', () => {
     });
   });
 
-  it(`updates userSession in database`, async () => {
-    const userSession = encodeURI(
+  it(`updates session in database`, async () => {
+    const session = encodeURI(
       JSON.stringify({
         lessonId: 'lesson1',
         sessionId: 'session 1',
@@ -272,7 +272,7 @@ describe('updateSession', () => {
       .post('/grading-api')
       .send({
         query: `mutation { 
-            updateSession(sessionId: "session 1", userSession: "${userSession}") { 
+            updateSession(sessionId: "session 1", session: "${session}") { 
               username
             } 
           }`,
@@ -280,7 +280,7 @@ describe('updateSession', () => {
 
     const response = await request(app).post('/grading-api').send({
       query: `query { 
-            userSession(sessionId: "session 1") { 
+            session(sessionId: "session 1") { 
               sessionId
               username
               question {
@@ -300,7 +300,7 @@ describe('updateSession', () => {
           }`,
     });
     expect(response.status).to.equal(200);
-    expect(response.body.data.userSession).to.eql({
+    expect(response.body.data.session).to.eql({
       sessionId: 'session 1',
       username: 'new username',
       question: {
@@ -322,7 +322,7 @@ describe('updateSession', () => {
   });
 
   it(`calculates grader and classifier scores`, async () => {
-    const userSession = encodeURI(
+    const session = encodeURI(
       JSON.stringify({
         lessonId: 'lesson1',
         sessionId: 'new session',
@@ -348,7 +348,7 @@ describe('updateSession', () => {
       .post('/grading-api')
       .send({
         query: `mutation { 
-            updateSession(sessionId: "new session", userSession: "${userSession}") { 
+            updateSession(sessionId: "new session", session: "${session}") { 
               graderGrade
               classifierGrade
             }
