@@ -30,7 +30,6 @@ describe('sessions', () => {
         '{ sessions { edges { cursor node { sessionId } } pageInfo { hasNextPage } } }',
     });
     expect(response.status).to.equal(200);
-    console.log(response.body);
     expect(response.body).to.eql({
       data: {
         sessions: {

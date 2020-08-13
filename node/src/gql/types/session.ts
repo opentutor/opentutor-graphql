@@ -12,10 +12,39 @@ import {
   GraphQLFloat,
 } from 'graphql';
 import DateType from './date';
-import QuestionType from './question';
-import ResponseType from './response';
 import LessonType from './lesson';
 import { Lesson } from 'models';
+
+const ExpectationType = new GraphQLObjectType({
+  name: 'Expectation',
+  fields: {
+    text: { type: GraphQLString },
+  },
+});
+
+const QuestionType = new GraphQLObjectType({
+  name: 'Question',
+  fields: {
+    text: { type: GraphQLString },
+    expectations: { type: GraphQLList(ExpectationType) },
+  },
+});
+
+const ExpectationScoreType = new GraphQLObjectType({
+  name: 'ExpectationScore',
+  fields: {
+    classifierGrade: { type: GraphQLString },
+    graderGrade: { type: GraphQLString },
+  },
+});
+
+const ResponseType = new GraphQLObjectType({
+  name: 'Response',
+  fields: {
+    text: { type: GraphQLString },
+    expectationScores: { type: GraphQLList(ExpectationScoreType) },
+  },
+});
 
 export const SessionType = new GraphQLObjectType({
   name: 'Session',
@@ -29,6 +58,9 @@ export const SessionType = new GraphQLObjectType({
     userResponses: { type: GraphQLList(ResponseType) },
     createdAt: { type: DateType },
     updatedAt: { type: DateType },
+    lessonId: { type: GraphQLString },
+    lessonName: { type: GraphQLString },
+    lessonCreatedBy: { type: GraphQLString },
     lesson: {
       type: LessonType,
       resolve: async function (session) {

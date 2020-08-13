@@ -441,4 +441,39 @@ describe('updateLesson', () => {
       'lesson not found for args "{"lessonId":"lesson1"}"'
     );
   });
+
+  it(`updates session lesson`, async () => {
+    const lesson = encodeURI(
+      JSON.stringify({
+        lessonId: 'newlessonid',
+        name: 'new lesson name',
+        createdBy: 'new creator',
+      })
+    );
+    await request(app)
+      .post('/grading-api')
+      .send({
+        query: `mutation { 
+          updateLesson(lessonId: "lesson1", lesson: "${lesson}") {
+            lessonId
+          } 
+        }`,
+      });
+
+    const response = await request(app).post('/grading-api').send({
+      query: `query {
+        session(sessionId: "session 1") {
+          lessonId
+          lessonName
+          lessonCreatedBy
+        } 
+      }`,
+    });
+    expect(response.status).to.equal(200);
+    expect(response.body.data.session).to.eql({
+      lessonId: 'newlessonid',
+      lessonName: 'new lesson name',
+      lessonCreatedBy: 'new creator',
+    });
+  });
 });

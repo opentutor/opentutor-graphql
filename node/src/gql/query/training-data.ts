@@ -5,10 +5,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import { GraphQLString } from 'graphql';
-import { Session, Lesson } from 'models';
-import { Session as SessionType } from 'models/Session';
-import { Response } from 'models/Response';
-import { ExpectationScore } from 'models/ExpectationScore';
+import { Lesson, Session } from 'models';
 import TrainingDataType from 'gql/types/training-data';
 
 export const trainingData = {
@@ -17,23 +14,10 @@ export const trainingData = {
     lessonId: { type: GraphQLString },
   },
   resolve: async (root: any, args: any) => {
-    const sessions = await Session.find({
-      lessonId: args.lessonId,
-    });
-    let training = 'exp_num,text,label';
-    sessions.forEach((session: SessionType) => {
-      session.userResponses.forEach((response: Response) => {
-        for (let i = 0; i < response.expectationScores.length; i++) {
-          const score: ExpectationScore = response.expectationScores[i];
-          if (score.graderGrade) {
-            training += `\n${i},${response.text},${score.graderGrade}`;
-          }
-        }
-      });
-    });
+    const trainingData = await Session.getTrainingData(args.lessonId);
     const lesson = await Lesson.findOne({ lessonId: args.lessonId });
     const config = `question: "${lesson.question}"`;
-    return { config: config, training: training };
+    return { config: config, training: trainingData };
   },
 };
 

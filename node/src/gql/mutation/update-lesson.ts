@@ -6,7 +6,7 @@ The full terms of this copyright and license should always be found in the root 
 */
 import { GraphQLString } from 'graphql';
 import LessonType from 'gql/types/lesson';
-import { Lesson } from 'models';
+import { Lesson, Session } from 'models';
 
 export const updateLesson = {
   type: LessonType,
@@ -29,6 +29,8 @@ export const updateLesson = {
     ) {
       throw new Error('lessonId must match [a-z0-9-]');
     }
+
+    await Session.updateLesson(args.lessonId, lesson);
 
     return await Lesson.findOneAndUpdate(
       {

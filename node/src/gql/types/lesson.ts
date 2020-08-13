@@ -11,7 +11,21 @@ import {
   GraphQLList,
 } from 'graphql';
 import DateType from './date';
-import LessonExpectationType from './lesson-expectation';
+
+const HintType = new GraphQLObjectType({
+  name: 'Hint',
+  fields: {
+    text: { type: GraphQLString },
+  },
+});
+
+const LessonExpectationType = new GraphQLObjectType({
+  name: 'LessonExpectation',
+  fields: {
+    expectation: { type: GraphQLString },
+    hints: { type: GraphQLList(HintType) },
+  },
+});
 
 export const LessonType = new GraphQLObjectType({
   name: 'Lesson',

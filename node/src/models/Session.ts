@@ -5,14 +5,61 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import mongoose, { Schema, Document, Model } from 'mongoose';
-import { Response, ResponseSchema } from './Response';
-import { Question, QuestionSchema } from './Question';
 import { PaginatedResolveResult } from './PaginatedResolveResult';
+import { Lesson } from './Lesson';
 import calculateScore from 'models/utils/calculate-score';
+
+interface Expectation extends Document {
+  text: string;
+}
+
+const ExpectationSchema = new Schema({
+  text: { type: String },
+});
+
+interface Question extends Document {
+  text: string;
+  expectations: [Expectation];
+}
+
+const QuestionSchema = new Schema({
+  text: { type: String },
+  expectations: [ExpectationSchema],
+});
+
+interface ExpectationScore extends Document {
+  classifierGrade: string;
+  graderGrade: string;
+}
+
+const ExpectationScoreSchema = new Schema({
+  classifierGrade: {
+    type: String,
+    enum: ['Good', 'Bad', 'Neutral'],
+    default: 'Neutral',
+  },
+  graderGrade: {
+    type: String,
+    enum: ['Good', 'Bad', 'Neutral', null],
+    default: null,
+  },
+});
+
+interface Response extends Document {
+  text: string;
+  expectationScores: [ExpectationScore];
+}
+
+const ResponseSchema = new Schema({
+  text: { type: String },
+  expectationScores: [ExpectationScoreSchema],
+});
 
 export interface Session extends Document {
   sessionId: string;
   lessonId: string;
+  lessonName: string;
+  lessonCreatedBy: string;
   username: string;
   graderGrade: number;
   classifierGrade: number;
@@ -20,12 +67,31 @@ export interface Session extends Document {
   userResponses: [Response];
 }
 
+export const SessionSchema = new Schema(
+  {
+    sessionId: { type: String, required: '{PATH} is required!' },
+    lessonId: { type: String, required: '{PATH} is required!' },
+    lessonName: { type: String },
+    lessonCreatedBy: { type: String },
+    username: { type: String },
+    graderGrade: { type: Number },
+    classifierGrade: { type: Number },
+    question: { type: QuestionSchema },
+    userResponses: [ResponseSchema],
+  },
+  { timestamps: true }
+);
+
 export interface SessionModel extends Model<Session> {
   paginate(
     query?: any,
     options?: any,
     callback?: any
   ): Promise<PaginatedResolveResult<Session>>;
+
+  getTrainingData(lessonId: string): string;
+
+  updateLesson(lessonId: string, updatedLesson: Lesson): void;
 
   setGrade(
     sessionId: string,
@@ -35,27 +101,49 @@ export interface SessionModel extends Model<Session> {
   ): Promise<Session>;
 }
 
-export const SessionSchema = new Schema(
-  {
-    sessionId: { type: String, required: '{PATH} is required!' },
-    lessonId: { type: String, required: '{PATH} is required!' },
-    username: { type: String },
-    graderGrade: { type: Number },
-    classifierGrade: { type: Number },
-    question: { type: QuestionSchema },
-    userResponses: [ResponseSchema],
-  },
-  { timestamps: true }
-);
 SessionSchema.index({
-  _id: -1,
-  sessionId: 1,
-  lessonId: 1,
-  username: 1,
-  graderGrade: -1,
+  lessonName: -1,
+  lessonCreatedBy: -1,
   createdAt: -1,
+  classifierGrade: -1,
+  graderGrade: -1,
+  _id: -1,
 });
 SessionSchema.plugin(require('mongoose-cursor-pagination').default);
+
+SessionSchema.statics.getTrainingData = async function (lessonId: string) {
+  const sessions = await this.find({ lessonId });
+  let csv = 'exp_num,text,label';
+  sessions.forEach((session: Session) => {
+    session.userResponses.forEach((response: Response) => {
+      for (let i = 0; i < response.expectationScores.length; i++) {
+        const score: ExpectationScore = response.expectationScores[i];
+        if (score.graderGrade) {
+          csv += `\n${i},${response.text},${score.graderGrade}`;
+        }
+      }
+    });
+  });
+  return csv;
+};
+
+SessionSchema.statics.updateLesson = async function (
+  lessonId: string,
+  updatedLesson: Lesson
+) {
+  await this.updateMany(
+    {
+      lessonId: lessonId,
+    },
+    {
+      $set: {
+        lessonId: updatedLesson.lessonId,
+        lessonName: updatedLesson.name,
+        lessonCreatedBy: updatedLesson.createdBy,
+      },
+    }
+  );
+};
 
 SessionSchema.statics.setGrade = async function (
   sessionId: string,

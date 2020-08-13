@@ -6,10 +6,24 @@ The full terms of this copyright and license should always be found in the root 
 */
 import mongoose, { Schema, Document, Model } from 'mongoose';
 import { PaginatedResolveResult } from './PaginatedResolveResult';
-import {
-  LessonExpectation,
-  LessonExpectationSchema,
-} from './LessonExpectation';
+
+interface Hint extends Document {
+  text: string;
+}
+
+const HintSchema = new Schema({
+  text: { type: String },
+});
+
+interface LessonExpectation extends Document {
+  expectation: string;
+  hints: [Hint];
+}
+
+const LessonExpectationSchema = new Schema({
+  expectation: { type: String },
+  hints: { type: [HintSchema] },
+});
 
 export interface Lesson extends Document {
   lessonId: string;
@@ -19,14 +33,6 @@ export interface Lesson extends Document {
   expectations: [LessonExpectation];
   conclusion: [string];
   createdBy: string;
-}
-
-export interface LessonModel extends Model<Lesson> {
-  paginate(
-    query?: any,
-    options?: any,
-    callback?: any
-  ): Promise<PaginatedResolveResult<Lesson>>;
 }
 
 export const LessonSchema = new Schema(
@@ -41,10 +47,20 @@ export const LessonSchema = new Schema(
   },
   { timestamps: true }
 );
+
+export interface LessonModel extends Model<Lesson> {
+  paginate(
+    query?: any,
+    options?: any,
+    callback?: any
+  ): Promise<PaginatedResolveResult<Lesson>>;
+}
+
 LessonSchema.index({
-  _id: -1,
-  name: 1,
+  name: -1,
+  createdBy: -1,
   createdAt: -1,
+  _id: -1,
 });
 LessonSchema.plugin(require('mongoose-cursor-pagination').default);
 
