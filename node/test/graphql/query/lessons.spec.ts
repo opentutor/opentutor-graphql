@@ -24,12 +24,11 @@ describe('lessons', () => {
     await mongoUnit.drop();
   });
 
-  it('gets a page of all lessons', async () => {
+  it('gets a default page of lessons', async () => {
     const response = await request(app).post('/grading-api').send({
       query:
-        '{ lessons { edges { cursor node { lessonId } } pageInfo { hasNextPage } } }',
+        '{ lessons { edges { node { lessonId } } pageInfo { hasNextPage endCursor } } }',
     });
-
     expect(response.status).to.equal(200);
     expect(response.body).to.eql({
       data: {
@@ -37,31 +36,29 @@ describe('lessons', () => {
           edges: [
             {
               node: {
-                lessonId: 'lesson1',
+                lessonId: 'lesson2',
               },
-              cursor: '5f0cfea3395d762ca65405c3',
             },
             {
               node: {
-                lessonId: 'lesson2',
+                lessonId: 'lesson1',
               },
-              cursor: '5f0cfea3395d762ca65405c4',
             },
           ],
           pageInfo: {
             hasNextPage: false,
+            endCursor: null,
           },
         },
       },
     });
   });
 
-  it('gets a page of 1 lessons', async () => {
+  it('gets a page of lessons sorted in ascending order by lessonId with limit = 1', async () => {
     const response = await request(app).post('/grading-api').send({
       query:
-        '{ lessons(limit: 1) { edges { cursor node { lessonId } } pageInfo { hasNextPage } } }',
+        '{ lessons(sortBy: "lessonId", sortAscending: true, limit: 1) { edges { node { lessonId } } pageInfo { hasNextPage hasPreviousPage startCursor endCursor } } }',
     });
-
     expect(response.status).to.equal(200);
     expect(response.body).to.eql({
       data: {
@@ -71,23 +68,25 @@ describe('lessons', () => {
               node: {
                 lessonId: 'lesson1',
               },
-              cursor: '5f0cfea3395d762ca65405c3',
             },
           ],
           pageInfo: {
+            hasPreviousPage: false,
             hasNextPage: true,
+            startCursor: null,
+            endCursor:
+              'WyJsZXNzb24xIix7IiRvaWQiOiI1ZjBjZmVhMzM5NWQ3NjJjYTY1NDA1YzMifV0',
           },
         },
       },
     });
   });
 
-  it('gets next page after cursor', async () => {
+  it('gets next page of lessons sorted in ascending order by lessonId with limit = 1', async () => {
     const response = await request(app).post('/grading-api').send({
       query:
-        '{ lessons(limit: 1, cursor: "5f0cfea3395d762ca65405c3") { edges { node { lessonId } } pageInfo { hasNextPage } } }',
+        '{ lessons(sortBy: "lessonId", sortAscending: true, limit: 1, cursor: "next__WyJsZXNzb24xIix7IiRvaWQiOiI1ZjBjZmVhMzM5NWQ3NjJjYTY1NDA1YzMifV0") { edges { node { lessonId } } pageInfo { hasNextPage hasPreviousPage startCursor endCursor } } }',
     });
-
     expect(response.status).to.equal(200);
     expect(response.body).to.eql({
       data: {
@@ -100,29 +99,27 @@ describe('lessons', () => {
             },
           ],
           pageInfo: {
+            hasPreviousPage: true,
             hasNextPage: false,
+            startCursor:
+              'WyJsZXNzb24yIix7IiRvaWQiOiI1ZjBjZmVhMzM5NWQ3NjJjYTY1NDA1YzQifV0',
+            endCursor: null,
           },
         },
       },
     });
   });
 
-  it('sorts lessons by name in descending order', async () => {
+  it('gets previous page of lessons sorted in ascending order by lessonId with limit = 1', async () => {
     const response = await request(app).post('/grading-api').send({
       query:
-        '{ lessons(sortBy: "name", sortDescending: true) { edges { node { lessonId } } pageInfo { hasNextPage } } }',
+        '{ lessons(sortBy: "lessonId", sortAscending: true, limit: 1, cursor: "prev__WyJsZXNzb24yIix7IiRvaWQiOiI1ZjBjZmVhMzM5NWQ3NjJjYTY1NDA1YzQifV0") { edges { node { lessonId } } pageInfo { hasNextPage hasPreviousPage startCursor endCursor } } }',
     });
-
     expect(response.status).to.equal(200);
     expect(response.body).to.eql({
       data: {
         lessons: {
           edges: [
-            {
-              node: {
-                lessonId: 'lesson2',
-              },
-            },
             {
               node: {
                 lessonId: 'lesson1',
@@ -130,7 +127,11 @@ describe('lessons', () => {
             },
           ],
           pageInfo: {
-            hasNextPage: false,
+            hasPreviousPage: false,
+            hasNextPage: true,
+            startCursor: null,
+            endCursor:
+              'WyJsZXNzb24xIix7IiRvaWQiOiI1ZjBjZmVhMzM5NWQ3NjJjYTY1NDA1YzMifV0',
           },
         },
       },

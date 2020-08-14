@@ -62,6 +62,6 @@ LessonSchema.index({
   createdAt: -1,
   _id: -1,
 });
-LessonSchema.plugin(require('mongoose-cursor-pagination').default);
+LessonSchema.plugin(require('mongo-cursor-pagination').mongoosePlugin);
 
 export default mongoose.model<Lesson, LessonModel>('Lesson', LessonSchema);

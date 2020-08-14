@@ -11,11 +11,16 @@ import {
   GraphQLObjectType,
   GraphQLString,
 } from 'graphql';
+import { Document } from 'mongoose';
+const base64url = require('base64-url');
+const objectPath = require('object-path');
 
 export const PageInfoType = new GraphQLObjectType({
   name: 'PageInfo',
   fields: {
+    startCursor: { type: GraphQLString },
     endCursor: { type: GraphQLString },
+    hasPreviousPage: { type: GraphQLBoolean },
     hasNextPage: { type: GraphQLBoolean },
   },
 });
@@ -60,16 +65,37 @@ export function makeConnectionType(nodeType: GraphQLObjectType) {
   );
 }
 
+export function itemToCursor(
+  item: Document,
+  paginatedField: string
+): string | null {
+  if (!item) {
+    return null;
+  }
+  if (paginatedField && paginatedField !== '_id') {
+    const field = objectPath.get(item, paginatedField);
+    return base64url.encode(JSON.stringify([field, item._id]));
+  }
+  return base64url.encode(`${item._id}`);
+}
+
+export function cursorToItem(cursor: string): string {
+  return JSON.parse(base64url.decode(cursor));
+}
+
 export interface PaginatedResolveResult {
-  items: any[];
-  hasMore: boolean;
+  results: any[];
+  previous: string;
+  next: string;
+  hasPrevious: boolean;
+  hasNext: boolean;
 }
 
 export interface HasPaginationArgs {
   cursor?: string;
   limit?: number;
   sortBy?: string;
-  sortDescending?: boolean;
+  sortAscending?: boolean;
 }
 
 export interface PaginatedResolveArgs {
@@ -93,42 +119,47 @@ export function makeConnection(args: MakeConnectionArgs) {
     type: makeConnectionType(nodeType),
     args: {
       cursor: {
-        description: `start after this item`,
+        description: `value to start querying the page`,
         type: GraphQLString,
       },
       limit: {
-        description: `max items to return`,
+        description: `max items to return (default: 100)`,
         type: GraphQLInt,
       },
       sortBy: {
-        description: `field to sort by`,
+        description: `field to paginate and sort by (default: id)`,
         type: GraphQLString,
       },
-      sortDescending: {
-        description: `sort in descending order`,
+      sortAscending: {
+        description: `sort in ascending order (default: false)`,
         type: GraphQLBoolean,
       },
       ...(additionalConnectionArgs || {}),
     },
     resolve: async (
       parent: any,
-      args: { cursor?: string; limit?: number; sort?: string }
+      args: {
+        cursor?: string;
+        limit?: number;
+        sortBy?: string;
+        sortAscending?: boolean;
+      }
     ) => {
       const paginateResult = await resolve({ parent, args });
       return {
-        edges: paginateResult.items.map((m: any) => {
+        edges: paginateResult.results.map((m: any) => {
           return {
             node: m,
-            cursor: m.id,
+            cursor: itemToCursor(m, args.sortBy),
           };
         }),
         pageInfo: {
-          hasNextPage: paginateResult.hasMore,
-          endCursor:
-            Array.isArray(paginateResult.items) &&
-            paginateResult.items.length > 0
-              ? paginateResult.items[paginateResult.items.length - 1].id
-              : null,
+          hasNextPage: paginateResult.hasNext,
+          hasPreviousPage: paginateResult.hasPrevious,
+          startCursor: paginateResult.hasPrevious
+            ? paginateResult.previous
+            : null,
+          endCursor: paginateResult.hasNext ? paginateResult.next : null,
         },
       };
     },

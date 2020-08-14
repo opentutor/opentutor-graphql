@@ -109,7 +109,7 @@ SessionSchema.index({
   graderGrade: -1,
   _id: -1,
 });
-SessionSchema.plugin(require('mongoose-cursor-pagination').default);
+SessionSchema.plugin(require('mongo-cursor-pagination').mongoosePlugin);
 
 SessionSchema.statics.getTrainingData = async function (lessonId: string) {
   const sessions = await this.find({ lessonId });

@@ -18,18 +18,27 @@ export function findAll<T>(config: {
     nodeType,
     resolve: async (resolveArgs: PaginatedResolveArgs) => {
       const { parent, args } = resolveArgs;
-      const sortBy: any = {};
-      sortBy[args.sortBy ? `${args.sortBy}` : '_id'] = args.sortDescending
-        ? -1
-        : 1;
-      return await model.paginate(
-        {},
-        {
-          sort: sortBy,
-          limit: Number(args.limit) || 100,
-          startingAfter: args.cursor,
+      const cursor = args.cursor;
+      let next = null;
+      let prev = null;
+
+      if (cursor) {
+        if (cursor.startsWith('prev__')) {
+          prev = cursor.split('prev__')[1];
+        } else if (cursor.startsWith('next__')) {
+          next = cursor.split('next__')[1];
+        } else {
+          next = cursor;
         }
-      );
+      }
+
+      return await model.paginate({
+        limit: Number(args.limit) || 100,
+        paginatedField: args.sortBy || '_id',
+        sortAscending: args.sortAscending,
+        next: next,
+        previous: prev,
+      });
     },
   });
 }

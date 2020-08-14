@@ -24,10 +24,10 @@ describe('sessions', () => {
     await mongoUnit.drop();
   });
 
-  it('gets a page of all sessions', async () => {
+  it('gets a default page of sessions', async () => {
     const response = await request(app).post('/grading-api').send({
       query:
-        '{ sessions { edges { cursor node { sessionId } } pageInfo { hasNextPage } } }',
+        '{ sessions { edges { node { sessionId } } pageInfo { hasNextPage } } }',
     });
     expect(response.status).to.equal(200);
     expect(response.body).to.eql({
@@ -36,33 +36,28 @@ describe('sessions', () => {
           edges: [
             {
               node: {
-                sessionId: 'session 1',
+                sessionId: 'session 5',
               },
-              cursor: '5f20c63646f6110a6a5b2134',
-            },
-            {
-              node: {
-                sessionId: 'session 2',
-              },
-              cursor: '5f20c63646f6110a6a5b2135',
-            },
-            {
-              node: {
-                sessionId: 'session 3',
-              },
-              cursor: '5f20c63646f6110a6a5b2136',
             },
             {
               node: {
                 sessionId: 'session 4',
               },
-              cursor: '5f20c63646f6110a6a5b2137',
             },
             {
               node: {
-                sessionId: 'session 5',
+                sessionId: 'session 3',
               },
-              cursor: '5f20c63646f6110a6a5b2138',
+            },
+            {
+              node: {
+                sessionId: 'session 2',
+              },
+            },
+            {
+              node: {
+                sessionId: 'session 1',
+              },
             },
           ],
           pageInfo: {
@@ -76,7 +71,7 @@ describe('sessions', () => {
   it('gets a page of 1 sessions', async () => {
     const response = await request(app).post('/grading-api').send({
       query:
-        '{ sessions(limit: 1) { edges { cursor node { sessionId } } pageInfo { hasNextPage } } }',
+        '{ sessions(limit: 1) { edges { node { sessionId } } pageInfo { hasNextPage endCursor } } }',
     });
 
     expect(response.status).to.equal(200);
@@ -86,13 +81,13 @@ describe('sessions', () => {
           edges: [
             {
               node: {
-                sessionId: 'session 1',
+                sessionId: 'session 5',
               },
-              cursor: '5f20c63646f6110a6a5b2134',
             },
           ],
           pageInfo: {
             hasNextPage: true,
+            endCursor: 'eyIkb2lkIjoiNWYyMGM2MzY0NmY2MTEwYTZhNWIyMTM4In0',
           },
         },
       },
@@ -102,7 +97,7 @@ describe('sessions', () => {
   it('gets next page after cursor', async () => {
     const response = await request(app).post('/grading-api').send({
       query:
-        '{ sessions(limit: 1, cursor: "5f20c63646f6110a6a5b2134") { edges { node { sessionId } } pageInfo { hasNextPage } } }',
+        '{ sessions(limit: 1, cursor: "eyIkb2lkIjoiNWYyMGM2MzY0NmY2MTEwYTZhNWIyMTM4In0") { edges { node { sessionId } } pageInfo { hasNextPage } } }',
     });
 
     expect(response.status).to.equal(200);
@@ -112,7 +107,7 @@ describe('sessions', () => {
           edges: [
             {
               node: {
-                sessionId: 'session 2',
+                sessionId: 'session 4',
               },
             },
           ],
