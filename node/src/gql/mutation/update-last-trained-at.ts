@@ -4,24 +4,38 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { GraphQLScalarType } from 'graphql';
-import { Kind } from 'graphql/language';
+import { GraphQLString } from 'graphql';
+import LessonType from 'gql/types/lesson';
+import DateType from 'gql/types/date';
+import { Lesson } from 'models';
 
-export const DateType: GraphQLScalarType = new GraphQLScalarType({
-  name: 'Date',
-  description: 'Date custom scalar type',
-  parseValue(value) {
-    return new Date(value);
+export const updateLastTrainedAt = {
+  type: LessonType,
+  args: {
+    lessonId: { type: GraphQLString },
+    date: { type: DateType },
   },
-  serialize(value) {
-    return value.toLocaleString();
-  },
-  parseLiteral(ast) {
-    if (ast.kind === Kind.INT) {
-      return new Date(ast.value);
+  resolve: async (root: any, args: any) => {
+    if (!args.lessonId) {
+      throw new Error('missing required param lessonId');
     }
-    return null;
-  },
-});
+    if (!args.date) {
+      args.date = new Date();
+    }
 
-export default DateType;
+    return await Lesson.findOneAndUpdate(
+      {
+        lessonId: args.lessonId,
+      },
+      {
+        lastTrainedAt: args.date,
+      },
+      {
+        new: true, // return the updated doc rather than pre update
+        upsert: true,
+      }
+    );
+  },
+};
+
+export default updateLastTrainedAt;

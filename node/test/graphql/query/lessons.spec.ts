@@ -36,6 +36,26 @@ describe('lessons', () => {
           edges: [
             {
               node: {
+                lessonId: 'lesson6',
+              },
+            },
+            {
+              node: {
+                lessonId: 'lesson5',
+              },
+            },
+            {
+              node: {
+                lessonId: 'lesson4',
+              },
+            },
+            {
+              node: {
+                lessonId: 'lesson3',
+              },
+            },
+            {
+              node: {
                 lessonId: 'lesson2',
               },
             },
@@ -75,7 +95,7 @@ describe('lessons', () => {
             hasNextPage: true,
             startCursor: null,
             endCursor:
-              'WyJsZXNzb24xIix7IiRvaWQiOiI1ZjBjZmVhMzM5NWQ3NjJjYTY1NDA1YzMifV0',
+              'WyJsZXNzb24xIix7IiRvaWQiOiI1ZjBjZmVhMzM5NWQ3NjJjYTY1NDA1YzEifV0',
           },
         },
       },
@@ -85,7 +105,7 @@ describe('lessons', () => {
   it('gets next page of lessons sorted in ascending order by lessonId with limit = 1', async () => {
     const response = await request(app).post('/grading-api').send({
       query:
-        '{ lessons(sortBy: "lessonId", sortAscending: true, limit: 1, cursor: "next__WyJsZXNzb24xIix7IiRvaWQiOiI1ZjBjZmVhMzM5NWQ3NjJjYTY1NDA1YzMifV0") { edges { node { lessonId } } pageInfo { hasNextPage hasPreviousPage startCursor endCursor } } }',
+        '{ lessons(sortBy: "lessonId", sortAscending: true, limit: 1, cursor: "next__WyJsZXNzb24xIix7IiRvaWQiOiI1ZjBjZmVhMzM5NWQ3NjJjYTY1NDA1YzEifV0") { edges { node { lessonId } } pageInfo { hasNextPage hasPreviousPage startCursor endCursor } } }',
     });
     expect(response.status).to.equal(200);
     expect(response.body).to.eql({
@@ -100,10 +120,11 @@ describe('lessons', () => {
           ],
           pageInfo: {
             hasPreviousPage: true,
-            hasNextPage: false,
+            hasNextPage: true,
             startCursor:
-              'WyJsZXNzb24yIix7IiRvaWQiOiI1ZjBjZmVhMzM5NWQ3NjJjYTY1NDA1YzQifV0',
-            endCursor: null,
+              'WyJsZXNzb24yIix7IiRvaWQiOiI1ZjBjZmVhMzM5NWQ3NjJjYTY1NDA1YzIifV0',
+            endCursor:
+              'WyJsZXNzb24yIix7IiRvaWQiOiI1ZjBjZmVhMzM5NWQ3NjJjYTY1NDA1YzIifV0',
           },
         },
       },
@@ -113,7 +134,7 @@ describe('lessons', () => {
   it('gets previous page of lessons sorted in ascending order by lessonId with limit = 1', async () => {
     const response = await request(app).post('/grading-api').send({
       query:
-        '{ lessons(sortBy: "lessonId", sortAscending: true, limit: 1, cursor: "prev__WyJsZXNzb24yIix7IiRvaWQiOiI1ZjBjZmVhMzM5NWQ3NjJjYTY1NDA1YzQifV0") { edges { node { lessonId } } pageInfo { hasNextPage hasPreviousPage startCursor endCursor } } }',
+        '{ lessons(sortBy: "lessonId", sortAscending: true, limit: 1, cursor: "prev__WyJsZXNzb24yIix7IiRvaWQiOiI1ZjBjZmVhMzM5NWQ3NjJjYTY1NDA1YzIifV0") { edges { node { lessonId } } pageInfo { hasNextPage hasPreviousPage startCursor endCursor } } }',
     });
     expect(response.status).to.equal(200);
     expect(response.body).to.eql({
@@ -131,7 +152,7 @@ describe('lessons', () => {
             hasNextPage: true,
             startCursor: null,
             endCursor:
-              'WyJsZXNzb24xIix7IiRvaWQiOiI1ZjBjZmVhMzM5NWQ3NjJjYTY1NDA1YzMifV0',
+              'WyJsZXNzb24xIix7IiRvaWQiOiI1ZjBjZmVhMzM5NWQ3NjJjYTY1NDA1YzEifV0',
           },
         },
       },

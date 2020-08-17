@@ -8,6 +8,7 @@ import { GraphQLObjectType } from 'graphql';
 import setGrade from './set-grade';
 import updateLesson from './update-lesson';
 import updateSession from './update-session';
+import updateLastTrainedAt from './update-last-trained-at';
 
 export default new GraphQLObjectType({
   name: 'Mutation',
@@ -15,5 +16,6 @@ export default new GraphQLObjectType({
     setGrade,
     updateLesson,
     updateSession,
+    updateLastTrainedAt,
   },
 });

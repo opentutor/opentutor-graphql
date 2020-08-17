@@ -58,7 +58,6 @@ describe('lesson', () => {
         }
       }`,
     });
-
     expect(response.status).to.equal(200);
     expect(response.body.data.lesson).to.eql({
       lessonId: 'lesson1',
@@ -90,6 +89,70 @@ describe('lesson', () => {
         },
       ],
       conclusion: ['conclusion text'],
+    });
+  });
+
+  it('is not trainable if fewer than 10 grades per expectation', async () => {
+    const response = await request(app).post('/grading-api').send({
+      query: `query {
+        lesson(lessonId: "lesson3") {
+          lessonId
+          isTrainable
+        }
+      }`,
+    });
+    expect(response.status).to.equal(200);
+    expect(response.body.data.lesson).to.eql({
+      lessonId: 'lesson3',
+      isTrainable: false,
+    });
+  });
+
+  it('is not trainable if fewer than 2 Good grades per expectation', async () => {
+    const response = await request(app).post('/grading-api').send({
+      query: `query {
+        lesson(lessonId: "lesson4") {
+          lessonId
+          isTrainable
+        }
+      }`,
+    });
+    expect(response.status).to.equal(200);
+    expect(response.body.data.lesson).to.eql({
+      lessonId: 'lesson4',
+      isTrainable: false,
+    });
+  });
+
+  it('is not trainable if fewer than 2 Bad grades per expectation', async () => {
+    const response = await request(app).post('/grading-api').send({
+      query: `query {
+        lesson(lessonId: "lesson5") {
+          lessonId
+          isTrainable
+        }
+      }`,
+    });
+    expect(response.status).to.equal(200);
+    expect(response.body.data.lesson).to.eql({
+      lessonId: 'lesson5',
+      isTrainable: false,
+    });
+  });
+
+  it('is trainable if at least 2 good, 2 bad, and 10 total grades per expectation', async () => {
+    const response = await request(app).post('/grading-api').send({
+      query: `query {
+        lesson(lessonId: "lesson6") {
+          lessonId
+          isTrainable
+        }
+      }`,
+    });
+    expect(response.status).to.equal(200);
+    expect(response.body.data.lesson).to.eql({
+      lessonId: 'lesson6',
+      isTrainable: true,
     });
   });
 });

@@ -104,7 +104,7 @@ jobs:
                   echo 'export IMAGE_TAG="$CIRCLE_TAG"' >> $BASH_ENV
       - run:
           name: report tag
-          command: echo "building tag uscictdocker/opentutor-grading-api:${IMAGE_TAG}..."
+          command: echo "building tag uscictdocker/opentutor-graphql:${IMAGE_TAG}..."
       - setup_remote_docker:
           version: 18.09.3
           docker_layer_caching: true
@@ -114,10 +114,10 @@ jobs:
           command: docker login -u ${DOCKER_LOGIN} -p ${DOCKER_PASSWORD}
       - run:
           name: Docker build
-          command: cd node && DOCKER_IMAGE=uscictdocker/opentutor-grading-api:${IMAGE_TAG} make docker-build
+          command: cd node && DOCKER_IMAGE=uscictdocker/opentutor-graphql:${IMAGE_TAG} make docker-build
       - run:
           name: Docker push
-          command: docker push uscictdocker/opentutor-grading-api
+          command: docker push uscictdocker/opentutor-graphql
 workflows:
   test-build-deploy:
     jobs:

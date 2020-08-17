@@ -10,7 +10,7 @@ const { ObjectId } = mongoose.Types;
 module.exports = {
   lessons: [
     {
-      _id: ObjectId('5f0cfea3395d762ca65405c3'),
+      _id: ObjectId('5f0cfea3395d762ca65405c1'),
       lessonId: 'lesson1',
       name: 'lesson name',
       intro: 'intro text',
@@ -42,8 +42,80 @@ module.exports = {
       conclusion: ['conclusion text'],
     },
     {
-      _id: ObjectId('5f0cfea3395d762ca65405c4'),
+      _id: ObjectId('5f0cfea3395d762ca65405c2'),
       lessonId: 'lesson2',
+      name: 'name',
+      intro: 'intro',
+      question: 'question',
+      expectations: [
+        {
+          expectation: 'answer1',
+          hints: [
+            {
+              text: 'expectation 1 hint 1',
+            },
+          ],
+        },
+      ],
+      conclusion: ['conclusion'],
+    },
+    {
+      _id: ObjectId('5f0cfea3395d762ca65405c3'),
+      lessonId: 'lesson3',
+      name: 'name',
+      intro: 'intro',
+      question: 'question',
+      expectations: [
+        {
+          expectation: 'answer1',
+          hints: [
+            {
+              text: 'expectation 1 hint 1',
+            },
+          ],
+        },
+      ],
+      conclusion: ['conclusion'],
+    },
+    {
+      _id: ObjectId('5f0cfea3395d762ca65405c4'),
+      lessonId: 'lesson4',
+      name: 'name',
+      intro: 'intro',
+      question: 'question',
+      expectations: [
+        {
+          expectation: 'answer1',
+          hints: [
+            {
+              text: 'expectation 1 hint 1',
+            },
+          ],
+        },
+      ],
+      conclusion: ['conclusion'],
+    },
+    {
+      _id: ObjectId('5f0cfea3395d762ca65405c5'),
+      lessonId: 'lesson5',
+      name: 'name',
+      intro: 'intro',
+      question: 'question',
+      expectations: [
+        {
+          expectation: 'answer1',
+          hints: [
+            {
+              text: 'expectation 1 hint 1',
+            },
+          ],
+        },
+      ],
+      conclusion: ['conclusion'],
+    },
+    {
+      _id: ObjectId('5f0cfea3395d762ca65405c6'),
+      lessonId: 'lesson6',
       name: 'name',
       intro: 'intro',
       question: 'question',
@@ -63,7 +135,7 @@ module.exports = {
 
   sessions: [
     {
-      _id: ObjectId('5f20c63646f6110a6a5b2134'),
+      _id: ObjectId('5f20c63646f6110a6a5b2131'),
       sessionId: 'session 1',
       lessonId: 'lesson1',
       username: 'username1',
@@ -96,7 +168,7 @@ module.exports = {
       ],
     },
     {
-      _id: ObjectId('5f20c63646f6110a6a5b2135'),
+      _id: ObjectId('5f20c63646f6110a6a5b2132'),
       sessionId: 'session 2',
       username: 'username2',
       question: {
@@ -120,7 +192,7 @@ module.exports = {
       ],
     },
     {
-      _id: ObjectId('5f20c63646f6110a6a5b2136'),
+      _id: ObjectId('5f20c63646f6110a6a5b2133'),
       lessonId: 'lesson1',
       sessionId: 'session 3',
       userResponses: [
@@ -136,7 +208,7 @@ module.exports = {
       ],
     },
     {
-      _id: ObjectId('5f20c63646f6110a6a5b2137'),
+      _id: ObjectId('5f20c63646f6110a6a5b2134'),
       lessonId: 'lesson1',
       sessionId: 'session 4',
       userResponses: [
@@ -152,7 +224,7 @@ module.exports = {
       ],
     },
     {
-      _id: ObjectId('5f20c63646f6110a6a5b2138'),
+      _id: ObjectId('5f20c63646f6110a6a5b2135'),
       lessonId: 'lesson1',
       sessionId: 'session 5',
       userResponses: [
@@ -161,6 +233,306 @@ module.exports = {
           expectationScores: [
             {
               classifierGrade: 'Neutral',
+              graderGrade: 'Neutral',
+            },
+          ],
+        },
+      ],
+    },
+    {
+      _id: ObjectId('5f20c63646f6110a6a5b2136'),
+      lessonId: 'lesson3',
+      sessionId: 'session 6',
+      userResponses: [
+        {
+          text: 'good',
+          expectationScores: [
+            {
+              graderGrade: 'Good',
+            },
+          ],
+        },
+        {
+          text: 'good',
+          expectationScores: [
+            {
+              graderGrade: 'Good',
+            },
+          ],
+        },
+        {
+          text: 'bad',
+          expectationScores: [
+            {
+              graderGrade: 'Bad',
+            },
+          ],
+        },
+        {
+          text: 'bad',
+          expectationScores: [
+            {
+              graderGrade: 'Bad',
+            },
+          ],
+        },
+      ],
+    },
+    {
+      _id: ObjectId('5f20c63646f6110a6a5b2137'),
+      lessonId: 'lesson4',
+      sessionId: 'session 7',
+      userResponses: [
+        {
+          text: 'bad',
+          expectationScores: [
+            {
+              graderGrade: 'Bad',
+            },
+          ],
+        },
+        {
+          text: 'bad',
+          expectationScores: [
+            {
+              graderGrade: 'Bad',
+            },
+          ],
+        },
+        {
+          text: 'bad',
+          expectationScores: [
+            {
+              graderGrade: 'Bad',
+            },
+          ],
+        },
+        {
+          text: 'bad',
+          expectationScores: [
+            {
+              graderGrade: 'Bad',
+            },
+          ],
+        },
+        {
+          text: 'bad',
+          expectationScores: [
+            {
+              graderGrade: 'Bad',
+            },
+          ],
+        },
+        {
+          text: 'bad',
+          expectationScores: [
+            {
+              graderGrade: 'Bad',
+            },
+          ],
+        },
+        {
+          text: 'bad',
+          expectationScores: [
+            {
+              graderGrade: 'Bad',
+            },
+          ],
+        },
+        {
+          text: 'bad',
+          expectationScores: [
+            {
+              graderGrade: 'Bad',
+            },
+          ],
+        },
+        {
+          text: 'bad',
+          expectationScores: [
+            {
+              graderGrade: 'Bad',
+            },
+          ],
+        },
+        {
+          text: 'bad',
+          expectationScores: [
+            {
+              graderGrade: 'Bad',
+            },
+          ],
+        },
+      ],
+    },
+    {
+      _id: ObjectId('5f20c63646f6110a6a5b2138'),
+      lessonId: 'lesson5',
+      sessionId: 'session 8',
+      userResponses: [
+        {
+          text: 'good',
+          expectationScores: [
+            {
+              graderGrade: 'Good',
+            },
+          ],
+        },
+        {
+          text: 'good',
+          expectationScores: [
+            {
+              graderGrade: 'Good',
+            },
+          ],
+        },
+        {
+          text: 'good',
+          expectationScores: [
+            {
+              graderGrade: 'Good',
+            },
+          ],
+        },
+        {
+          text: 'good',
+          expectationScores: [
+            {
+              graderGrade: 'Good',
+            },
+          ],
+        },
+        {
+          text: 'good',
+          expectationScores: [
+            {
+              graderGrade: 'Good',
+            },
+          ],
+        },
+        {
+          text: 'good',
+          expectationScores: [
+            {
+              graderGrade: 'Good',
+            },
+          ],
+        },
+        {
+          text: 'good',
+          expectationScores: [
+            {
+              graderGrade: 'Good',
+            },
+          ],
+        },
+        {
+          text: 'good',
+          expectationScores: [
+            {
+              graderGrade: 'Good',
+            },
+          ],
+        },
+        {
+          text: 'good',
+          expectationScores: [
+            {
+              graderGrade: 'Good',
+            },
+          ],
+        },
+        {
+          text: 'good',
+          expectationScores: [
+            {
+              graderGrade: 'Good',
+            },
+          ],
+        },
+      ],
+    },
+    {
+      _id: ObjectId('5f20c63646f6110a6a5b2139'),
+      lessonId: 'lesson6',
+      sessionId: 'session 9',
+      userResponses: [
+        {
+          text: 'good',
+          expectationScores: [
+            {
+              graderGrade: 'Good',
+            },
+          ],
+        },
+        {
+          text: 'good',
+          expectationScores: [
+            {
+              graderGrade: 'Good',
+            },
+          ],
+        },
+        {
+          text: 'bad',
+          expectationScores: [
+            {
+              graderGrade: 'Bad',
+            },
+          ],
+        },
+        {
+          text: 'bad',
+          expectationScores: [
+            {
+              graderGrade: 'Bad',
+            },
+          ],
+        },
+        {
+          text: 'neutral',
+          expectationScores: [
+            {
+              graderGrade: 'Neutral',
+            },
+          ],
+        },
+        {
+          text: 'neutral',
+          expectationScores: [
+            {
+              graderGrade: 'Neutral',
+            },
+          ],
+        },
+        {
+          text: 'neutral',
+          expectationScores: [
+            {
+              graderGrade: 'Neutral',
+            },
+          ],
+        },
+        {
+          text: 'neutral',
+          expectationScores: [
+            {
+              graderGrade: 'Neutral',
+            },
+          ],
+        },
+        {
+          text: 'neutral',
+          expectationScores: [
+            {
+              graderGrade: 'Neutral',
+            },
+          ],
+        },
+        {
+          text: 'neutral',
+          expectationScores: [
+            {
               graderGrade: 'Neutral',
             },
           ],

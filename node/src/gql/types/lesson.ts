@@ -9,7 +9,9 @@ import {
   GraphQLObjectType,
   GraphQLID,
   GraphQLList,
+  GraphQLBoolean,
 } from 'graphql';
+import { Session } from 'models';
 import DateType from './date';
 
 const HintType = new GraphQLObjectType({
@@ -32,14 +34,22 @@ export const LessonType = new GraphQLObjectType({
   fields: {
     id: { type: GraphQLID },
     lessonId: { type: GraphQLString },
+    createdBy: { type: GraphQLString },
     name: { type: GraphQLString },
     intro: { type: GraphQLString },
     question: { type: GraphQLString },
     expectations: { type: GraphQLList(LessonExpectationType) },
     conclusion: { type: GraphQLList(GraphQLString) },
-    createdBy: { type: GraphQLString },
+    lastTrainedAt: { type: DateType },
     createdAt: { type: DateType },
     updatedAt: { type: DateType },
+    isTrainable: {
+      type: GraphQLBoolean,
+      resolve: async function (lesson) {
+        const trainingData = await Session.getTrainingData(lesson.lessonId);
+        return trainingData.isTrainable;
+      },
+    },
   },
 });
 

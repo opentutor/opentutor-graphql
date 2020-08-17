@@ -36,6 +36,26 @@ describe('sessions', () => {
           edges: [
             {
               node: {
+                sessionId: 'session 9',
+              },
+            },
+            {
+              node: {
+                sessionId: 'session 8',
+              },
+            },
+            {
+              node: {
+                sessionId: 'session 7',
+              },
+            },
+            {
+              node: {
+                sessionId: 'session 6',
+              },
+            },
+            {
+              node: {
                 sessionId: 'session 5',
               },
             },
@@ -71,7 +91,7 @@ describe('sessions', () => {
   it('gets a page of 1 sessions', async () => {
     const response = await request(app).post('/grading-api').send({
       query:
-        '{ sessions(limit: 1) { edges { node { sessionId } } pageInfo { hasNextPage endCursor } } }',
+        '{ sessions(sortBy: "sessionId", limit: 1) { edges { node { sessionId } } pageInfo { hasNextPage endCursor } } }',
     });
 
     expect(response.status).to.equal(200);
@@ -81,13 +101,14 @@ describe('sessions', () => {
           edges: [
             {
               node: {
-                sessionId: 'session 5',
+                sessionId: 'session 9',
               },
             },
           ],
           pageInfo: {
             hasNextPage: true,
-            endCursor: 'eyIkb2lkIjoiNWYyMGM2MzY0NmY2MTEwYTZhNWIyMTM4In0',
+            endCursor:
+              'WyJzZXNzaW9uIDkiLHsiJG9pZCI6IjVmMjBjNjM2NDZmNjExMGE2YTViMjEzOSJ9XQ',
           },
         },
       },
@@ -97,7 +118,7 @@ describe('sessions', () => {
   it('gets next page after cursor', async () => {
     const response = await request(app).post('/grading-api').send({
       query:
-        '{ sessions(limit: 1, cursor: "eyIkb2lkIjoiNWYyMGM2MzY0NmY2MTEwYTZhNWIyMTM4In0") { edges { node { sessionId } } pageInfo { hasNextPage } } }',
+        '{ sessions(sortBy: "sessionId", limit: 1, cursor: "WyJzZXNzaW9uIDkiLHsiJG9pZCI6IjVmMjBjNjM2NDZmNjExMGE2YTViMjEzOSJ9XQ") { edges { node { sessionId } } pageInfo { hasNextPage } } }',
     });
 
     expect(response.status).to.equal(200);
@@ -107,7 +128,7 @@ describe('sessions', () => {
           edges: [
             {
               node: {
-                sessionId: 'session 4',
+                sessionId: 'session 8',
               },
             },
           ],

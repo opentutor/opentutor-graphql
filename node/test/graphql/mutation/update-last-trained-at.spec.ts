@@ -10,7 +10,7 @@ import { Express } from 'express';
 import mongoUnit from 'mongo-unit';
 import request from 'supertest';
 
-describe('training data', () => {
+describe('updateLastTrainedAt', () => {
   let app: Express;
 
   beforeEach(async () => {
@@ -24,23 +24,49 @@ describe('training data', () => {
     await mongoUnit.drop();
   });
 
-  it(`return all training data for lesson`, async () => {
+  it(`returns an error if no lessonId`, async () => {
     const response = await request(app).post('/grading-api').send({
-      query: `query {
-        trainingData(lessonId: "lesson1") {
-          isTrainable
-          training
-          config
-        }
-      }`,
+      query: `mutation { 
+          updateLastTrainedAt(lessonId: "") { 
+            lastTrainedAt
+          } 
+        }`,
     });
     expect(response.status).to.equal(200);
-    expect(response.body.data.trainingData.training).to.eql(
-      'exp_num,text,label\n0,a good answer,Good\n0,a bad answer,Bad'
+    expect(response.body).to.have.deep.nested.property(
+      'errors[0].message',
+      'missing required param lessonId'
     );
-    expect(response.body.data.trainingData.config).to.eql(
-      'question: "question?"'
+  });
+
+  it(`update with given date`, async () => {
+    const date = new Date();
+    const response = await request(app)
+      .post('/grading-api')
+      .send({
+        query: `mutation { 
+          updateLastTrainedAt(lessonId: "lesson1", date: "${date}") { 
+            lastTrainedAt
+          } 
+        }`,
+      });
+    expect(response.status).to.equal(200);
+    expect(response.body.data.updateLastTrainedAt).to.eql({
+      lastTrainedAt: date.toLocaleString(),
+    });
+  });
+
+  it(`update with current date`, async () => {
+    const response = await request(app).post('/grading-api').send({
+      query: `mutation { 
+          updateLastTrainedAt(lessonId: "lesson1") { 
+            lastTrainedAt
+          } 
+        }`,
+    });
+    expect(response.status).to.equal(200);
+    expect(response.body.data.updateLastTrainedAt.lastTrainedAt).to.not.eql(
+      null
     );
-    expect(response.body.data.trainingData.isTrainable).to.eql(false);
   });
 });

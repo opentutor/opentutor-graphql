@@ -33,6 +33,7 @@ export interface Lesson extends Document {
   expectations: [LessonExpectation];
   conclusion: [string];
   createdBy: string;
+  lastTrainedAt: Date;
 }
 
 export const LessonSchema = new Schema(
@@ -44,6 +45,7 @@ export const LessonSchema = new Schema(
     expectations: { type: [LessonExpectationSchema] },
     conclusion: { type: [String] },
     createdBy: { type: String },
+    lastTrainedAt: { type: Date },
   },
   { timestamps: true }
 );

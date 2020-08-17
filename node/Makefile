@@ -4,7 +4,7 @@ PROJECT_NAME?=$(shell v='$(PROJECT_ROOT)'; echo "$${v\#\#*/}")
 SERVICE_NAME?=$(shell v='$(DIR)'; echo "$${v\#\#*/}")
 DIR=$(shell pwd)
 ENV?=dev
-DOCKER_IMAGE?=opentutor-grading-api
+DOCKER_IMAGE?=opentutor-graphql
 
 .PHONY: clean-dist
 clean-dist: 
@@ -28,7 +28,7 @@ docker-build: clean
 .PHONY: docker-run
 docker-run:
 	docker run \
-			--name opentutor-grading-api \
+			--name opentutor-graphql \
 			--rm \
 			--init \
 			-p 3001:3001 \
@@ -37,7 +37,7 @@ docker-run:
 .PHONY: docker-run
 docker-run-shell:
 	docker run \
-			--name opentutor-grading-api \
+			--name opentutor-graphql \
 			--rm \
 			-it \
 			--init \

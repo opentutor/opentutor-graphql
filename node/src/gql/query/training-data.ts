@@ -17,7 +17,11 @@ export const trainingData = {
     const trainingData = await Session.getTrainingData(args.lessonId);
     const lesson = await Lesson.findOne({ lessonId: args.lessonId });
     const config = `question: "${lesson.question}"`;
-    return { config: config, training: trainingData };
+    return {
+      config: config,
+      training: trainingData.csv,
+      isTrainable: trainingData.isTrainable,
+    };
   },
 };
 

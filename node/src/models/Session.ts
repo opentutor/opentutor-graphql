@@ -6,7 +6,7 @@ The full terms of this copyright and license should always be found in the root 
 */
 import mongoose, { Schema, Document, Model } from 'mongoose';
 import { PaginatedResolveResult } from './PaginatedResolveResult';
-import { Lesson } from './Lesson';
+import LessonSchema, { Lesson } from './Lesson';
 import calculateScore from 'models/utils/calculate-score';
 
 interface Expectation extends Document {
@@ -89,7 +89,7 @@ export interface SessionModel extends Model<Session> {
     callback?: any
   ): Promise<PaginatedResolveResult<Session>>;
 
-  getTrainingData(lessonId: string): string;
+  getTrainingData(lessonId: string): any;
 
   updateLesson(lessonId: string, updatedLesson: Lesson): void;
 
@@ -112,19 +112,48 @@ SessionSchema.index({
 SessionSchema.plugin(require('mongo-cursor-pagination').mongoosePlugin);
 
 SessionSchema.statics.getTrainingData = async function (lessonId: string) {
+  const lesson: Lesson = await LessonSchema.findOne({ lessonId });
   const sessions = await this.find({ lessonId });
+
+  const data: any = {};
+  for (let i = 0; i < lesson.expectations.length; i++) {
+    data[i] = { Good: 0, Bad: 0, Neutral: 0, total: 0 };
+  }
+
+  // CSV of data to be used by classifier training
   let csv = 'exp_num,text,label';
   sessions.forEach((session: Session) => {
     session.userResponses.forEach((response: Response) => {
       for (let i = 0; i < response.expectationScores.length; i++) {
-        const score: ExpectationScore = response.expectationScores[i];
-        if (score.graderGrade) {
-          csv += `\n${i},${response.text},${score.graderGrade}`;
+        const grade = response.expectationScores[i].graderGrade;
+        if (grade) {
+          data[i].total += 1;
+          data[i][grade] += 1;
+          // Classifier cannot use Neutral data
+          if (grade !== 'Neutral') {
+            csv += `\n${i},${response.text},${grade}`;
+          }
         }
       }
     });
   });
-  return csv;
+
+  // Does the lesson have enough data for training, based on these requirements:
+  //   * At least 10 graded answers per expectation
+  //   * At least 2 Good and 2 Bad answers per expectation
+  let isTrainable = true;
+  for (let i = 0; i < lesson.expectations.length; i++) {
+    if (data[i].total < 10) {
+      isTrainable = false;
+      break;
+    }
+    if (data[i].Good < 2 || data[i].Bad < 2) {
+      isTrainable = false;
+      break;
+    }
+  }
+
+  return { data, csv, isTrainable };
 };
 
 SessionSchema.statics.updateLesson = async function (
