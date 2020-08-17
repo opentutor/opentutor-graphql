@@ -25,7 +25,7 @@ describe('updateLastTrainedAt', () => {
   });
 
   it(`returns an error if no lessonId`, async () => {
-    const response = await request(app).post('/grading-api').send({
+    const response = await request(app).post('/graphql').send({
       query: `mutation { 
           updateLastTrainedAt(lessonId: "") { 
             lastTrainedAt
@@ -42,7 +42,7 @@ describe('updateLastTrainedAt', () => {
   it(`update with given date`, async () => {
     const date = new Date();
     const response = await request(app)
-      .post('/grading-api')
+      .post('/graphql')
       .send({
         query: `mutation { 
           updateLastTrainedAt(lessonId: "lesson1", date: "${date}") { 
@@ -57,7 +57,7 @@ describe('updateLastTrainedAt', () => {
   });
 
   it(`update with current date`, async () => {
-    const response = await request(app).post('/grading-api').send({
+    const response = await request(app).post('/graphql').send({
       query: `mutation { 
           updateLastTrainedAt(lessonId: "lesson1") { 
             lastTrainedAt

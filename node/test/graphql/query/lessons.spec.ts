@@ -25,7 +25,7 @@ describe('lessons', () => {
   });
 
   it('gets a default page of lessons', async () => {
-    const response = await request(app).post('/grading-api').send({
+    const response = await request(app).post('/graphql').send({
       query:
         '{ lessons { edges { node { lessonId } } pageInfo { hasNextPage endCursor } } }',
     });
@@ -75,7 +75,7 @@ describe('lessons', () => {
   });
 
   it('gets a page of lessons sorted in ascending order by lessonId with limit = 1', async () => {
-    const response = await request(app).post('/grading-api').send({
+    const response = await request(app).post('/graphql').send({
       query:
         '{ lessons(sortBy: "lessonId", sortAscending: true, limit: 1) { edges { node { lessonId } } pageInfo { hasNextPage hasPreviousPage startCursor endCursor } } }',
     });
@@ -103,7 +103,7 @@ describe('lessons', () => {
   });
 
   it('gets next page of lessons sorted in ascending order by lessonId with limit = 1', async () => {
-    const response = await request(app).post('/grading-api').send({
+    const response = await request(app).post('/graphql').send({
       query:
         '{ lessons(sortBy: "lessonId", sortAscending: true, limit: 1, cursor: "next__WyJsZXNzb24xIix7IiRvaWQiOiI1ZjBjZmVhMzM5NWQ3NjJjYTY1NDA1YzEifV0") { edges { node { lessonId } } pageInfo { hasNextPage hasPreviousPage startCursor endCursor } } }',
     });
@@ -132,7 +132,7 @@ describe('lessons', () => {
   });
 
   it('gets previous page of lessons sorted in ascending order by lessonId with limit = 1', async () => {
-    const response = await request(app).post('/grading-api').send({
+    const response = await request(app).post('/graphql').send({
       query:
         '{ lessons(sortBy: "lessonId", sortAscending: true, limit: 1, cursor: "prev__WyJsZXNzb24yIix7IiRvaWQiOiI1ZjBjZmVhMzM5NWQ3NjJjYTY1NDA1YzIifV0") { edges { node { lessonId } } pageInfo { hasNextPage hasPreviousPage startCursor endCursor } } }',
     });

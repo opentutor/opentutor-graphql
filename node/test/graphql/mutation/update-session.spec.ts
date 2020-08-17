@@ -25,7 +25,7 @@ describe('updateSession', () => {
   });
 
   it(`returns an error if no sessionId`, async () => {
-    const response = await request(app).post('/grading-api').send({
+    const response = await request(app).post('/graphql').send({
       query: `mutation { 
           updateSession(session: "") { 
             username
@@ -40,7 +40,7 @@ describe('updateSession', () => {
   });
 
   it(`returns an error if no session`, async () => {
-    const response = await request(app).post('/grading-api').send({
+    const response = await request(app).post('/graphql').send({
       query: `mutation { 
           updateSession(sessionId: "new session") { 
             username
@@ -61,7 +61,7 @@ describe('updateSession', () => {
       })
     );
     const response = await request(app)
-      .post('/grading-api')
+      .post('/graphql')
       .send({
         query: `mutation { 
           updateSession(sessionId: "new session", session: "${session}") { 
@@ -83,7 +83,7 @@ describe('updateSession', () => {
       })
     );
     const response = await request(app)
-      .post('/grading-api')
+      .post('/graphql')
       .send({
         query: `mutation { 
           updateSession(sessionId: "new session", session: "${session}") { 
@@ -121,7 +121,7 @@ describe('updateSession', () => {
       })
     );
     const response = await request(app)
-      .post('/grading-api')
+      .post('/graphql')
       .send({
         query: `mutation { 
           updateSession(sessionId: "new session", session: "${session}") { 
@@ -194,7 +194,7 @@ describe('updateSession', () => {
       })
     );
     await request(app)
-      .post('/grading-api')
+      .post('/graphql')
       .send({
         query: `mutation { 
             updateSession(sessionId: "new session", session: "${session}") { 
@@ -203,7 +203,7 @@ describe('updateSession', () => {
           }`,
       });
 
-    const response = await request(app).post('/grading-api').send({
+    const response = await request(app).post('/graphql').send({
       query: `query { 
             session(sessionId: "new session") { 
               sessionId
@@ -269,7 +269,7 @@ describe('updateSession', () => {
       })
     );
     await request(app)
-      .post('/grading-api')
+      .post('/graphql')
       .send({
         query: `mutation { 
             updateSession(sessionId: "session 1", session: "${session}") { 
@@ -278,7 +278,7 @@ describe('updateSession', () => {
           }`,
       });
 
-    const response = await request(app).post('/grading-api').send({
+    const response = await request(app).post('/graphql').send({
       query: `query { 
             session(sessionId: "session 1") { 
               sessionId
@@ -345,7 +345,7 @@ describe('updateSession', () => {
       })
     );
     const updated = await request(app)
-      .post('/grading-api')
+      .post('/graphql')
       .send({
         query: `mutation { 
             updateSession(sessionId: "new session", session: "${session}") { 

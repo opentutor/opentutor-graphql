@@ -30,7 +30,7 @@ export default async function createApp(): Promise<Express> {
   }
   app.use(cors());
   app.use(
-    '/grading-api',
+    '/graphql',
     graphqlHTTP({
       schema: schema,
       graphiql: true,

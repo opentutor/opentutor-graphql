@@ -25,7 +25,7 @@ describe('updateLesson', () => {
   });
 
   it(`returns an error if no lessonId`, async () => {
-    const response = await request(app).post('/grading-api').send({
+    const response = await request(app).post('/graphql').send({
       query: `mutation { 
           updateLesson(lesson: "") { 
             lessonId
@@ -40,7 +40,7 @@ describe('updateLesson', () => {
   });
 
   it(`returns an error if no lesson`, async () => {
-    const response = await request(app).post('/grading-api').send({
+    const response = await request(app).post('/graphql').send({
       query: `mutation { 
           updateLesson(lessonId: "lesson1") { 
             lessonId
@@ -61,7 +61,7 @@ describe('updateLesson', () => {
       })
     );
     const response = await request(app)
-      .post('/grading-api')
+      .post('/graphql')
       .send({
         query: `mutation { 
           updateLesson(lessonId: "A", lesson: "${lesson}") {
@@ -84,7 +84,7 @@ describe('updateLesson', () => {
       })
     );
     const response = await request(app)
-      .post('/grading-api')
+      .post('/graphql')
       .send({
         query: `mutation { 
           updateLesson(lessonId: "a", lesson: "${lesson}") {
@@ -107,7 +107,7 @@ describe('updateLesson', () => {
       })
     );
     const response = await request(app)
-      .post('/grading-api')
+      .post('/graphql')
       .send({
         query: `mutation { 
           updateLesson(lessonId: "!", lesson: "${lesson}") {
@@ -130,7 +130,7 @@ describe('updateLesson', () => {
       })
     );
     const response = await request(app)
-      .post('/grading-api')
+      .post('/graphql')
       .send({
         query: `mutation { 
           updateLesson(lessonId: "a", lesson: "${lesson}") {
@@ -167,7 +167,7 @@ describe('updateLesson', () => {
       })
     );
     const response = await request(app)
-      .post('/grading-api')
+      .post('/graphql')
       .send({
         query: `mutation { 
           updateLesson(lessonId: "newlesson", lesson: "${lesson}") {
@@ -226,7 +226,7 @@ describe('updateLesson', () => {
       })
     );
     await request(app)
-      .post('/grading-api')
+      .post('/graphql')
       .send({
         query: `mutation { 
           updateLesson(lessonId: "newlesson", lesson: "${lesson}") {
@@ -235,7 +235,7 @@ describe('updateLesson', () => {
         }`,
       });
 
-    const newLesson = await request(app).post('/grading-api').send({
+    const newLesson = await request(app).post('/graphql').send({
       query: `query {
         lesson(lessonId: "newlesson") { 
           lessonId
@@ -293,7 +293,7 @@ describe('updateLesson', () => {
       })
     );
     const response = await request(app)
-      .post('/grading-api')
+      .post('/graphql')
       .send({
         query: `mutation { 
           updateLesson(lessonId: "lesson1", lesson: "${lesson}") {
@@ -352,7 +352,7 @@ describe('updateLesson', () => {
       })
     );
     await request(app)
-      .post('/grading-api')
+      .post('/graphql')
       .send({
         query: `mutation { 
           updateLesson(lessonId: "lesson1", lesson: "${lesson}") {
@@ -361,7 +361,7 @@ describe('updateLesson', () => {
         }`,
       });
 
-    const newLesson = await request(app).post('/grading-api').send({
+    const newLesson = await request(app).post('/graphql').send({
       query: `query {
         lesson(lessonId: "lesson1") { 
           lessonId
@@ -406,7 +406,7 @@ describe('updateLesson', () => {
       })
     );
     await request(app)
-      .post('/grading-api')
+      .post('/graphql')
       .send({
         query: `mutation { 
           updateLesson(lessonId: "lesson1", lesson: "${lesson}") {
@@ -416,7 +416,7 @@ describe('updateLesson', () => {
         }`,
       });
 
-    const newLesson = await request(app).post('/grading-api').send({
+    const newLesson = await request(app).post('/graphql').send({
       query: `query {
         lesson(lessonId: "newlessonid") {
           lessonId
@@ -428,7 +428,7 @@ describe('updateLesson', () => {
       lessonId: 'newlessonid',
     });
 
-    const oldLesson = await request(app).post('/grading-api').send({
+    const oldLesson = await request(app).post('/graphql').send({
       query: `query {
         lesson(lessonId: "lesson1") {
           lessonId
@@ -451,7 +451,7 @@ describe('updateLesson', () => {
       })
     );
     await request(app)
-      .post('/grading-api')
+      .post('/graphql')
       .send({
         query: `mutation { 
           updateLesson(lessonId: "lesson1", lesson: "${lesson}") {
@@ -460,7 +460,7 @@ describe('updateLesson', () => {
         }`,
       });
 
-    const response = await request(app).post('/grading-api').send({
+    const response = await request(app).post('/graphql').send({
       query: `query {
         session(sessionId: "session 1") {
           lessonId
