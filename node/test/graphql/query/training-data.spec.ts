@@ -25,7 +25,7 @@ describe('training data', () => {
   });
 
   it(`return all training data for lesson`, async () => {
-    const response = await request(app).post('/grading-api').send({
+    const response = await request(app).post('/graphql').send({
       query: `query {
         trainingData(lessonId: "lesson1") {
           isTrainable

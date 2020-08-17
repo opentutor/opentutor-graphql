@@ -25,7 +25,7 @@ describe('session', () => {
   });
 
   it(`returns an error if invalid sessionId`, async () => {
-    const response = await request(app).post('/grading-api').send({
+    const response = await request(app).post('/graphql').send({
       query: `query { 
           session(sessionId: "111111111111111111111111") { 
             username
@@ -41,7 +41,7 @@ describe('session', () => {
   });
 
   it('succeeds with valid sessionId', async () => {
-    const response = await request(app).post('/grading-api').send({
+    const response = await request(app).post('/graphql').send({
       query: `query { 
         session(sessionId: "session 1") { 
           sessionId

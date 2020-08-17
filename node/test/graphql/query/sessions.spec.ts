@@ -25,7 +25,7 @@ describe('sessions', () => {
   });
 
   it('gets a default page of sessions', async () => {
-    const response = await request(app).post('/grading-api').send({
+    const response = await request(app).post('/graphql').send({
       query:
         '{ sessions { edges { node { sessionId } } pageInfo { hasNextPage } } }',
     });
@@ -89,7 +89,7 @@ describe('sessions', () => {
   });
 
   it('gets a page of 1 sessions', async () => {
-    const response = await request(app).post('/grading-api').send({
+    const response = await request(app).post('/graphql').send({
       query:
         '{ sessions(sortBy: "sessionId", limit: 1) { edges { node { sessionId } } pageInfo { hasNextPage endCursor } } }',
     });
@@ -116,7 +116,7 @@ describe('sessions', () => {
   });
 
   it('gets next page after cursor', async () => {
-    const response = await request(app).post('/grading-api').send({
+    const response = await request(app).post('/graphql').send({
       query:
         '{ sessions(sortBy: "sessionId", limit: 1, cursor: "WyJzZXNzaW9uIDkiLHsiJG9pZCI6IjVmMjBjNjM2NDZmNjExMGE2YTViMjEzOSJ9XQ") { edges { node { sessionId } } pageInfo { hasNextPage } } }',
     });

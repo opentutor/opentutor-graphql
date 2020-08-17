@@ -25,7 +25,7 @@ describe('lesson', () => {
   });
 
   it(`returns an error if invalid id`, async () => {
-    const response = await request(app).post('/grading-api').send({
+    const response = await request(app).post('/graphql').send({
       query: `query {
         lesson(lessonId: "111111111111111111111111") {
           lessonId
@@ -41,7 +41,7 @@ describe('lesson', () => {
   });
 
   it('succeeds with valid id', async () => {
-    const response = await request(app).post('/grading-api').send({
+    const response = await request(app).post('/graphql').send({
       query: `query {
         lesson(lessonId: "lesson1") {
           lessonId
@@ -93,7 +93,7 @@ describe('lesson', () => {
   });
 
   it('is not trainable if fewer than 10 grades per expectation', async () => {
-    const response = await request(app).post('/grading-api').send({
+    const response = await request(app).post('/graphql').send({
       query: `query {
         lesson(lessonId: "lesson3") {
           lessonId
@@ -109,7 +109,7 @@ describe('lesson', () => {
   });
 
   it('is not trainable if fewer than 2 Good grades per expectation', async () => {
-    const response = await request(app).post('/grading-api').send({
+    const response = await request(app).post('/graphql').send({
       query: `query {
         lesson(lessonId: "lesson4") {
           lessonId
@@ -125,7 +125,7 @@ describe('lesson', () => {
   });
 
   it('is not trainable if fewer than 2 Bad grades per expectation', async () => {
-    const response = await request(app).post('/grading-api').send({
+    const response = await request(app).post('/graphql').send({
       query: `query {
         lesson(lessonId: "lesson5") {
           lessonId
@@ -141,7 +141,7 @@ describe('lesson', () => {
   });
 
   it('is trainable if at least 2 good, 2 bad, and 10 total grades per expectation', async () => {
-    const response = await request(app).post('/grading-api').send({
+    const response = await request(app).post('/graphql').send({
       query: `query {
         lesson(lessonId: "lesson6") {
           lessonId

@@ -1,5 +1,5 @@
 {
-  "name": "opentutor-grading-api",
+  "name": "opentutor-graphql",
   "version": "1.0.0",
   "description": "opentutor project backend setup",
   "main": "dist/app.js",

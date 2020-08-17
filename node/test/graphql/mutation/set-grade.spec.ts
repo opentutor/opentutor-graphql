@@ -25,7 +25,7 @@ describe('setGrade', () => {
   });
 
   it(`returns an error if no sessionId`, async () => {
-    const response = await request(app).post('/grading-api').send({
+    const response = await request(app).post('/graphql').send({
       query: `mutation { 
           setGrade(userAnswerIndex: 0, userExpectationIndex: 0, grade: "Bad") { 
             username
@@ -41,7 +41,7 @@ describe('setGrade', () => {
   });
 
   it(`returns an error if no userAnswerIndex`, async () => {
-    const response = await request(app).post('/grading-api').send({
+    const response = await request(app).post('/graphql').send({
       query: `mutation { 
           setGrade(sessionId: "session 1", userExpectationIndex: 0, grade: "Bad") { 
             username
@@ -57,7 +57,7 @@ describe('setGrade', () => {
   });
 
   it(`returns an error if no userExpectationIndex`, async () => {
-    const response = await request(app).post('/grading-api').send({
+    const response = await request(app).post('/graphql').send({
       query: `mutation { 
           setGrade(sessionId: "session 1", userAnswerIndex: 0, grade: "Bad") { 
             username
@@ -73,7 +73,7 @@ describe('setGrade', () => {
   });
 
   it(`returns an error if no grade`, async () => {
-    const response = await request(app).post('/grading-api').send({
+    const response = await request(app).post('/graphql').send({
       query: `mutation { 
           setGrade(sessionId: "session 1", userAnswerIndex: 0, userExpectationIndex: 0) { 
             username
@@ -89,7 +89,7 @@ describe('setGrade', () => {
   });
 
   it(`returns an error if invalid sessionId`, async () => {
-    const response = await request(app).post('/grading-api').send({
+    const response = await request(app).post('/graphql').send({
       query: `mutation { 
         setGrade(sessionId: "111111111111111111111111", userAnswerIndex: 0, userExpectationIndex: 0, grade: "Bad") { 
           username
@@ -105,7 +105,7 @@ describe('setGrade', () => {
   });
 
   it('returns updated session', async () => {
-    const setGrade = await request(app).post('/grading-api').send({
+    const setGrade = await request(app).post('/graphql').send({
       query: `mutation { 
           setGrade(sessionId: "session 1", userAnswerIndex: 0, userExpectationIndex: 0, grade: "Bad") { 
             username
@@ -164,7 +164,7 @@ describe('setGrade', () => {
   });
 
   it('updates session in database', async () => {
-    await request(app).post('/grading-api').send({
+    await request(app).post('/graphql').send({
       query: `mutation { 
           setGrade(sessionId: "session 1", userAnswerIndex: 0, userExpectationIndex: 0, grade: "Bad") { 
             username
@@ -172,7 +172,7 @@ describe('setGrade', () => {
         }`,
     });
 
-    const session = await request(app).post('/grading-api').send({
+    const session = await request(app).post('/graphql').send({
       query: `query { 
           session(sessionId: "session 1") { 
             username
@@ -230,7 +230,7 @@ describe('setGrade', () => {
   });
 
   it('calculates and updates GOOD graderGrade', async () => {
-    await request(app).post('/grading-api').send({
+    await request(app).post('/graphql').send({
       query: `mutation { 
           setGrade(sessionId: "session 2", userAnswerIndex: 0, userExpectationIndex: 0, grade: "Good") { 
             username
@@ -238,7 +238,7 @@ describe('setGrade', () => {
         }`,
     });
 
-    const session = await request(app).post('/grading-api').send({
+    const session = await request(app).post('/graphql').send({
       query: `query { 
           session(sessionId: "session 2") { 
             graderGrade
@@ -252,7 +252,7 @@ describe('setGrade', () => {
   });
 
   it('calculates and updates BAD graderGrade', async () => {
-    await request(app).post('/grading-api').send({
+    await request(app).post('/graphql').send({
       query: `mutation { 
           setGrade(sessionId: "session 2", userAnswerIndex: 0, userExpectationIndex: 0, grade: "Bad") { 
             username
@@ -260,7 +260,7 @@ describe('setGrade', () => {
         }`,
     });
 
-    const session = await request(app).post('/grading-api').send({
+    const session = await request(app).post('/graphql').send({
       query: `query { 
           session(sessionId: "session 2") { 
             graderGrade
@@ -274,7 +274,7 @@ describe('setGrade', () => {
   });
 
   it('calculates and updates NEUTRAL graderGrade', async () => {
-    await request(app).post('/grading-api').send({
+    await request(app).post('/graphql').send({
       query: `mutation { 
           setGrade(sessionId: "session 2", userAnswerIndex: 0, userExpectationIndex: 0, grade: "Neutral") { 
             username
@@ -282,7 +282,7 @@ describe('setGrade', () => {
         }`,
     });
 
-    const session = await request(app).post('/grading-api').send({
+    const session = await request(app).post('/graphql').send({
       query: `query { 
           session(sessionId: "session 2") { 
             graderGrade
@@ -296,7 +296,7 @@ describe('setGrade', () => {
   });
 
   it('calculates and updates NO graderGrade', async () => {
-    await request(app).post('/grading-api').send({
+    await request(app).post('/graphql').send({
       query: `mutation { 
           setGrade(sessionId: "session 2", userAnswerIndex: 0, userExpectationIndex: 0, grade: "") { 
             username
@@ -304,7 +304,7 @@ describe('setGrade', () => {
         }`,
     });
 
-    const session = await request(app).post('/grading-api').send({
+    const session = await request(app).post('/graphql').send({
       query: `query { 
           session(sessionId: "session 2") { 
             graderGrade
