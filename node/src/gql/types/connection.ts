@@ -36,7 +36,6 @@ export function makeEdgeType(nodeType: GraphQLObjectType): GraphQLObjectType {
   if (TYPE_REGISTRY[name]) {
     return TYPE_REGISTRY[name];
   }
-
   return registerType(
     new GraphQLObjectType({
       name,
@@ -55,7 +54,6 @@ export function makeConnectionType(
   if (TYPE_REGISTRY[name]) {
     return TYPE_REGISTRY[name];
   }
-
   return registerType(
     new GraphQLObjectType({
       name,
@@ -94,6 +92,7 @@ export interface PaginatedResolveResult {
 }
 
 export interface HasPaginationArgs {
+  filter?: string;
   cursor?: string;
   limit?: number;
   sortBy?: string;
@@ -120,6 +119,10 @@ export function makeConnection(args: MakeConnectionArgs): any {
   return {
     type: makeConnectionType(nodeType),
     args: {
+      filter: {
+        description: `filter query string`,
+        type: GraphQLString,
+      },
       cursor: {
         description: `value to start querying the page`,
         type: GraphQLString,
@@ -141,6 +144,7 @@ export function makeConnection(args: MakeConnectionArgs): any {
     resolve: async (
       parent: any,
       args: {
+        filter?: string;
         cursor?: string;
         limit?: number;
         sortBy?: string;

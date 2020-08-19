@@ -13,15 +13,14 @@ export function findAll<T>(config: {
   model: HasPaginate<T>;
 }): any {
   const { nodeType, model } = config;
-
   return makeConnection({
     nodeType,
     resolve: async (resolveArgs: PaginatedResolveArgs) => {
       const { args } = resolveArgs;
+      const filter = args.filter ? JSON.parse(decodeURI(args.filter)) : {};
       const cursor = args.cursor;
       let next = null;
       let prev = null;
-
       if (cursor) {
         if (cursor.startsWith('prev__')) {
           prev = cursor.split('prev__')[1];
@@ -31,8 +30,8 @@ export function findAll<T>(config: {
           next = cursor;
         }
       }
-
       return await model.paginate({
+        query: filter,
         limit: Number(args.limit) || 100,
         paginatedField: args.sortBy || '_id',
         sortAscending: args.sortAscending,

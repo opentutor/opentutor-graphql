@@ -88,12 +88,11 @@ describe('sessions', () => {
     });
   });
 
-  it('gets a page of 1 sessions', async () => {
+  it('gets a page of sessions sorted in ascending order by sessionId with limit = 1', async () => {
     const response = await request(app).post('/graphql').send({
       query:
-        '{ sessions(sortBy: "sessionId", limit: 1) { edges { node { sessionId } } pageInfo { hasNextPage endCursor } } }',
+        '{ sessions(sortBy: "sessionId", limit: 1) { edges { node { sessionId } } pageInfo { hasNextPage endCursor hasPreviousPage startCursor } } }',
     });
-
     expect(response.status).to.equal(200);
     expect(response.body).to.eql({
       data: {
@@ -106,7 +105,9 @@ describe('sessions', () => {
             },
           ],
           pageInfo: {
+            hasPreviousPage: false,
             hasNextPage: true,
+            startCursor: null,
             endCursor:
               'WyJzZXNzaW9uIDkiLHsiJG9pZCI6IjVmMjBjNjM2NDZmNjExMGE2YTViMjEzOSJ9XQ',
           },
@@ -115,12 +116,11 @@ describe('sessions', () => {
     });
   });
 
-  it('gets next page after cursor', async () => {
+  it('gets next page of sessions sorted in ascending order by sessionId with limit = 1', async () => {
     const response = await request(app).post('/graphql').send({
       query:
-        '{ sessions(sortBy: "sessionId", limit: 1, cursor: "WyJzZXNzaW9uIDkiLHsiJG9pZCI6IjVmMjBjNjM2NDZmNjExMGE2YTViMjEzOSJ9XQ") { edges { node { sessionId } } pageInfo { hasNextPage } } }',
+        '{ sessions(sortBy: "sessionId", limit: 1, cursor: "WyJzZXNzaW9uIDkiLHsiJG9pZCI6IjVmMjBjNjM2NDZmNjExMGE2YTViMjEzOSJ9XQ") { edges { node { sessionId } } pageInfo { hasNextPage endCursor hasPreviousPage startCursor } } }',
     });
-
     expect(response.status).to.equal(200);
     expect(response.body).to.eql({
       data: {
@@ -133,7 +133,81 @@ describe('sessions', () => {
             },
           ],
           pageInfo: {
+            hasPreviousPage: true,
             hasNextPage: true,
+            startCursor:
+              'WyJzZXNzaW9uIDgiLHsiJG9pZCI6IjVmMjBjNjM2NDZmNjExMGE2YTViMjEzOCJ9XQ',
+            endCursor:
+              'WyJzZXNzaW9uIDgiLHsiJG9pZCI6IjVmMjBjNjM2NDZmNjExMGE2YTViMjEzOCJ9XQ',
+          },
+        },
+      },
+    });
+  });
+
+  it('gets previous page of sessions sorted in ascending order by sessionId with limit = 1', async () => {
+    const response = await request(app).post('/graphql').send({
+      query:
+        '{ sessions(sortBy: "sessionId", limit: 1, cursor: "prev__WyJzZXNzaW9uIDgiLHsiJG9pZCI6IjVmMjBjNjM2NDZmNjExMGE2YTViMjEzOCJ9XQ") { edges { node { sessionId } } pageInfo { hasNextPage endCursor hasPreviousPage startCursor } } }',
+    });
+    expect(response.status).to.equal(200);
+    expect(response.body).to.eql({
+      data: {
+        sessions: {
+          edges: [
+            {
+              node: {
+                sessionId: 'session 9',
+              },
+            },
+          ],
+          pageInfo: {
+            hasPreviousPage: false,
+            hasNextPage: true,
+            startCursor: null,
+            endCursor:
+              'WyJzZXNzaW9uIDkiLHsiJG9pZCI6IjVmMjBjNjM2NDZmNjExMGE2YTViMjEzOSJ9XQ',
+          },
+        },
+      },
+    });
+  });
+
+  it('gets sessions with lessonId = lesson1', async () => {
+    const filter = encodeURI(JSON.stringify({ lessonId: 'lesson1' }));
+    const response = await request(app)
+      .post('/graphql')
+      .send({
+        query: `{ sessions(filter: "${filter}") { edges { node { sessionId } } pageInfo { hasNextPage } } }`,
+      });
+    expect(response.status).to.equal(200);
+    expect(response.body).to.eql({
+      data: {
+        sessions: {
+          edges: [
+            {
+              node: {
+                sessionId: 'session 5',
+              },
+            },
+            {
+              node: {
+                sessionId: 'session 4',
+              },
+            },
+            {
+              node: {
+                sessionId: 'session 3',
+              },
+            },
+            {
+              node: {
+                sessionId: 'session 1',
+              },
+            },
+          ],
+          pageInfo: {
+            hasNextPage: false,
           },
         },
       },

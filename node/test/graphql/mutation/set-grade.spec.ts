@@ -32,7 +32,6 @@ describe('setGrade', () => {
           } 
         }`,
     });
-
     expect(response.status).to.equal(200);
     expect(response.body).to.have.deep.nested.property(
       'errors[0].message',
@@ -48,7 +47,6 @@ describe('setGrade', () => {
           } 
         }`,
     });
-
     expect(response.status).to.equal(200);
     expect(response.body).to.have.deep.nested.property(
       'errors[0].message',
@@ -64,7 +62,6 @@ describe('setGrade', () => {
           } 
         }`,
     });
-
     expect(response.status).to.equal(200);
     expect(response.body).to.have.deep.nested.property(
       'errors[0].message',
@@ -80,7 +77,6 @@ describe('setGrade', () => {
           } 
         }`,
     });
-
     expect(response.status).to.equal(200);
     expect(response.body).to.have.deep.nested.property(
       'errors[0].message',
@@ -96,7 +92,6 @@ describe('setGrade', () => {
           } 
         }`,
     });
-
     expect(response.status).to.equal(200);
     expect(response.body).to.have.deep.nested.property(
       'errors[0].message',
@@ -127,7 +122,6 @@ describe('setGrade', () => {
           } 
         }`,
     });
-
     expect(setGrade.status).to.equal(200);
     expect(setGrade.body.data.setGrade).to.eql({
       username: 'username1',
@@ -171,7 +165,6 @@ describe('setGrade', () => {
           } 
         }`,
     });
-
     const session = await request(app).post('/graphql').send({
       query: `query { 
           session(sessionId: "session 1") { 
@@ -237,7 +230,6 @@ describe('setGrade', () => {
           } 
         }`,
     });
-
     const session = await request(app).post('/graphql').send({
       query: `query { 
           session(sessionId: "session 2") { 
@@ -259,7 +251,6 @@ describe('setGrade', () => {
           } 
         }`,
     });
-
     const session = await request(app).post('/graphql').send({
       query: `query { 
           session(sessionId: "session 2") { 
@@ -281,7 +272,6 @@ describe('setGrade', () => {
           } 
         }`,
     });
-
     const session = await request(app).post('/graphql').send({
       query: `query { 
           session(sessionId: "session 2") { 
@@ -303,7 +293,6 @@ describe('setGrade', () => {
           } 
         }`,
     });
-
     const session = await request(app).post('/graphql').send({
       query: `query { 
           session(sessionId: "session 2") { 
