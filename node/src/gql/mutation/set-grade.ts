@@ -4,9 +4,10 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { GraphQLString, GraphQLInt } from 'graphql';
+import { GraphQLString, GraphQLInt, GraphQLObjectType } from 'graphql';
 import SessionType from 'gql/types/session';
-import { Session } from 'models';
+import { Session as SessionModel } from 'models';
+import { Session } from 'models/Session';
 
 export const setGrade = {
   type: SessionType,
@@ -16,8 +17,16 @@ export const setGrade = {
     userExpectationIndex: { type: GraphQLInt },
     grade: { type: GraphQLString },
   },
-  resolve: async (root: any, args: any) => {
-    if (args.sessionId === undefined) {
+  resolve: async (
+    _root: GraphQLObjectType,
+    args: {
+      sessionId: string;
+      userAnswerIndex: number;
+      userExpectationIndex: number;
+      grade: string;
+    }
+  ): Promise<Session> => {
+    if (!args.sessionId) {
       throw new Error('missing required param sessionId');
     }
     if (args.userAnswerIndex === undefined) {
@@ -26,10 +35,10 @@ export const setGrade = {
     if (args.userExpectationIndex === undefined) {
       throw new Error('missing required param userExpectationIndex');
     }
-    if (args.grade === undefined) {
+    if (!args.grade) {
       throw new Error('missing required param grade');
     }
-    return await Session.setGrade(
+    return await SessionModel.setGrade(
       args.sessionId,
       args.userAnswerIndex,
       args.userExpectationIndex,

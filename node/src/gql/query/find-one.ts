@@ -15,7 +15,7 @@ export interface ArgsConfig {
   };
 }
 
-function toObjectIdOrThrow(id: string, argName: string) {
+function toObjectIdOrThrow(id: string, argName: string): Types.ObjectId {
   try {
     return Types.ObjectId(`${id}`);
   } catch (err) {
@@ -30,7 +30,7 @@ export function findOne<T>(config: {
   argsConfig?: ArgsConfig;
   disableAutoIdArg?: boolean;
   disableExceptionOnNotFound?: boolean;
-}) {
+}): any {
   const {
     argsConfig,
     disableAutoIdArg,
@@ -53,7 +53,7 @@ export function findOne<T>(config: {
   return {
     type,
     args: argsConfEffective,
-    resolve: async (parent: any, args: any) => {
+    resolve: async (parent: any, args: any): Promise<T> => {
       const mArgs = Object.getOwnPropertyNames(args).reduce(
         (acc: any, cur: string) => {
           if (cur === 'id') {

@@ -69,12 +69,12 @@ export default async function createApp(): Promise<Express> {
   return app;
 }
 
-export async function appStart() {
+export async function appStart(): Promise<void> {
   const mongooseConnect = (await import('utils/mongoose-connect')).default;
   await mongooseConnect(process.env.MONGO_URI);
 }
 
-export async function appStop() {
+export async function appStop(): Promise<void> {
   try {
     mongoose.connection.removeAllListeners();
     await mongoose.disconnect();

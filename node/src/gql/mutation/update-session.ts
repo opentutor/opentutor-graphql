@@ -4,9 +4,10 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { GraphQLString } from 'graphql';
+import { GraphQLString, GraphQLObjectType } from 'graphql';
 import SessionType from 'gql/types/session';
-import { Session } from 'models';
+import { Session as SessionSchema } from 'models';
+import { Session } from 'models/Session';
 import calculateScore from 'models/utils/calculate-score';
 
 export const updateSession = {
@@ -15,11 +16,14 @@ export const updateSession = {
     sessionId: { type: GraphQLString },
     session: { type: GraphQLString },
   },
-  resolve: async (root: any, args: any) => {
-    if (args.sessionId === undefined) {
+  resolve: async (
+    _root: GraphQLObjectType,
+    args: { sessionId: string; session: string }
+  ): Promise<Session> => {
+    if (!args.sessionId) {
       throw new Error('missing required param sessionId');
     }
-    if (args.session === undefined) {
+    if (!args.session) {
       throw new Error('missing required param session');
     }
     const session = JSON.parse(decodeURI(args.session));
@@ -33,7 +37,7 @@ export const updateSession = {
     const grade = calculateScore(session, 'graderGrade');
     const classifierGrade = calculateScore(session, 'classifierGrade');
 
-    return await Session.findOneAndUpdate(
+    return await SessionSchema.findOneAndUpdate(
       {
         sessionId: args.sessionId,
       },

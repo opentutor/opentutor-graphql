@@ -4,9 +4,10 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { GraphQLString } from 'graphql';
+import { GraphQLString, GraphQLObjectType } from 'graphql';
 import LessonType from 'gql/types/lesson';
-import { Lesson, Session } from 'models';
+import { Lesson as LessonSchema, Session } from 'models';
+import { Lesson } from 'models/Lesson';
 
 export const updateLesson = {
   type: LessonType,
@@ -14,11 +15,14 @@ export const updateLesson = {
     lessonId: { type: GraphQLString },
     lesson: { type: GraphQLString },
   },
-  resolve: async (root: any, args: any) => {
-    if (args.lessonId === undefined) {
+  resolve: async (
+    _root: GraphQLObjectType,
+    args: { lessonId: string; lesson: string }
+  ): Promise<Lesson> => {
+    if (!args.lessonId) {
       throw new Error('missing required param lessonId');
     }
-    if (args.lesson === undefined) {
+    if (!args.lesson) {
       throw new Error('missing required param lesson');
     }
     const lesson = JSON.parse(decodeURI(args.lesson));
@@ -32,7 +36,7 @@ export const updateLesson = {
 
     await Session.updateLesson(args.lessonId, lesson);
 
-    return await Lesson.findOneAndUpdate(
+    return await LessonSchema.findOneAndUpdate(
       {
         lessonId: args.lessonId,
       },

@@ -11,13 +11,13 @@ import { HasPaginate } from 'gql/types/mongoose-type-helpers';
 export function findAll<T>(config: {
   nodeType: GraphQLObjectType;
   model: HasPaginate<T>;
-}) {
+}): any {
   const { nodeType, model } = config;
 
   return makeConnection({
     nodeType,
     resolve: async (resolveArgs: PaginatedResolveArgs) => {
-      const { parent, args } = resolveArgs;
+      const { args } = resolveArgs;
       const cursor = args.cursor;
       let next = null;
       let prev = null;

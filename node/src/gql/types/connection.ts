@@ -26,12 +26,12 @@ export const PageInfoType = new GraphQLObjectType({
 });
 
 const TYPE_REGISTRY: { [type: string]: GraphQLObjectType } = {};
-export function registerType(type: GraphQLObjectType) {
+export function registerType(type: GraphQLObjectType): GraphQLObjectType {
   TYPE_REGISTRY[type.name] = type;
   return type;
 }
 
-export function makeEdgeType(nodeType: GraphQLObjectType) {
+export function makeEdgeType(nodeType: GraphQLObjectType): GraphQLObjectType {
   const name = `${nodeType.name}Edge`;
   if (TYPE_REGISTRY[name]) {
     return TYPE_REGISTRY[name];
@@ -48,7 +48,9 @@ export function makeEdgeType(nodeType: GraphQLObjectType) {
   );
 }
 
-export function makeConnectionType(nodeType: GraphQLObjectType) {
+export function makeConnectionType(
+  nodeType: GraphQLObjectType
+): GraphQLObjectType {
   const name = `${nodeType.name}Connection`;
   if (TYPE_REGISTRY[name]) {
     return TYPE_REGISTRY[name];
@@ -113,7 +115,7 @@ export interface MakeConnectionArgs {
   additionalConnectionArgs?: any;
 }
 
-export function makeConnection(args: MakeConnectionArgs) {
+export function makeConnection(args: MakeConnectionArgs): any {
   const { additionalConnectionArgs, nodeType, resolve } = args;
   return {
     type: makeConnectionType(nodeType),

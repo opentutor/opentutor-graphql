@@ -12,7 +12,7 @@ function findDotEnvPath(): string[] {
     : ['.env'];
 }
 
-export function configureEnv() {
+export function configureEnv(): void {
   const dotEnvPath = findDotEnvPath();
   for (const p of dotEnvPath) {
     dotenv.config({ path: p });

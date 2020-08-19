@@ -6,7 +6,10 @@ The full terms of this copyright and license should always be found in the root 
 */
 import { Session } from 'models/Session';
 
-const calculateScore = (session: Session, gradeField = 'graderGrade') => {
+const calculateScore = (
+  session: Session,
+  gradeField = 'graderGrade'
+): number => {
   const expGrades = [];
   let score = 0;
 

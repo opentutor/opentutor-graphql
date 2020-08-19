@@ -4,10 +4,11 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { GraphQLString } from 'graphql';
+import { GraphQLString, GraphQLObjectType } from 'graphql';
 import LessonType from 'gql/types/lesson';
 import DateType from 'gql/types/date';
-import { Lesson } from 'models';
+import { Lesson as LessonModel } from 'models';
+import { Lesson } from 'models/Lesson';
 
 export const updateLastTrainedAt = {
   type: LessonType,
@@ -15,7 +16,10 @@ export const updateLastTrainedAt = {
     lessonId: { type: GraphQLString },
     date: { type: DateType },
   },
-  resolve: async (root: any, args: any) => {
+  resolve: async (
+    _root: GraphQLObjectType,
+    args: { lessonId: string; date: Date }
+  ): Promise<Lesson> => {
     if (!args.lessonId) {
       throw new Error('missing required param lessonId');
     }
@@ -23,7 +27,7 @@ export const updateLastTrainedAt = {
       args.date = new Date();
     }
 
-    return await Lesson.findOneAndUpdate(
+    return await LessonModel.findOneAndUpdate(
       {
         lessonId: args.lessonId,
       },

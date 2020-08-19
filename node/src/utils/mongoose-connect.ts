@@ -16,7 +16,7 @@ mongoose.set('useCreateIndex', true);
  * MONGO_DB - database name
  * MONGO_QUERY_STRING - query string
  */
-export default async function mongooseConnect(uri: string) {
+export default async function mongooseConnect(uri: string): Promise<void> {
   const mongoUri =
     uri ||
     process.env.MONGO_URI ||
