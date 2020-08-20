@@ -43,4 +43,24 @@ describe('training data', () => {
     );
     expect(response.body.data.trainingData.isTrainable).to.eql(false);
   });
+
+  it(`training csv escapes commas and quotes`, async () => {
+    const response = await request(app).post('/graphql').send({
+      query: `query {
+        trainingData(lessonId: "lesson6") {
+          isTrainable
+          training
+          config
+        }
+      }`,
+    });
+    expect(response.status).to.equal(200);
+    expect(response.body.data.trainingData.training).to.eql(
+      `exp_num,text,label\n0,"""good, not bad""",Good\n0,"good, not bad",Good\n0,"""bad"", not ""good""",Bad\n0,"bad",Bad`
+    );
+    expect(response.body.data.trainingData.config).to.eql(
+      'question: "question"'
+    );
+    expect(response.body.data.trainingData.isTrainable).to.eql(true);
+  });
 });

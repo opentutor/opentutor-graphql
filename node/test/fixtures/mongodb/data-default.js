@@ -458,7 +458,7 @@ module.exports = {
       sessionId: 'session 9',
       userResponses: [
         {
-          text: 'good',
+          text: '"good, not bad"',
           expectationScores: [
             {
               graderGrade: 'Good',
@@ -466,7 +466,7 @@ module.exports = {
           ],
         },
         {
-          text: 'good',
+          text: 'good, not bad',
           expectationScores: [
             {
               graderGrade: 'Good',
@@ -474,7 +474,7 @@ module.exports = {
           ],
         },
         {
-          text: 'bad',
+          text: '"bad", not "good"',
           expectationScores: [
             {
               graderGrade: 'Bad',

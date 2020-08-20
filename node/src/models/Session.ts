@@ -114,7 +114,6 @@ SessionSchema.plugin(require('mongo-cursor-pagination').mongoosePlugin);
 SessionSchema.statics.getTrainingData = async function (lessonId: string) {
   const lesson: Lesson = await LessonSchema.findOne({ lessonId });
   const sessions = await this.find({ lessonId });
-
   const data: any = {};
   for (let i = 0; i < lesson.expectations.length; i++) {
     data[i] = { Good: 0, Bad: 0, Neutral: 0, total: 0 };
@@ -131,7 +130,8 @@ SessionSchema.statics.getTrainingData = async function (lessonId: string) {
           data[i][grade] += 1;
           // Classifier cannot use Neutral data
           if (grade !== 'Neutral') {
-            csv += `\n${i},"${response.text}",${grade}`;
+            const text = response.text.replace(/"/g, '""');
+            csv += `\n${i},"${text}",${grade}`;
           }
         }
       }
