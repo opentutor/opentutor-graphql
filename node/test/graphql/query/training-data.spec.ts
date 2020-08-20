@@ -36,7 +36,7 @@ describe('training data', () => {
     });
     expect(response.status).to.equal(200);
     expect(response.body.data.trainingData.training).to.eql(
-      'exp_num,text,label\n0,a good answer,Good\n0,a bad answer,Bad'
+      'exp_num,text,label\n0,"a good answer",Good\n0,"a bad answer",Bad'
     );
     expect(response.body.data.trainingData.config).to.eql(
       'question: "question?"'

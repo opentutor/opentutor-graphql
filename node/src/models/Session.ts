@@ -131,7 +131,7 @@ SessionSchema.statics.getTrainingData = async function (lessonId: string) {
           data[i][grade] += 1;
           // Classifier cannot use Neutral data
           if (grade !== 'Neutral') {
-            csv += `\n${i},${response.text},${grade}`;
+            csv += `\n${i},"${response.text}",${grade}`;
           }
         }
       }
