@@ -6,7 +6,7 @@ The full terms of this copyright and license should always be found in the root 
 */
 import { GraphQLString, GraphQLObjectType } from 'graphql';
 import SessionType from 'gql/types/session';
-import { Session as SessionSchema } from 'models';
+import { Lesson as LessonSchema, Session as SessionSchema } from 'models';
 import { Session } from 'models/Session';
 import calculateScore from 'models/utils/calculate-score';
 
@@ -26,7 +26,8 @@ export const updateSession = {
     if (!args.session) {
       throw new Error('missing required param session');
     }
-    const session = JSON.parse(decodeURI(args.session));
+
+    const session: Session = JSON.parse(decodeURI(args.session));
     if (!session.sessionId) {
       throw new Error('session is missing a sessionId');
     }
@@ -34,6 +35,7 @@ export const updateSession = {
       throw new Error('session is missing a lessonId');
     }
 
+    const lesson = await LessonSchema.findOne({ lessonId: session.lessonId });
     const grade = calculateScore(session, 'graderGrade');
     const classifierGrade = calculateScore(session, 'classifierGrade');
 
@@ -46,6 +48,8 @@ export const updateSession = {
           ...session,
           graderGrade: grade,
           classifierGrade: classifierGrade,
+          lessonName: lesson.name,
+          lessonCreatedBy: lesson.createdBy,
         },
       },
       {

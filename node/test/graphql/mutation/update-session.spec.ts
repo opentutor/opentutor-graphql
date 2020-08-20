@@ -129,6 +129,7 @@ describe('updateSession', () => {
             username
             lesson {
               name
+              createdBy
             }
             question {
               text
@@ -152,6 +153,7 @@ describe('updateSession', () => {
       username: 'new username',
       lesson: {
         name: 'lesson name',
+        createdBy: null,
       },
       question: {
         text: 'new question?',
@@ -202,12 +204,15 @@ describe('updateSession', () => {
             } 
           }`,
       });
-
     const response = await request(app).post('/graphql').send({
       query: `query { 
             session(sessionId: "new session") { 
               sessionId
               username
+              lesson {
+                name
+                createdBy
+              }
               question {
                 text
                 expectations {
@@ -228,6 +233,10 @@ describe('updateSession', () => {
     expect(response.body.data.session).to.eql({
       sessionId: 'new session',
       username: 'new username',
+      lesson: {
+        name: 'lesson name',
+        createdBy: null,
+      },
       question: {
         text: 'new question?',
         expectations: [{ text: 'new expected text' }],
