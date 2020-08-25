@@ -32,6 +32,7 @@ const LessonExpectationType = new GraphQLObjectType({
 export const LessonType = new GraphQLObjectType({
   name: 'Lesson',
   fields: {
+    deleted: { type: GraphQLBoolean },
     id: { type: GraphQLID },
     lessonId: { type: GraphQLString },
     createdBy: { type: GraphQLString },

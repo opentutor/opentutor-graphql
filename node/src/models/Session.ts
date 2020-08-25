@@ -65,6 +65,7 @@ export interface Session extends Document {
   classifierGrade: number;
   question: Question;
   userResponses: [Response];
+  deleted: boolean;
 }
 
 export const SessionSchema = new Schema(
@@ -78,6 +79,7 @@ export const SessionSchema = new Schema(
     classifierGrade: { type: Number },
     question: { type: QuestionSchema },
     userResponses: [ResponseSchema],
+    deleted: { type: Boolean },
   },
   { timestamps: true }
 );

@@ -4,22 +4,37 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { GraphQLObjectType } from 'graphql';
-import setGrade from './set-grade';
-import updateLesson from './update-lesson';
-import updateSession from './update-session';
-import updateLastTrainedAt from './update-last-trained-at';
-import deleteLesson from './delete-lesson';
-import deleteSession from './delete-session';
+import { GraphQLString, GraphQLObjectType } from 'graphql';
+import LessonType from 'gql/types/lesson';
+import { Lesson as LessonSchema } from 'models';
+import { Lesson } from 'models/Lesson';
 
-export default new GraphQLObjectType({
-  name: 'Mutation',
-  fields: {
-    setGrade,
-    updateLesson,
-    updateSession,
-    updateLastTrainedAt,
-    deleteLesson,
-    deleteSession,
+export const deleteLesson = {
+  type: LessonType,
+  args: {
+    lessonId: { type: GraphQLString },
   },
-});
+  resolve: async (
+    _root: GraphQLObjectType,
+    args: { lessonId: string }
+  ): Promise<Lesson> => {
+    if (!args.lessonId) {
+      throw new Error('missing required param lessonId');
+    }
+    return await LessonSchema.findOneAndUpdate(
+      {
+        lessonId: args.lessonId,
+      },
+      {
+        $set: {
+          deleted: true,
+        },
+      },
+      {
+        new: true, // return the updated doc rather than pre update
+      }
+    );
+  },
+};
+
+export default deleteLesson;

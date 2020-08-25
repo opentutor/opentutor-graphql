@@ -34,6 +34,7 @@ export interface Lesson extends Document {
   conclusion: [string];
   createdBy: string;
   lastTrainedAt: Date;
+  deleted: boolean;
 }
 
 export const LessonSchema = new Schema(
@@ -46,6 +47,7 @@ export const LessonSchema = new Schema(
     conclusion: { type: [String] },
     createdBy: { type: String },
     lastTrainedAt: { type: Date },
+    deleted: { type: Boolean },
   },
   { timestamps: true }
 );
