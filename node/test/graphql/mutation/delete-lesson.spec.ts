@@ -52,4 +52,53 @@ describe('deleteLesson', () => {
       deleted: true,
     });
   });
+
+  it(`marks related sessions deleted`, async () => {
+    await request(app).post('/graphql').send({
+      query: `mutation { 
+          deleteLesson(lessonId: "lesson1") {
+            deleted
+          } 
+        }`,
+    });
+    const filter = encodeURI(JSON.stringify({ lessonId: 'lesson1' }));
+    const response = await request(app)
+      .post('/graphql')
+      .send({
+        query: `{ sessions(filter: "${filter}") { edges { node { sessionId deleted } } } }`,
+      });
+    expect(response.status).to.equal(200);
+    expect(response.body).to.eql({
+      data: {
+        sessions: {
+          edges: [
+            {
+              node: {
+                sessionId: 'session 5',
+                deleted: true,
+              },
+            },
+            {
+              node: {
+                sessionId: 'session 4',
+                deleted: true,
+              },
+            },
+            {
+              node: {
+                sessionId: 'session 3',
+                deleted: true,
+              },
+            },
+            {
+              node: {
+                sessionId: 'session 1',
+                deleted: true,
+              },
+            },
+          ],
+        },
+      },
+    });
+  });
 });

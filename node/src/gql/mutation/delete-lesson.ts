@@ -6,7 +6,7 @@ The full terms of this copyright and license should always be found in the root 
 */
 import { GraphQLString, GraphQLObjectType } from 'graphql';
 import LessonType from 'gql/types/lesson';
-import { Lesson as LessonSchema } from 'models';
+import { Lesson as LessonSchema, Session } from 'models';
 import { Lesson } from 'models/Lesson';
 
 export const deleteLesson = {
@@ -21,6 +21,16 @@ export const deleteLesson = {
     if (!args.lessonId) {
       throw new Error('missing required param lessonId');
     }
+    await Session.updateMany(
+      {
+        lessonId: args.lessonId,
+      },
+      {
+        $set: {
+          deleted: true,
+        },
+      }
+    );
     return await LessonSchema.findOneAndUpdate(
       {
         lessonId: args.lessonId,
