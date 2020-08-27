@@ -25,8 +25,10 @@ export const updateLesson = {
     if (!args.lesson) {
       throw new Error('missing required param lesson');
     }
-    const lesson = JSON.parse(decodeURI(args.lesson));
-
+    const lesson: Lesson = JSON.parse(decodeURI(args.lesson));
+    if (lesson.deleted) {
+      throw new Error('lesson was deleted');
+    }
     if (
       !args.lessonId.match(/^[a-z0-9\-]+$/) ||
       !lesson.lessonId.match(/^[a-z0-9\-]+$/)

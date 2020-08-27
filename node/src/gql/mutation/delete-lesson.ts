@@ -21,6 +21,10 @@ export const deleteLesson = {
     if (!args.lessonId) {
       throw new Error('missing required param lessonId');
     }
+    const lesson = await LessonSchema.findOne({ lessonId: args.lessonId });
+    if (lesson.deleted || lesson.lessonId.startsWith('_deleted_')) {
+      throw new Error('lesson was already deleted');
+    }
     await Session.updateMany(
       {
         lessonId: args.lessonId,
@@ -28,6 +32,7 @@ export const deleteLesson = {
       {
         $set: {
           deleted: true,
+          lessonId: `_deleted_${args.lessonId}`,
         },
       }
     );
@@ -38,6 +43,7 @@ export const deleteLesson = {
       {
         $set: {
           deleted: true,
+          lessonId: `_deleted_${args.lessonId}`,
         },
       },
       {

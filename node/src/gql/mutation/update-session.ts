@@ -34,8 +34,14 @@ export const updateSession = {
     if (!session.lessonId) {
       throw new Error('session is missing a lessonId');
     }
+    if (session.deleted) {
+      throw new Error('session was deleted');
+    }
 
     const lesson = await LessonSchema.findOne({ lessonId: session.lessonId });
+    if (lesson.deleted || lesson.lessonId.startsWith('_deleted_')) {
+      throw new Error('lesson was deleted');
+    }
     const grade = calculateScore(session, 'graderGrade');
     const classifierGrade = calculateScore(session, 'classifierGrade');
 

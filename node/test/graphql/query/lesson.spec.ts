@@ -40,6 +40,22 @@ describe('lesson', () => {
     );
   });
 
+  it(`cannot find a deleted lesson`, async () => {
+    const response = await request(app).post('/graphql').send({
+      query: `query {
+        lesson(lessonId: "_deleted_lesson") {
+          lessonId
+        }
+      }`,
+    });
+
+    expect(response.status).to.equal(200);
+    expect(response.body).to.have.deep.nested.property(
+      'errors[0].message',
+      'lesson not found for args "{"lessonId":"_deleted_lesson"}"'
+    );
+  });
+
   it('succeeds with valid id', async () => {
     const response = await request(app).post('/graphql').send({
       query: `query {

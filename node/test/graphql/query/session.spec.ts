@@ -32,11 +32,25 @@ describe('session', () => {
           } 
         }`,
     });
-
     expect(response.status).to.equal(200);
     expect(response.body).to.have.deep.nested.property(
       'errors[0].message',
       'session not found for args "{"sessionId":"111111111111111111111111"}"'
+    );
+  });
+
+  it(`cannot find a deleted session`, async () => {
+    const response = await request(app).post('/graphql').send({
+      query: `query { 
+          session(sessionId: "session 10") { 
+            username
+          } 
+        }`,
+    });
+    expect(response.status).to.equal(200);
+    expect(response.body).to.have.deep.nested.property(
+      'errors[0].message',
+      'session not found for args "{"sessionId":"session 10"}"'
     );
   });
 

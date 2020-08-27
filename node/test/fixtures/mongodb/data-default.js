@@ -131,6 +131,11 @@ module.exports = {
       ],
       conclusion: ['conclusion'],
     },
+    {
+      _id: ObjectId('5f0cfea3395d762ca65405c7'),
+      lessonId: '_deleted_lesson',
+      deleted: true,
+    },
   ],
 
   sessions: [
@@ -538,6 +543,12 @@ module.exports = {
           ],
         },
       ],
+    },
+    {
+      _id: ObjectId('5f20c63646f6110a6a5b2130'),
+      sessionId: 'session 10',
+      lessonId: '_deleted_lesson',
+      deleted: true,
     },
   ],
 };

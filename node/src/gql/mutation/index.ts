@@ -10,7 +10,6 @@ import updateLesson from './update-lesson';
 import updateSession from './update-session';
 import updateLastTrainedAt from './update-last-trained-at';
 import deleteLesson from './delete-lesson';
-import deleteSession from './delete-session';
 
 export default new GraphQLObjectType({
   name: 'Mutation',
@@ -20,6 +19,5 @@ export default new GraphQLObjectType({
     updateSession,
     updateLastTrainedAt,
     deleteLesson,
-    deleteSession,
   },
 });

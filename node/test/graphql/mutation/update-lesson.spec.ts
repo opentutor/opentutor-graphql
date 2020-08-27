@@ -70,7 +70,6 @@ describe('updateLesson', () => {
         }`,
       });
     expect(response.status).to.equal(200);
-    expect(response.status).to.equal(200);
     expect(response.body).to.have.deep.nested.property(
       'errors[0].message',
       'lessonId must match [a-z0-9-]'
@@ -92,7 +91,6 @@ describe('updateLesson', () => {
           } 
         }`,
       });
-    expect(response.status).to.equal(200);
     expect(response.status).to.equal(200);
     expect(response.body).to.have.deep.nested.property(
       'errors[0].message',
@@ -116,7 +114,6 @@ describe('updateLesson', () => {
         }`,
       });
     expect(response.status).to.equal(200);
-    expect(response.status).to.equal(200);
     expect(response.body).to.have.deep.nested.property(
       'errors[0].message',
       'lessonId must match [a-z0-9-]'
@@ -139,10 +136,32 @@ describe('updateLesson', () => {
         }`,
       });
     expect(response.status).to.equal(200);
-    expect(response.status).to.equal(200);
     expect(response.body).to.have.deep.nested.property(
       'errors[0].message',
       'lessonId must match [a-z0-9-]'
+    );
+  });
+
+  it(`throws an error if lesson was deleted`, async () => {
+    const lesson = encodeURI(
+      JSON.stringify({
+        lessonId: '_deleted_lesson',
+        deleted: true,
+      })
+    );
+    const response = await request(app)
+      .post('/graphql')
+      .send({
+        query: `mutation { 
+          updateLesson(lessonId: "_deleted_lesson", lesson: "${lesson}") {
+            lessonId
+          } 
+        }`,
+      });
+    expect(response.status).to.equal(200);
+    expect(response.body).to.have.deep.nested.property(
+      'errors[0].message',
+      'lesson was deleted'
     );
   });
 

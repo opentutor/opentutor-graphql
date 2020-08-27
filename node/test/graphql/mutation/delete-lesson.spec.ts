@@ -39,21 +39,76 @@ describe('deleteLesson', () => {
     );
   });
 
-  it(`marks lesson deleted`, async () => {
+  it(`returns an error if lesson was already deleted`, async () => {
+    const response = await request(app).post('/graphql').send({
+      query: `mutation { 
+          deleteLesson(lessonId: "_deleted_lesson") { 
+            deleted
+          } 
+        }`,
+    });
+    expect(response.status).to.equal(200);
+    expect(response.body).to.have.deep.nested.property(
+      'errors[0].message',
+      'lesson was already deleted'
+    );
+  });
+
+  it(`deletes lesson`, async () => {
     const response = await request(app).post('/graphql').send({
       query: `mutation { 
           deleteLesson(lessonId: "lesson1") {
+            lessonId
             deleted
           } 
         }`,
     });
     expect(response.status).to.equal(200);
     expect(response.body.data.deleteLesson).to.eql({
+      lessonId: '_deleted_lesson1',
       deleted: true,
+    });
+
+    const lessons = await request(app).post('/graphql').send({
+      query: '{ lessons { edges { node { lessonId } } } }',
+    });
+    expect(lessons.status).to.equal(200);
+    expect(lessons.body).to.eql({
+      data: {
+        lessons: {
+          edges: [
+            {
+              node: {
+                lessonId: 'lesson6',
+              },
+            },
+            {
+              node: {
+                lessonId: 'lesson5',
+              },
+            },
+            {
+              node: {
+                lessonId: 'lesson4',
+              },
+            },
+            {
+              node: {
+                lessonId: 'lesson3',
+              },
+            },
+            {
+              node: {
+                lessonId: 'lesson2',
+              },
+            },
+          ],
+        },
+      },
     });
   });
 
-  it(`marks related sessions deleted`, async () => {
+  it(`deletes related sessions`, async () => {
     await request(app).post('/graphql').send({
       query: `mutation { 
           deleteLesson(lessonId: "lesson1") {
@@ -61,12 +116,9 @@ describe('deleteLesson', () => {
           } 
         }`,
     });
-    const filter = encodeURI(JSON.stringify({ lessonId: 'lesson1' }));
-    const response = await request(app)
-      .post('/graphql')
-      .send({
-        query: `{ sessions(filter: "${filter}") { edges { node { sessionId deleted } } } }`,
-      });
+    const response = await request(app).post('/graphql').send({
+      query: '{ sessions { edges { node { sessionId } } } }',
+    });
     expect(response.status).to.equal(200);
     expect(response.body).to.eql({
       data: {
@@ -74,26 +126,27 @@ describe('deleteLesson', () => {
           edges: [
             {
               node: {
-                sessionId: 'session 5',
-                deleted: true,
+                sessionId: 'session 9',
               },
             },
             {
               node: {
-                sessionId: 'session 4',
-                deleted: true,
+                sessionId: 'session 8',
               },
             },
             {
               node: {
-                sessionId: 'session 3',
-                deleted: true,
+                sessionId: 'session 7',
               },
             },
             {
               node: {
-                sessionId: 'session 1',
-                deleted: true,
+                sessionId: 'session 6',
+              },
+            },
+            {
+              node: {
+                sessionId: 'session 2',
               },
             },
           ],

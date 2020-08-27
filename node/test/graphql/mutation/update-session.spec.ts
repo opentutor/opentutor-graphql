@@ -98,6 +98,53 @@ describe('updateSession', () => {
     );
   });
 
+  it(`throws an error if session was deleted`, async () => {
+    const session = encodeURI(
+      JSON.stringify({
+        lessonId: 'lesson1',
+        sessionId: 'new session',
+        deleted: true,
+      })
+    );
+    const response = await request(app)
+      .post('/graphql')
+      .send({
+        query: `mutation { 
+          updateSession(sessionId: "new session", session: "${session}") { 
+            sessionId
+          } 
+        }`,
+      });
+    expect(response.status).to.equal(200);
+    expect(response.body).to.have.deep.nested.property(
+      'errors[0].message',
+      'session was deleted'
+    );
+  });
+
+  it(`throws an error if lesson was deleted`, async () => {
+    const session = encodeURI(
+      JSON.stringify({
+        lessonId: '_deleted_lesson',
+        sessionId: 'new session',
+      })
+    );
+    const response = await request(app)
+      .post('/graphql')
+      .send({
+        query: `mutation { 
+          updateSession(sessionId: "new session", session: "${session}") { 
+            sessionId
+          } 
+        }`,
+      });
+    expect(response.status).to.equal(200);
+    expect(response.body).to.have.deep.nested.property(
+      'errors[0].message',
+      'lesson was deleted'
+    );
+  });
+
   it(`returns updated session`, async () => {
     const session = encodeURI(
       JSON.stringify({
