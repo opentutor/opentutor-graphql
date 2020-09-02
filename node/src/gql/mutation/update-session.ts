@@ -28,15 +28,26 @@ export const updateSession = {
     }
 
     const session: Session = JSON.parse(decodeURI(args.session));
+    if (session.deleted) {
+      throw new Error('session was deleted');
+    }
     if (!session.sessionId) {
       throw new Error('session is missing a sessionId');
     }
     if (!session.lessonId) {
       throw new Error('session is missing a lessonId');
     }
-    if (session.deleted) {
-      throw new Error('session was deleted');
+    if (!session.username) {
+      throw new Error('session is missing a username');
     }
+    if (!session.question) {
+      throw new Error('session is missing a question');
+    }
+    session.userResponses.forEach((response) => {
+      if (!response.text.trim()) {
+        throw new Error('session has an invalid answer (empty response text)');
+      }
+    });
 
     const lesson = await LessonSchema.findOne({ lessonId: session.lessonId });
     if (lesson.deleted || lesson.lessonId.startsWith('_deleted_')) {

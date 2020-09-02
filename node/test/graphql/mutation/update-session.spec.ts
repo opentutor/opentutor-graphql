@@ -58,6 +58,21 @@ describe('updateSession', () => {
     const session = encodeURI(
       JSON.stringify({
         sessionId: 'new session',
+        username: 'new username',
+        question: {
+          text: 'new question?',
+          expectations: [{ text: 'new expected text' }],
+        },
+        userResponses: [
+          {
+            text: 'new answer',
+            expectationScores: [
+              {
+                classifierGrade: 'Good',
+              },
+            ],
+          },
+        ],
       })
     );
     const response = await request(app)
@@ -80,6 +95,21 @@ describe('updateSession', () => {
     const session = encodeURI(
       JSON.stringify({
         lessonId: 'lesson1',
+        username: 'new username',
+        question: {
+          text: 'new question?',
+          expectations: [{ text: 'new expected text' }],
+        },
+        userResponses: [
+          {
+            text: 'new answer',
+            expectationScores: [
+              {
+                classifierGrade: 'Good',
+              },
+            ],
+          },
+        ],
       })
     );
     const response = await request(app)
@@ -98,11 +128,135 @@ describe('updateSession', () => {
     );
   });
 
+  it(`returns an error if session has no username`, async () => {
+    const session = encodeURI(
+      JSON.stringify({
+        lessonId: 'lesson1',
+        sessionId: 'new session',
+        question: {
+          text: 'new question?',
+          expectations: [{ text: 'new expected text' }],
+        },
+        userResponses: [
+          {
+            text: 'new answer',
+            expectationScores: [
+              {
+                classifierGrade: 'Good',
+              },
+            ],
+          },
+        ],
+      })
+    );
+    const response = await request(app)
+      .post('/graphql')
+      .send({
+        query: `mutation { 
+          updateSession(sessionId: "new session", session: "${session}") { 
+            sessionId
+          } 
+        }`,
+      });
+    expect(response.status).to.equal(200);
+    expect(response.body).to.have.deep.nested.property(
+      'errors[0].message',
+      'session is missing a username'
+    );
+  });
+
+  it(`returns an error if session has no question`, async () => {
+    const session = encodeURI(
+      JSON.stringify({
+        lessonId: 'lesson1',
+        sessionId: 'new session',
+        username: 'new username',
+        userResponses: [
+          {
+            text: 'new answer',
+            expectationScores: [
+              {
+                classifierGrade: 'Good',
+              },
+            ],
+          },
+        ],
+      })
+    );
+    const response = await request(app)
+      .post('/graphql')
+      .send({
+        query: `mutation { 
+          updateSession(sessionId: "new session", session: "${session}") { 
+            sessionId
+          } 
+        }`,
+      });
+    expect(response.status).to.equal(200);
+    expect(response.body).to.have.deep.nested.property(
+      'errors[0].message',
+      'session is missing a question'
+    );
+  });
+
+  it(`returns an error if session has invalid answer`, async () => {
+    const session = encodeURI(
+      JSON.stringify({
+        lessonId: 'lesson1',
+        sessionId: 'new session',
+        username: 'new username',
+        question: {
+          text: 'new question?',
+          expectations: [{ text: 'new expected text' }],
+        },
+        userResponses: [
+          {
+            text: ' ',
+            expectationScores: [
+              {
+                classifierGrade: 'Good',
+              },
+            ],
+          },
+        ],
+      })
+    );
+    const response = await request(app)
+      .post('/graphql')
+      .send({
+        query: `mutation { 
+          updateSession(sessionId: "new session", session: "${session}") { 
+            sessionId
+          } 
+        }`,
+      });
+    expect(response.status).to.equal(200);
+    expect(response.body).to.have.deep.nested.property(
+      'errors[0].message',
+      'session has an invalid answer (empty response text)'
+    );
+  });
+
   it(`throws an error if session was deleted`, async () => {
     const session = encodeURI(
       JSON.stringify({
         lessonId: 'lesson1',
         sessionId: 'new session',
+        username: 'new username',
+        question: {
+          text: 'new question?',
+          expectations: [{ text: 'new expected text' }],
+        },
+        userResponses: [
+          {
+            text: 'new answer',
+            expectationScores: [
+              {
+                classifierGrade: 'Good',
+              },
+            ],
+          },
+        ],
         deleted: true,
       })
     );
@@ -127,6 +281,21 @@ describe('updateSession', () => {
       JSON.stringify({
         lessonId: '_deleted_lesson',
         sessionId: 'new session',
+        username: 'new username',
+        question: {
+          text: 'new question?',
+          expectations: [{ text: 'new expected text' }],
+        },
+        userResponses: [
+          {
+            text: 'new answer',
+            expectationScores: [
+              {
+                classifierGrade: 'Good',
+              },
+            ],
+          },
+        ],
       })
     );
     const response = await request(app)
