@@ -7,6 +7,9 @@ The full terms of this copyright and license should always be found in the root 
 import mongoose, { Schema, Document, Model } from 'mongoose';
 import { PaginatedResolveResult } from './PaginatedResolveResult';
 
+const mongoPaging = require('mongo-cursor-pagination');
+mongoPaging.config.COLLATION = { locale: 'en', strength: 2 };
+
 interface Hint extends Document {
   text: string;
 }
@@ -39,7 +42,7 @@ export interface Lesson extends Document {
 
 export const LessonSchema = new Schema(
   {
-    lessonId: { type: String, required: '{PATH} is required!' },
+    lessonId: { type: String, required: true, unique: true },
     name: { type: String },
     intro: { type: String },
     question: { type: String },
@@ -49,7 +52,7 @@ export const LessonSchema = new Schema(
     lastTrainedAt: { type: Date },
     deleted: { type: Boolean },
   },
-  { timestamps: true }
+  { timestamps: true, collation: { locale: 'en', strength: 2 } }
 );
 
 export interface LessonModel extends Model<Lesson> {
@@ -60,12 +63,9 @@ export interface LessonModel extends Model<Lesson> {
   ): Promise<PaginatedResolveResult<Lesson>>;
 }
 
-LessonSchema.index({
-  name: -1,
-  createdBy: -1,
-  createdAt: -1,
-  _id: -1,
-});
-LessonSchema.plugin(require('mongo-cursor-pagination').mongoosePlugin);
+LessonSchema.index({ name: -1, _id: -1 });
+LessonSchema.index({ createdBy: -1, _id: -1 });
+LessonSchema.index({ createdAt: -1, _id: -1 });
+LessonSchema.plugin(mongoPaging.mongoosePlugin);
 
 export default mongoose.model<Lesson, LessonModel>('Lesson', LessonSchema);

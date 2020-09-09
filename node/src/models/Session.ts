@@ -9,6 +9,9 @@ import { PaginatedResolveResult } from './PaginatedResolveResult';
 import LessonSchema, { Lesson } from './Lesson';
 import calculateScore from 'models/utils/calculate-score';
 
+const mongoPaging = require('mongo-cursor-pagination');
+mongoPaging.config.COLLATION = { locale: 'en', strength: 2 };
+
 interface Expectation extends Document {
   text: string;
 }
@@ -81,7 +84,7 @@ export const SessionSchema = new Schema(
     userResponses: [ResponseSchema],
     deleted: { type: Boolean },
   },
-  { timestamps: true }
+  { timestamps: true, collation: { locale: 'en', strength: 2 } }
 );
 
 export interface SessionModel extends Model<Session> {
@@ -102,16 +105,6 @@ export interface SessionModel extends Model<Session> {
     grade: string
   ): Promise<Session>;
 }
-
-SessionSchema.index({
-  lessonName: -1,
-  lessonCreatedBy: -1,
-  createdAt: -1,
-  classifierGrade: -1,
-  graderGrade: -1,
-  _id: -1,
-});
-SessionSchema.plugin(require('mongo-cursor-pagination').mongoosePlugin);
 
 SessionSchema.statics.getTrainingData = async function (lessonId: string) {
   const lesson: Lesson = await LessonSchema.findOne({ lessonId });
@@ -212,5 +205,12 @@ SessionSchema.statics.setGrade = async function (
     }
   );
 };
+
+SessionSchema.index({ lessonName: -1, _id: -1 });
+SessionSchema.index({ lessonCreatedBy: -1, _id: -1 });
+SessionSchema.index({ createdAt: -1, _id: -1 });
+SessionSchema.index({ classifierGrade: -1, _id: -1 });
+SessionSchema.index({ graderGrade: -1, _id: -1 });
+SessionSchema.plugin(mongoPaging.mongoosePlugin);
 
 export default mongoose.model<Session, SessionModel>('Session', SessionSchema);
