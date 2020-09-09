@@ -7,6 +7,7 @@ The full terms of this copyright and license should always be found in the root 
 import { GraphQLString, GraphQLObjectType } from 'graphql';
 import { Lesson, Session } from 'models';
 import TrainingDataType from 'gql/types/training-data';
+import * as YAML from 'yaml';
 
 export interface TrainingData {
   config: string;
@@ -28,9 +29,13 @@ export const trainingData = {
     }
     const trainingData = await Session.getTrainingData(args.lessonId);
     const lesson = await Lesson.findOne({ lessonId: args.lessonId });
-    const config = `question: "${lesson.question}"`;
     return {
-      config: config,
+      config: YAML.stringify({
+        question: lesson.question,
+        expectations: lesson.expectations.map((x) => {
+          return { ideal: x.expectation };
+        }),
+      }),
       training: trainingData.csv,
       isTrainable: trainingData.isTrainable,
     };

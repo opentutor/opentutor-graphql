@@ -4,9 +4,10 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
+import csvStringify from 'csv-stringify';
 import mongoose, { Schema, Document, Model } from 'mongoose';
 import { PaginatedResolveResult } from './PaginatedResolveResult';
-import LessonSchema, { Lesson } from './Lesson';
+import LessonModel, { Lesson } from './Lesson';
 import calculateScore from 'models/utils/calculate-score';
 
 const mongoPaging = require('mongo-cursor-pagination');
@@ -25,14 +26,20 @@ interface Question extends Document {
   expectations: [Expectation];
 }
 
+enum Grade {
+  Good = 'Good',
+  Bad = 'Bad',
+  Neutral = 'Neutral',
+}
+
 const QuestionSchema = new Schema({
   text: { type: String },
   expectations: [ExpectationSchema],
 });
 
 interface ExpectationScore extends Document {
-  classifierGrade: string;
-  graderGrade: string;
+  classifierGrade: Grade;
+  graderGrade?: Grade;
 }
 
 const ExpectationScoreSchema = new Schema({
@@ -71,7 +78,7 @@ export interface Session extends Document {
   deleted: boolean;
 }
 
-export const SessionSchema = new Schema(
+export const SessionSchema = new Schema<Session>(
   {
     sessionId: { type: String, required: '{PATH} is required!' },
     lessonId: { type: String, required: '{PATH} is required!' },
@@ -106,49 +113,50 @@ export interface SessionModel extends Model<Session> {
   ): Promise<Session>;
 }
 
-SessionSchema.statics.getTrainingData = async function (lessonId: string) {
-  const lesson: Lesson = await LessonSchema.findOne({ lessonId });
-  const sessions = await this.find({ lessonId });
-  const data: any = {};
-  for (let i = 0; i < lesson.expectations.length; i++) {
-    data[i] = { Good: 0, Bad: 0, Neutral: 0, total: 0 };
-  }
+function _toCsv(data: string[][]): Promise<string> {
+  return new Promise((resolve, reject) => {
+    csvStringify(data, (err: any, csv: string | PromiseLike<string>) => {
+      if (err) {
+        return reject(err);
+      } else {
+        return resolve(csv);
+      }
+    });
+  });
+}
 
-  // CSV of data to be used by classifier training
-  let csv = 'exp_num,text,label';
+SessionSchema.statics.getTrainingData = async function (lessonId: string) {
+  const lesson: Lesson = await LessonModel.findOne({ lessonId });
+  const sessions: Session[] = await this.find({ lessonId });
+  const expectationGradingStats = lesson.expectations.map(() => {
+    return { Good: 0, Bad: 0, Neutral: 0, total: 0 };
+  });
+  const trainingData = [['exp_num', 'text', 'label']];
   sessions.forEach((session: Session) => {
     session.userResponses.forEach((response: Response) => {
-      for (let i = 0; i < response.expectationScores.length; i++) {
-        const grade = response.expectationScores[i].graderGrade;
+      for (let expIx = 0; expIx < response.expectationScores.length; expIx++) {
+        const grade = response.expectationScores[expIx].graderGrade;
         if (grade) {
-          data[i].total += 1;
-          data[i][grade] += 1;
+          expectationGradingStats[expIx].total += 1;
+          expectationGradingStats[expIx][grade] += 1;
           // Classifier cannot use Neutral data
           if (grade !== 'Neutral') {
-            const text = response.text.replace(/"/g, '""');
-            csv += `\n${i},"${text}",${grade}`;
+            trainingData.push([`${expIx}`, response.text, grade]);
           }
         }
       }
     });
   });
-
-  // Does the lesson have enough data for training, based on these requirements:
-  //   * At least 10 graded answers per expectation
-  //   * At least 2 Good and 2 Bad answers per expectation
-  let isTrainable = true;
-  for (let i = 0; i < lesson.expectations.length; i++) {
-    if (data[i].total < 10) {
-      isTrainable = false;
-      break;
-    }
-    if (data[i].Good < 2 || data[i].Bad < 2) {
-      isTrainable = false;
-      break;
-    }
-  }
-
-  return { data, csv, isTrainable };
+  return {
+    data: expectationGradingStats,
+    csv: await _toCsv(trainingData),
+    // Does the lesson have enough data for training, based on these requirements:
+    //   * At least 10 graded answers per expectation
+    //   * At least 2 Good and 2 Bad answers per expectation
+    isTrainable: expectationGradingStats.every((exp) => {
+      return exp.total >= 10 && exp.Bad >= 2 && exp.Good >= 2;
+    }),
+  };
 };
 
 SessionSchema.statics.updateLesson = async function (
@@ -179,20 +187,16 @@ SessionSchema.statics.setGrade = async function (
   if (!session) {
     throw new Error(`failed to find session with sessionId ${sessionId}`);
   }
-
   session.userResponses[userAnswerIndex].expectationScores[
     userExpectationIndex
   ].graderGrade = grade;
-
   const score = calculateScore(session);
   session.score = score;
-
   const changesAsSet: any = {};
   changesAsSet[
     `userResponses.${userAnswerIndex}.expectationScores.${userExpectationIndex}.graderGrade`
   ] = grade;
   changesAsSet['graderGrade'] = score;
-
   return await this.findOneAndUpdate(
     {
       sessionId: sessionId,

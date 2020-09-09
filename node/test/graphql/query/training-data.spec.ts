@@ -7,8 +7,10 @@ The full terms of this copyright and license should always be found in the root 
 import createApp, { appStart, appStop } from 'app';
 import { expect } from 'chai';
 import { Express } from 'express';
+import { describe } from 'mocha';
 import mongoUnit from 'mongo-unit';
 import request from 'supertest';
+import * as YAML from 'yaml';
 
 describe('training data', () => {
   let app: Express;
@@ -36,11 +38,19 @@ describe('training data', () => {
     });
     expect(response.status).to.equal(200);
     expect(response.body.data.trainingData.training).to.eql(
-      'exp_num,text,label\n0,"a good answer",Good\n0,"a bad answer",Bad'
+      'exp_num,text,label\n0,a good answer,Good\n0,a bad answer,Bad\n'
     );
-    expect(response.body.data.trainingData.config).to.eql(
-      'question: "question?"'
-    );
+    expect(YAML.parse(response.body.data.trainingData.config)).to.eql({
+      question: 'question?',
+      expectations: [
+        {
+          ideal: 'expected text 1',
+        },
+        {
+          ideal: 'expected text 2',
+        },
+      ],
+    });
     expect(response.body.data.trainingData.isTrainable).to.eql(false);
   });
 
@@ -48,19 +58,13 @@ describe('training data', () => {
     const response = await request(app).post('/graphql').send({
       query: `query {
         trainingData(lessonId: "lesson6") {
-          isTrainable
           training
-          config
         }
       }`,
     });
     expect(response.status).to.equal(200);
     expect(response.body.data.trainingData.training).to.eql(
-      `exp_num,text,label\n0,"""good, not bad""",Good\n0,"good, not bad",Good\n0,"""bad"", not ""good""",Bad\n0,"bad",Bad`
+      `exp_num,text,label\n0,"""good, not bad""",Good\n0,"good, not bad",Good\n0,"""bad"", not ""good""",Bad\n0,bad,Bad\n`
     );
-    expect(response.body.data.trainingData.config).to.eql(
-      'question: "question"'
-    );
-    expect(response.body.data.trainingData.isTrainable).to.eql(true);
   });
 });
