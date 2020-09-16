@@ -64,10 +64,10 @@ describe('deleteLesson', () => {
         }`,
     });
     expect(response.status).to.equal(200);
-    expect(response.body.data.deleteLesson).to.eql({
-      lessonId: '_deleted_lesson1',
-      deleted: true,
-    });
+    expect(response.body.data.deleteLesson.lessonId).to.contain(
+      '_deleted_lesson1'
+    );
+    expect(response.body.data.deleteLesson.deleted).to.eql(true);
 
     const lessons = await request(app).post('/graphql').send({
       query: '{ lessons { edges { node { lessonId } } } }',

@@ -25,6 +25,9 @@ export const deleteLesson = {
     if (lesson.deleted || lesson.lessonId.startsWith('_deleted_')) {
       throw new Error('lesson was already deleted');
     }
+
+    const date = new Date();
+    const deletedId = `_deleted_${args.lessonId}_${date.getTime()}`;
     await Session.updateMany(
       {
         lessonId: args.lessonId,
@@ -32,7 +35,7 @@ export const deleteLesson = {
       {
         $set: {
           deleted: true,
-          lessonId: `_deleted_${args.lessonId}`,
+          lessonId: deletedId,
         },
       }
     );
@@ -43,7 +46,7 @@ export const deleteLesson = {
       {
         $set: {
           deleted: true,
-          lessonId: `_deleted_${args.lessonId}`,
+          lessonId: deletedId,
         },
       },
       {
