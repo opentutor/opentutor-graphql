@@ -39,6 +39,7 @@ export const LessonType = new GraphQLObjectType({
     name: { type: GraphQLString },
     intro: { type: GraphQLString },
     question: { type: GraphQLString },
+    image: { type: GraphQLString },
     expectations: { type: GraphQLList(LessonExpectationType) },
     conclusion: { type: GraphQLList(GraphQLString) },
     lastTrainedAt: { type: DateType },
