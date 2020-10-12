@@ -136,6 +136,42 @@ module.exports = {
       lessonId: '_deleted_lesson',
       deleted: true,
     },
+    {
+      _id: ObjectId('5f0cfea3395d762ca65405c8'),
+      lessonId: 'lesson8',
+      name: 'name',
+      intro: 'intro',
+      question: 'question',
+      expectations: [
+        {
+          expectation: 'answer1',
+          hints: [
+            {
+              text: 'expectation 1 hint 1',
+            },
+          ],
+          additionalFeatures: {
+            ideal: 'new ideal answer',
+            good_regex: ['good regex 1'],
+            bad_regex: ['bad regex 1'],
+          },
+        },
+        {
+          expectation: 'answer2',
+          hints: [
+            {
+              text: 'expectation 2 hint 1',
+            },
+          ],
+          additionalFeatures: {
+            good_regex: ['good regex 2'],
+            bad_regex: ['bad regex 2'],
+          },
+        },
+      ],
+      conclusion: ['conclusion'],
+      additionalFeatures: { test: 'test', question: 'fake question' },
+    },
   ],
 
   sessions: [

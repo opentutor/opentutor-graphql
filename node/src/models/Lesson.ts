@@ -20,11 +20,13 @@ const HintSchema = new Schema({
 
 interface LessonExpectation extends Document {
   expectation: string;
+  additionalFeatures: any;
   hints: [Hint];
 }
 
 const LessonExpectationSchema = new Schema({
   expectation: { type: String },
+  additionalFeatures: { type: Schema.Types.Mixed },
   hints: { type: [HintSchema] },
 });
 
@@ -38,6 +40,7 @@ export interface Lesson extends Document {
   conclusion: [string];
   createdBy: string;
   lastTrainedAt: Date;
+  additionalFeatures: any;
   deleted: boolean;
 }
 
@@ -51,6 +54,7 @@ export const LessonSchema = new Schema(
     expectations: { type: [LessonExpectationSchema] },
     conclusion: { type: [String] },
     createdBy: { type: String },
+    additionalFeatures: { type: Schema.Types.Mixed },
     lastTrainedAt: { type: Date },
     deleted: { type: Boolean },
   },

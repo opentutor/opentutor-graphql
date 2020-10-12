@@ -29,13 +29,16 @@ export const trainingData = {
     }
     const trainingData = await Session.getTrainingData(args.lessonId);
     const lesson = await Lesson.findOne({ lessonId: args.lessonId });
-    return {
-      config: YAML.stringify({
-        question: lesson.question,
-        expectations: lesson.expectations.map((x) => {
-          return { ideal: x.expectation };
-        }),
+    const config = {
+      ...lesson.additionalFeatures,
+      expectations: lesson.expectations.map((exp) => {
+        return { ideal: exp.expectation, ...exp.additionalFeatures };
       }),
+      question: lesson.question,
+    };
+
+    return {
+      config: YAML.stringify(config),
       training: trainingData.csv,
       isTrainable: trainingData.isTrainable,
     };

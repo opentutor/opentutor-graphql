@@ -54,6 +54,33 @@ describe('training data', () => {
     expect(response.body.data.trainingData.isTrainable).to.eql(false);
   });
 
+  it(`training config includes additional properties `, async () => {
+    const response = await request(app).post('/graphql').send({
+      query: `query {
+        trainingData(lessonId: "lesson8") {
+          config
+        }
+      }`,
+    });
+    expect(response.status).to.equal(200);
+    expect(YAML.parse(response.body.data.trainingData.config)).to.eql({
+      question: 'question',
+      test: 'test',
+      expectations: [
+        {
+          ideal: 'new ideal answer',
+          good_regex: ['good regex 1'],
+          bad_regex: ['bad regex 1'],
+        },
+        {
+          ideal: 'answer2',
+          good_regex: ['good regex 2'],
+          bad_regex: ['bad regex 2'],
+        },
+      ],
+    });
+  });
+
   it(`training csv escapes commas and quotes`, async () => {
     const response = await request(app).post('/graphql').send({
       query: `query {

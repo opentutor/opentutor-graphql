@@ -36,6 +36,11 @@ describe('lessons', () => {
           edges: [
             {
               node: {
+                lessonId: 'lesson8',
+              },
+            },
+            {
+              node: {
                 lessonId: 'lesson6',
               },
             },
