@@ -150,11 +150,11 @@ module.exports = {
               text: 'expectation 1 hint 1',
             },
           ],
-          additionalFeatures: {
+          additionalFeatures: JSON.stringify({
             ideal: 'new ideal answer',
             good_regex: ['good regex 1'],
             bad_regex: ['bad regex 1'],
-          },
+          }),
         },
         {
           expectation: 'answer2',
@@ -163,14 +163,17 @@ module.exports = {
               text: 'expectation 2 hint 1',
             },
           ],
-          additionalFeatures: {
+          additionalFeatures: JSON.stringify({
             good_regex: ['good regex 2'],
             bad_regex: ['bad regex 2'],
-          },
+          }),
         },
       ],
       conclusion: ['conclusion'],
-      additionalFeatures: { test: 'test', question: 'fake question' },
+      additionalFeatures: JSON.stringify({
+        test: 'test',
+        question: 'fake question',
+      }),
     },
   ],
 

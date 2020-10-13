@@ -7,7 +7,7 @@ The full terms of this copyright and license should always be found in the root 
 import { GraphQLString, GraphQLObjectType } from 'graphql';
 import LessonType from 'gql/types/lesson';
 import { Lesson as LessonSchema, Session } from 'models';
-import { Lesson } from 'models/Lesson';
+import { Lesson, LessonExpectation } from 'models/Lesson';
 
 export const updateLesson = {
   type: LessonType,
@@ -34,6 +34,21 @@ export const updateLesson = {
       !lesson.lessonId.match(/^[a-z0-9\-]+$/)
     ) {
       throw new Error('lessonId must match [a-z0-9-]');
+    }
+
+    try {
+      lesson.additionalFeatures = JSON.parse(lesson.additionalFeatures);
+      for (let i = 0; i < lesson.expectations.length; i++) {
+        try {
+          lesson.expectations[i].additionalFeatures = JSON.parse(
+            lesson.expectations[i].additionalFeatures
+          );
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    } catch (e) {
+      console.error(e);
     }
 
     await Session.updateLesson(args.lessonId, lesson);
