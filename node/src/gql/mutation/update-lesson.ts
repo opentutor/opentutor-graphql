@@ -37,11 +37,11 @@ export const updateLesson = {
     }
 
     try {
-      lesson.additionalFeatures = JSON.parse(lesson.additionalFeatures);
+      lesson.features = JSON.parse(lesson.features);
       for (let i = 0; i < lesson.expectations.length; i++) {
         try {
-          lesson.expectations[i].additionalFeatures = JSON.parse(
-            lesson.expectations[i].additionalFeatures
+          lesson.expectations[i].features = JSON.parse(
+            lesson.expectations[i].features
           );
         } catch (e) {
           console.error(e);

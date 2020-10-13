@@ -113,31 +113,31 @@ describe('lesson', () => {
     const response = await request(app).post('/graphql').send({
       query: `query {
         lesson(lessonId: "lesson8") {
-          additionalFeatures
+          features
           expectations {
-            additionalFeatures
+            features
           }
         }
       }`,
     });
     expect(response.status).to.equal(200);
     expect(response.body.data.lesson).to.eql({
-      additionalFeatures: JSON.stringify({
+      features: JSON.stringify({
         test: 'test',
         question: 'fake question',
       }),
       expectations: [
         {
-          additionalFeatures: JSON.stringify({
+          features: JSON.stringify({
             ideal: 'new ideal answer',
-            good_regex: ['good regex 1'],
-            bad_regex: ['bad regex 1'],
+            good: ['good regex 1'],
+            bad: ['bad regex 1'],
           }),
         },
         {
-          additionalFeatures: JSON.stringify({
-            good_regex: ['good regex 2'],
-            bad_regex: ['bad regex 2'],
+          features: JSON.stringify({
+            good: ['good regex 2'],
+            bad: ['bad regex 2'],
           }),
         },
       ],

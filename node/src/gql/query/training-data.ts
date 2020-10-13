@@ -32,7 +32,7 @@ export const trainingData = {
 
     let lessonFeatures = {};
     try {
-      lessonFeatures = JSON.parse(lesson.additionalFeatures);
+      lessonFeatures = JSON.parse(lesson.features);
     } catch (e) {}
 
     const config = {
@@ -40,7 +40,7 @@ export const trainingData = {
       expectations: lesson.expectations.map((exp) => {
         let expectationFeatures = {};
         try {
-          expectationFeatures = JSON.parse(exp.additionalFeatures);
+          expectationFeatures = JSON.parse(exp.features);
         } catch (e) {}
         return { ideal: exp.expectation, ...expectationFeatures };
       }),

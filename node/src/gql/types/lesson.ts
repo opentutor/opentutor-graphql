@@ -25,7 +25,7 @@ const LessonExpectationType = new GraphQLObjectType({
   name: 'LessonExpectation',
   fields: {
     expectation: { type: GraphQLString },
-    additionalFeatures: { type: GraphQLString },
+    features: { type: GraphQLString },
     hints: { type: GraphQLList(HintType) },
   },
 });
@@ -47,7 +47,7 @@ export const LessonType = new GraphQLObjectType({
     createdAt: { type: DateType },
     updatedAt: { type: DateType },
     trainingConfig: { type: GraphQLString },
-    additionalFeatures: { type: GraphQLString },
+    features: { type: GraphQLString },
     isTrainable: {
       type: GraphQLBoolean,
       resolve: async function (lesson) {

@@ -69,13 +69,13 @@ describe('training data', () => {
       expectations: [
         {
           ideal: 'new ideal answer',
-          good_regex: ['good regex 1'],
-          bad_regex: ['bad regex 1'],
+          good: ['good regex 1'],
+          bad: ['bad regex 1'],
         },
         {
           ideal: 'answer2',
-          good_regex: ['good regex 2'],
-          bad_regex: ['bad regex 2'],
+          good: ['good regex 2'],
+          bad: ['bad regex 2'],
         },
       ],
     });
