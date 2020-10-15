@@ -122,23 +122,23 @@ describe('lesson', () => {
     });
     expect(response.status).to.equal(200);
     expect(response.body.data.lesson).to.eql({
-      features: JSON.stringify({
+      features: {
         test: 'test',
         question: 'fake question',
-      }),
+      },
       expectations: [
         {
-          features: JSON.stringify({
+          features: {
             ideal: 'new ideal answer',
             good: ['good regex 1'],
             bad: ['bad regex 1'],
-          }),
+          },
         },
         {
-          features: JSON.stringify({
+          features: {
             good: ['good regex 2'],
             bad: ['bad regex 2'],
-          }),
+          },
         },
       ],
     });

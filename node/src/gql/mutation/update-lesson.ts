@@ -36,21 +36,6 @@ export const updateLesson = {
       throw new Error('lessonId must match [a-z0-9-]');
     }
 
-    try {
-      lesson.features = JSON.parse(lesson.features);
-      for (let i = 0; i < lesson.expectations.length; i++) {
-        try {
-          lesson.expectations[i].features = JSON.parse(
-            lesson.expectations[i].features
-          );
-        } catch (e) {
-          console.error(e);
-        }
-      }
-    } catch (e) {
-      console.error(e);
-    }
-
     await Session.updateLesson(args.lessonId, lesson);
 
     return await LessonSchema.findOneAndUpdate(

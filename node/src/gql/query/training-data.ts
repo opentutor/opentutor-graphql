@@ -29,20 +29,10 @@ export const trainingData = {
     }
     const trainingData = await Session.getTrainingData(args.lessonId);
     const lesson = await Lesson.findOne({ lessonId: args.lessonId });
-
-    let lessonFeatures = {};
-    try {
-      lessonFeatures = JSON.parse(lesson.features);
-    } catch (e) {}
-
     const config = {
-      ...lessonFeatures,
+      ...(lesson.features || {}),
       expectations: lesson.expectations.map((exp) => {
-        let expectationFeatures = {};
-        try {
-          expectationFeatures = JSON.parse(exp.features);
-        } catch (e) {}
-        return { ideal: exp.expectation, ...expectationFeatures };
+        return { ideal: exp.expectation, ...(exp.features || {}) };
       }),
       question: lesson.question,
     };

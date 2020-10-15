@@ -13,6 +13,7 @@ import {
 } from 'graphql';
 import { Session } from 'models';
 import DateType from './date';
+import GraphQLJSON from 'graphql-type-json';
 
 const HintType = new GraphQLObjectType({
   name: 'Hint',
@@ -25,8 +26,8 @@ const LessonExpectationType = new GraphQLObjectType({
   name: 'LessonExpectation',
   fields: {
     expectation: { type: GraphQLString },
-    features: { type: GraphQLString },
     hints: { type: GraphQLList(HintType) },
+    features: { type: GraphQLJSON },
   },
 });
 
@@ -47,7 +48,7 @@ export const LessonType = new GraphQLObjectType({
     createdAt: { type: DateType },
     updatedAt: { type: DateType },
     trainingConfig: { type: GraphQLString },
-    features: { type: GraphQLString },
+    features: { type: GraphQLJSON },
     isTrainable: {
       type: GraphQLBoolean,
       resolve: async function (lesson) {
