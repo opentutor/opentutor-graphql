@@ -1,0 +1,46 @@
+name: Publish docker image
+on:
+  push:
+    branches: master
+    tags:
+      - '*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: docker tag
+        required: false
+jobs:
+  build-and-publish:
+    name: Push docker image to docker hub
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: cd node && npm ci
+
+      - name: Run tests
+        id: test
+        run: cd node && npm run test:format && npm run test:lint && npm run test:types && npm run test:license && npm run test
+        
+      - name: Abort if tests failed
+        if: steps.test.outputs.conclusion == 'failure'
+        run: |
+          echo ${{ steps.test.outputs.status }}
+          exit 1
+
+      - name: Docker tag
+        id: tag
+        run: |
+          IMAGE_TAG=${GITHUB_SHA::8}
+          if [[ $GITHUB_REF == refs/tags/* ]]; then
+            IMAGE_TAG=${GITHUB_REF#refs/tags/}
+          fi
+          echo ::set-output name=image_tag::${IMAGE_TAG}
+
+      - name: Docker login
+        run: docker login -u  ${{ secrets.DOCKER_LOGIN }} -p ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Docker build
+        run: cd node && DOCKER_BUILDKIT=1 docker build -t uscictdocker/opentutor-graphql:${{ steps.tag.outputs.image_tag }} .
+
+      - name: Docker push
+        run: docker push uscictdocker/opentutor-graphql
