@@ -42,15 +42,14 @@ describe('training data', () => {
     );
     expect(YAML.parse(response.body.data.trainingData.config)).to.eql({
       question: 'question?',
-      features: {},
       expectations: [
         {
           ideal: 'expected text 1',
-          features: {},
+          features: null,
         },
         {
           ideal: 'expected text 2',
-          features: {},
+          features: null,
         },
       ],
     });
@@ -68,10 +67,6 @@ describe('training data', () => {
     expect(response.status).to.equal(200);
     expect(YAML.parse(response.body.data.trainingData.config)).to.eql({
       question: 'question',
-      features: {
-        test: 'test',
-        question: 'fake question',
-      },
       expectations: [
         {
           ideal: 'answer1',

@@ -31,9 +31,8 @@ export const trainingData = {
     const lesson = await Lesson.findOne({ lessonId: args.lessonId });
     const config = {
       expectations: lesson.expectations.map((exp) => {
-        return { ideal: exp.expectation, features: exp.features || {} };
+        return { ideal: exp.expectation, features: exp.features };
       }),
-      features: lesson.features || {},
       question: lesson.question,
     };
 
