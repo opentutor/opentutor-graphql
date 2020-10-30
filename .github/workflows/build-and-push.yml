@@ -1,24 +1,25 @@
 name: Publish docker image
 on:
-  push:
-    branches: master
-    tags:
-      - '*'
-  workflow_dispatch:
-    inputs:
-      tag:
-        description: docker tag
-        required: false
+  # push:
+  #   branches: master
+  #   tags:
+  #     - /^\d+\.\d+\.\d+(-[a-z\d\-.]+)?$/
+  # workflow_dispatch:
+  #   inputs:
+  #     tag:
+  #       description: docker tag
+  #       required: false
+  pull_request:
+
 jobs:
-  build-and-publish:
-    name: Push docker image to docker hub
+  test:
+    name: Run tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - run: cd node && npm ci
-
-      # - name: Run audit test
-      #   run: cd node && npm run test:audit
+      - name: Run audit test
+        run: cd node && npm run test:audit
       - name: Run format test
         run: cd node && npm run test:format
       - name: Run lint test
@@ -29,7 +30,14 @@ jobs:
         run: cd node && npm run test:license
       - name: Run tests
         run: cd node && npm run test
-        
+
+  build-and-publish:
+    needs: test
+    name: Push docker image to docker hub
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
       - name: Docker tag
         id: tag
         run: |
