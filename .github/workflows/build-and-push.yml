@@ -1,16 +1,18 @@
 name: Publish docker image
 on:
-  # push:
-  #   branches: master
-  #   tags:
-  #     - /^\d+\.\d+\.\d+(-[a-z\d\-.]+)?$/
-  # workflow_dispatch:
-  #   inputs:
-  #     tag:
-  #       description: docker tag
-  #       required: false
-  pull_request:
-
+  push:
+    branches: master
+  release:
+    type:
+      - created
+    tags:
+      - "[0-9]+.[0-9]+.[0-9]"
+      - "[0-9]+.[0-9]+.[0-9]+-alpha.[0-9]+"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: docker tag
+        required: false
 jobs:
   test:
     name: Run tests
