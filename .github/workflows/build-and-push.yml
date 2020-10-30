@@ -18,6 +18,9 @@ jobs:
     name: Run tests
     runs-on: ubuntu-latest
     steps:
+      - name: Reject forked repositories
+        if: github.repository != 'ICTLearningSciences/opentutor-graphql'
+        run: exit 1
       - uses: actions/checkout@v2
       - run: cd node && npm ci
       - name: Run audit test
@@ -38,6 +41,9 @@ jobs:
     name: Push docker image to docker hub
     runs-on: ubuntu-latest
     steps:
+      - name: Reject forked repositories
+        if: github.repository != 'ICTLearningSciences/opentutor-graphql'
+        run: exit 1
       - uses: actions/checkout@v2
 
       - name: Docker tag
@@ -50,7 +56,7 @@ jobs:
           echo ::set-output name=image_tag::${IMAGE_TAG}
 
       - name: Docker login
-        run: docker login -u  ${{ secrets.DOCKER_LOGIN }} -p ${{ secrets.DOCKER_PASSWORD }}
+        run: docker login -u ${{ secrets.DOCKER_LOGIN }} -p ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Docker build
         run: cd node && DOCKER_BUILDKIT=1 docker build -t uscictdocker/opentutor-graphql:${{ steps.tag.outputs.image_tag }} .
