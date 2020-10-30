@@ -17,16 +17,19 @@ jobs:
       - uses: actions/checkout@v2
       - run: cd node && npm ci
 
+      # - name: Run audit test
+      #   run: cd node && npm run test:audit
+      - name: Run format test
+        run: cd node && npm run test:format
+      - name: Run lint test
+        run: cd node && npm run test:lint
+      - name: Run types test
+        run: cd node && npm run test:types
+      - name: Run license test
+        run: cd node && npm run test:license
       - name: Run tests
-        id: test
-        run: cd node && npm run test:format && npm run test:lint && npm run test:types && npm run test:license && npm run test
+        run: cd node && npm run test
         
-      - name: Abort if tests failed
-        if: steps.test.outputs.conclusion == 'failure'
-        run: |
-          echo ${{ steps.test.outputs.status }}
-          exit 1
-
       - name: Docker tag
         id: tag
         run: |

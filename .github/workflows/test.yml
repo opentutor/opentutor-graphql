@@ -7,7 +7,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Install
         run: cd node && npm ci
-      # - name: Run audit
+      # - name: Run audit test
       #   run: cd node && npm run test:audit
       - name: Run format test
         run: cd node && npm run test:format
