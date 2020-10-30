@@ -17,7 +17,7 @@ import schema from 'gql/schema';
 
 export default async function createApp(): Promise<Express> {
   if (process.env.NODE_ENV !== 'production') {
-    require('longjohn'); // full stack traces when testing
+      require('longjohn'); // full stack traces when testing
   }
   const configureEnv = (await import('utils/configure-env')).default;
   configureEnv();
