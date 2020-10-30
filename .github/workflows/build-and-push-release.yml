@@ -1,7 +1,9 @@
-name: Publish docker image
+name: Build and publish tagged docker release
 on:
   push:
-    branches: master
+    tags:
+      - "[0-9]+.[0-9]+.[0-9]"
+      - "[0-9]+.[0-9]+.[0-9]+-alpha.[0-9]+"
 
 jobs:
   test:
@@ -34,8 +36,8 @@ jobs:
       - name: Reject forked repositories
         if: github.repository != 'ICTLearningSciences/opentutor-graphql'
         run: exit 1
-
       - uses: actions/checkout@v2
+
       - name: Docker tag
         id: tag
         run: |
