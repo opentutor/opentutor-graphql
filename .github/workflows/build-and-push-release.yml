@@ -1,21 +1,12 @@
-name: Publish docker image
+name: Build and publish tagged docker release
 on:
   push:
-    branches: master
-  release:
-    type:
-      - created
     tags:
       - "[0-9]+.[0-9]+.[0-9]"
       - "[0-9]+.[0-9]+.[0-9]+-alpha.[0-9]+"
-  workflow_dispatch:
-    inputs:
-      tag:
-        description: docker tag
-        required: false
+
 jobs:
   test:
-    name: Run tests
     runs-on: ubuntu-latest
     steps:
       - name: Reject forked repositories
@@ -49,10 +40,7 @@ jobs:
       - name: Docker tag
         id: tag
         run: |
-          IMAGE_TAG=${GITHUB_SHA::8}
-          if [[ $GITHUB_REF == refs/tags/* ]]; then
-            IMAGE_TAG=${GITHUB_REF#refs/tags/}
-          fi
+          IMAGE_TAG=${GITHUB_REF#refs/tags/}
           echo ::set-output name=image_tag::${IMAGE_TAG}
 
       - name: Docker login
