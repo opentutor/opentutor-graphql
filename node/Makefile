@@ -21,7 +21,6 @@ clean: clean-install clean-dist
 docker-build: clean
 	DOCKER_BUILDKIT=1 \
 	docker build \
-		--ssh default \
 		-t $(DOCKER_IMAGE) \
 	.
 
