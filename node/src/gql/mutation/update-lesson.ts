@@ -7,7 +7,7 @@ The full terms of this copyright and license should always be found in the root 
 import { GraphQLString, GraphQLObjectType } from 'graphql';
 import LessonType from 'gql/types/lesson';
 import { Lesson as LessonSchema, Session } from 'models';
-import { Lesson, LessonExpectation } from 'models/Lesson';
+import { Lesson } from 'models/Lesson';
 
 export const updateLesson = {
   type: LessonType,
