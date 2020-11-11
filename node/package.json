@@ -25,7 +25,8 @@
   "author": "CVM",
   "license": "ISC",
   "dependencies": {
-    "base64-url": "^2.3.3",
+    "@types/object-path": "^0.11.0",
+    "base64url": "^3.0.1",
     "cors": "^2.8.5",
     "csv-stringify": "^5.5.1",
     "dotenv": "^8.2.0",
