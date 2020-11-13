@@ -14,6 +14,8 @@ import {
 import { Session } from 'models';
 import DateType from './date';
 import GraphQLJSON from 'graphql-type-json';
+import UserType from './user';
+import User from 'models/User';
 
 const HintType = new GraphQLObjectType({
   name: 'Hint',
@@ -37,7 +39,6 @@ export const LessonType = new GraphQLObjectType({
     deleted: { type: GraphQLBoolean },
     id: { type: GraphQLID },
     lessonId: { type: GraphQLString },
-    createdBy: { type: GraphQLString },
     name: { type: GraphQLString },
     intro: { type: GraphQLString },
     question: { type: GraphQLString },
@@ -45,10 +46,30 @@ export const LessonType = new GraphQLObjectType({
     expectations: { type: GraphQLList(LessonExpectationType) },
     conclusion: { type: GraphQLList(GraphQLString) },
     lastTrainedAt: { type: DateType },
+    features: { type: GraphQLJSON },
+    isPrivate: { type: GraphQLBoolean },
+    isTemplate: { type: GraphQLBoolean },
     createdAt: { type: DateType },
     updatedAt: { type: DateType },
     trainingConfig: { type: GraphQLString },
-    features: { type: GraphQLJSON },
+    createdBy: {
+      type: UserType,
+      resolve: async function (lesson) {
+        return await User.findOne({ _id: lesson.createdBy });
+      },
+    },
+    contentManagers: {
+      type: GraphQLList(UserType),
+      resolve: async function (lesson) {
+        return await User.find({ _id: { $in: lesson.contentManagers } });
+      },
+    },
+    editors: {
+      type: GraphQLList(UserType),
+      resolve: async function (lesson) {
+        return await User.find({ _id: { $in: lesson.editors } });
+      },
+    },
     isTrainable: {
       type: GraphQLBoolean,
       resolve: async function (lesson) {

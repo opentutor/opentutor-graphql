@@ -38,9 +38,13 @@ export interface Lesson extends Document {
   image: string;
   expectations: [LessonExpectation];
   conclusion: [string];
-  createdBy: string;
   lastTrainedAt: Date;
   features: any;
+  createdBy: mongoose.Types.ObjectId;
+  contentManagers: [mongoose.Types.ObjectId];
+  editors: [mongoose.Types.ObjectId];
+  isPrivate: boolean;
+  isTemplate: boolean;
   deleted: boolean;
 }
 
@@ -53,9 +57,13 @@ export const LessonSchema = new Schema(
     image: { type: String },
     expectations: { type: [LessonExpectationSchema] },
     conclusion: { type: [String] },
-    createdBy: { type: String },
-    features: { type: Object },
     lastTrainedAt: { type: Date },
+    features: { type: Object },
+    createdBy: { type: Schema.Types.ObjectId, ref: 'User' },
+    contentManagers: { type: [Schema.Types.ObjectId], ref: 'User' },
+    editors: { type: [Schema.Types.ObjectId], ref: 'User' },
+    isPrivate: { type: Boolean },
+    isTemplate: { type: Boolean },
     deleted: { type: Boolean },
   },
   { timestamps: true, collation: { locale: 'en', strength: 2 } }

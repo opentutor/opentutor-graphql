@@ -8,8 +8,11 @@ import Lesson from './Lesson';
 export { default as Lesson } from './Lesson';
 import Session from './Session';
 export { default as Session } from './Session';
+import User from './User';
+export { default as User } from './User';
 
 export default {
   Lesson,
   Session,
+  User,
 };

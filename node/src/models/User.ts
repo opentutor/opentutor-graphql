@@ -4,22 +4,35 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { GraphQLObjectType } from 'graphql';
-import login from './login';
-import setGrade from './set-grade';
-import updateLesson from './update-lesson';
-import updateSession from './update-session';
-import updateLastTrainedAt from './update-last-trained-at';
-import deleteLesson from './delete-lesson';
+import mongoose, { Schema, Document, Model } from 'mongoose';
+import { PaginatedResolveResult } from './PaginatedResolveResult';
 
-export default new GraphQLObjectType({
-  name: 'Mutation',
-  fields: {
-    login,
-    setGrade,
-    updateLesson,
-    updateSession,
-    updateLastTrainedAt,
-    deleteLesson,
+const mongoPaging = require('mongo-cursor-pagination');
+mongoPaging.config.COLLATION = { locale: 'en', strength: 2 };
+
+export interface User extends Document {
+  name: string;
+  email: string;
+}
+
+export const UserSchema = new Schema(
+  {
+    name: { type: String, required: true },
+    email: { type: String, required: true },
   },
-});
+  { timestamps: true, collation: { locale: 'en', strength: 2 } }
+);
+
+export interface UserModel extends Model<User> {
+  paginate(
+    query?: any,
+    options?: any,
+    callback?: any
+  ): Promise<PaginatedResolveResult<User>>;
+}
+
+UserSchema.index({ name: -1, _id: -1 });
+UserSchema.index({ email: -1, _id: -1 });
+UserSchema.plugin(mongoPaging.mongoosePlugin);
+
+export default mongoose.model<User, UserModel>('User', UserSchema);

@@ -40,6 +40,11 @@ module.exports = {
         },
       ],
       conclusion: ['conclusion text'],
+      createdBy: ObjectId('5f0cfea3395d762ca65405d1'),
+      contentManagers: [ObjectId('5f0cfea3395d762ca65405d2')],
+      editors: [ObjectId('5f0cfea3395d762ca65405d3')],
+      isPrivate: false,
+      isTemplate: false,
     },
     {
       _id: ObjectId('5f0cfea3395d762ca65405c2'),
@@ -588,6 +593,24 @@ module.exports = {
       sessionId: 'session 10',
       lessonId: '_deleted_lesson',
       deleted: true,
+    },
+  ],
+
+  users: [
+    {
+      _id: ObjectId('5f0cfea3395d762ca65405d1'),
+      name: 'Admin',
+      email: 'admin@opentutor.com',
+    },
+    {
+      _id: ObjectId('5f0cfea3395d762ca65405d2'),
+      name: 'Content Manager',
+      email: 'manager@opentutor.com',
+    },
+    {
+      _id: ObjectId('5f0cfea3395d762ca65405d3'),
+      name: 'Editor',
+      email: 'editor@opentutor.com',
     },
   ],
 };
