@@ -18,15 +18,11 @@ export interface HasFindById<T> {
   findById(id: string): Executable<T>;
 }
 
-export interface HasPaginate<T> {
-  paginate(
-    query?: any,
-    options?: any,
-    callback?: any
-  ): Promise<PaginatedResolveResult>;
+export interface HasPaginate<T extends PaginatedResolveResult> {
+  paginate(query?: any, options?: any, callback?: any): Promise<T>;
 }
 
 export type MongooseModel<T> = HasFindOne<T> & HasFindById<T>;
-export type PaginatableMongooseModel<T> = HasFindOne<T> &
-  HasFindById<T> &
-  HasPaginate<T>;
+export type PaginatableMongooseModel<
+  T extends PaginatedResolveResult
+> = HasFindOne<T> & HasFindById<T> & HasPaginate<T>;

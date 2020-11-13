@@ -12,8 +12,8 @@ import {
   GraphQLString,
 } from 'graphql';
 import { Document } from 'mongoose';
-const base64url = require('base64-url');
-const objectPath = require('object-path');
+import base64url from 'base64url';
+import objectPath from 'object-path';
 
 export const PageInfoType = new GraphQLObjectType({
   name: 'PageInfo',

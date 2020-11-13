@@ -33,6 +33,11 @@ test-lint:
 	cd node \
 	&& $(MAKE) test-lint
 
+PHONY: test-types
+test-types:
+	cd node \
+	&& $(MAKE) test-types
+
 LICENSE:
 	@echo "you must have a LICENSE file" 1>&2
 	exit 1
