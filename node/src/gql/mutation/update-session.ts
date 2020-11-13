@@ -6,7 +6,7 @@ The full terms of this copyright and license should always be found in the root 
 */
 import { GraphQLString, GraphQLObjectType } from 'graphql';
 import SessionType from 'gql/types/session';
-import { Lesson as LessonSchema, Session as SessionSchema } from 'models';
+import { Lesson as LessonSchema, Session as SessionSchema, User } from 'models';
 import { Session } from 'models/Session';
 import calculateScore from 'models/utils/calculate-score';
 
@@ -55,6 +55,8 @@ export const updateSession = {
     }
     const grade = calculateScore(session, 'graderGrade');
     const classifierGrade = calculateScore(session, 'classifierGrade');
+    const createdBy = await User.findOne({ _id: lesson.createdBy });
+    const lessonCreatedBy = createdBy ? createdBy.name : '';
 
     return await SessionSchema.findOneAndUpdate(
       {
@@ -66,7 +68,7 @@ export const updateSession = {
           graderGrade: grade,
           classifierGrade: classifierGrade,
           lessonName: lesson.name,
-          lessonCreatedBy: lesson.createdBy,
+          lessonCreatedBy,
         },
       },
       {

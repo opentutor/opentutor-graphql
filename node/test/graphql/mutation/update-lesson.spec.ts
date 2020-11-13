@@ -466,7 +466,7 @@ describe('updateLesson', () => {
       JSON.stringify({
         lessonId: 'newlessonid',
         name: 'new lesson name',
-        createdBy: 'new creator',
+        createdBy: '5f0cfea3395d762ca65405d1',
       })
     );
     await request(app)
@@ -492,7 +492,7 @@ describe('updateLesson', () => {
     expect(response.body.data.session).to.eql({
       lessonId: 'newlessonid',
       lessonName: 'new lesson name',
-      lessonCreatedBy: 'new creator',
+      lessonCreatedBy: 'Admin',
     });
   });
 });

@@ -65,13 +65,31 @@ describe('lesson', () => {
           name
           intro
           question
+          image
           expectations {
             expectation
             hints {
               text
             }
+            features
           }
           conclusion
+          lastTrainedAt
+          features
+          createdBy {
+            name
+            email
+          }
+          contentManagers {
+            name
+            email
+          }
+          editors {
+            name
+            email
+          }
+          isPrivate
+          isTemplate
         }
       }`,
     });
@@ -92,6 +110,7 @@ describe('lesson', () => {
               text: 'expectation 1 hint 2',
             },
           ],
+          features: null,
         },
         {
           expectation: 'expected text 2',
@@ -103,9 +122,31 @@ describe('lesson', () => {
               text: 'expectation 2 hint 2',
             },
           ],
+          features: null,
         },
       ],
       conclusion: ['conclusion text'],
+      features: null,
+      image: null,
+      createdBy: {
+        name: 'Admin',
+        email: 'admin@opentutor.com',
+      },
+      contentManagers: [
+        {
+          name: 'Content Manager',
+          email: 'manager@opentutor.com',
+        },
+      ],
+      editors: [
+        {
+          name: 'Editor',
+          email: 'editor@opentutor.com',
+        },
+      ],
+      isPrivate: false,
+      isTemplate: false,
+      lastTrainedAt: null,
     });
   });
 

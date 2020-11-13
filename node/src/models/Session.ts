@@ -9,6 +9,7 @@ import mongoose, { Schema, Document, Model } from 'mongoose';
 import { PaginatedResolveResult } from './PaginatedResolveResult';
 import LessonModel, { Lesson } from './Lesson';
 import calculateScore from 'models/utils/calculate-score';
+import { User } from 'models';
 
 const mongoPaging = require('mongo-cursor-pagination');
 mongoPaging.config.COLLATION = { locale: 'en', strength: 2 };
@@ -163,6 +164,8 @@ SessionSchema.statics.updateLesson = async function (
   lessonId: string,
   updatedLesson: Lesson
 ) {
+  const createdBy = await User.findOne({ _id: updatedLesson.createdBy });
+  const lessonCreatedBy = createdBy ? createdBy.name : '';
   await this.updateMany(
     {
       lessonId: lessonId,
@@ -171,7 +174,7 @@ SessionSchema.statics.updateLesson = async function (
       $set: {
         lessonId: updatedLesson.lessonId,
         lessonName: updatedLesson.name,
-        lessonCreatedBy: updatedLesson.createdBy,
+        lessonCreatedBy,
       },
     }
   );

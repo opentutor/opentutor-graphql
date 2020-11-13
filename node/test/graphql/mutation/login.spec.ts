@@ -4,22 +4,39 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { GraphQLObjectType } from 'graphql';
-import login from './login';
-import setGrade from './set-grade';
-import updateLesson from './update-lesson';
-import updateSession from './update-session';
-import updateLastTrainedAt from './update-last-trained-at';
-import deleteLesson from './delete-lesson';
+import createApp, { appStart, appStop } from 'app';
+import { expect } from 'chai';
+import { Express } from 'express';
+import mongoUnit from 'mongo-unit';
+import request from 'supertest';
 
-export default new GraphQLObjectType({
-  name: 'Mutation',
-  fields: {
-    login,
-    setGrade,
-    updateLesson,
-    updateSession,
-    updateLastTrainedAt,
-    deleteLesson,
-  },
+describe('login', () => {
+  let app: Express;
+
+  beforeEach(async () => {
+    await mongoUnit.load(require('test/fixtures/mongodb/data-default.js'));
+    app = await createApp();
+    await appStart();
+  });
+
+  afterEach(async () => {
+    await appStop();
+    await mongoUnit.drop();
+  });
+
+  it(`returns an error if no accessToken`, async () => {
+    const response = await request(app).post('/graphql').send({
+      query: `mutation { 
+          login(accessToken: "") { 
+            name
+            email
+          } 
+        }`,
+    });
+    expect(response.status).to.equal(200);
+    expect(response.body).to.have.deep.nested.property(
+      'errors[0].message',
+      'missing required param accessToken'
+    );
+  });
 });
