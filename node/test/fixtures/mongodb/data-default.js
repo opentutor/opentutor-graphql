@@ -41,10 +41,7 @@ module.exports = {
       ],
       conclusion: ['conclusion text'],
       createdBy: ObjectId('5f0cfea3395d762ca65405d1'),
-      contentManagers: [ObjectId('5f0cfea3395d762ca65405d2')],
-      editors: [ObjectId('5f0cfea3395d762ca65405d3')],
-      isPrivate: false,
-      isTemplate: false,
+      createdByName: 'Admin',
     },
     {
       _id: ObjectId('5f0cfea3395d762ca65405c2'),
@@ -191,8 +188,12 @@ module.exports = {
       question: {
         text: 'question?',
         expectations: [
-          { text: 'expected text 1' },
-          { text: 'expected text 2' },
+          {
+            text: 'expected text 1',
+          },
+          {
+            text: 'expected text 2',
+          },
         ],
       },
       userResponses: [
@@ -222,7 +223,14 @@ module.exports = {
       username: 'username2',
       question: {
         text: 'question',
-        expectations: [{ text: 'expectation 1' }, { text: 'expectation 2' }],
+        expectations: [
+          {
+            text: 'expectation 1',
+          },
+          {
+            text: 'expectation 2',
+          },
+        ],
       },
       userResponses: [
         {

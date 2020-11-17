@@ -173,6 +173,7 @@ describe('updateLesson', () => {
         intro: 'new intro',
         question: 'new question',
         conclusion: ['new conclusion'],
+        createdBy: '5f0cfea3395d762ca65405d1',
         expectations: [
           {
             expectation: 'new expectation',
@@ -201,6 +202,8 @@ describe('updateLesson', () => {
               }
             }
             conclusion
+            createdByName
+            createdBy { name email }
           } 
         }`,
       });
@@ -221,6 +224,11 @@ describe('updateLesson', () => {
         },
       ],
       conclusion: ['new conclusion'],
+      createdByName: 'Admin',
+      createdBy: {
+        name: 'Admin',
+        email: 'admin@opentutor.com',
+      },
     });
   });
 
@@ -309,6 +317,7 @@ describe('updateLesson', () => {
             ],
           },
         ],
+        createdBy: '5f0cfea3395d762ca65405d3',
       })
     );
     const response = await request(app)
@@ -327,6 +336,8 @@ describe('updateLesson', () => {
               }
             }
             conclusion
+            createdByName
+            createdBy { name email }
           } 
         }`,
       });
@@ -347,6 +358,11 @@ describe('updateLesson', () => {
         },
       ],
       conclusion: ['updated conclusion'],
+      createdByName: 'Editor',
+      createdBy: {
+        name: 'Editor',
+        email: 'editor@opentutor.com',
+      },
     });
   });
 

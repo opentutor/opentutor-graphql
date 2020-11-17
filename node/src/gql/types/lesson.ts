@@ -47,27 +47,14 @@ export const LessonType = new GraphQLObjectType({
     conclusion: { type: GraphQLList(GraphQLString) },
     lastTrainedAt: { type: DateType },
     features: { type: GraphQLJSON },
-    isPrivate: { type: GraphQLBoolean },
-    isTemplate: { type: GraphQLBoolean },
     createdAt: { type: DateType },
     updatedAt: { type: DateType },
     trainingConfig: { type: GraphQLString },
+    createdByName: { type: GraphQLString },
     createdBy: {
       type: UserType,
       resolve: async function (lesson) {
         return await User.findOne({ _id: lesson.createdBy });
-      },
-    },
-    contentManagers: {
-      type: GraphQLList(UserType),
-      resolve: async function (lesson) {
-        return await User.find({ _id: { $in: lesson.contentManagers } });
-      },
-    },
-    editors: {
-      type: GraphQLList(UserType),
-      resolve: async function (lesson) {
-        return await User.find({ _id: { $in: lesson.editors } });
       },
     },
     isTrainable: {

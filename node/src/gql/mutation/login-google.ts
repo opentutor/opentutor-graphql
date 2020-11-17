@@ -10,7 +10,7 @@ import UserType from 'gql/types/user';
 import { User } from 'models/User';
 import { User as UserSchema } from 'models';
 
-export const login = {
+export const loginGoogle = {
   type: UserType,
   args: {
     accessToken: { type: GraphQLString },
@@ -29,10 +29,11 @@ export const login = {
       if (!user) {
         return await UserSchema.findOneAndUpdate(
           {
-            email: response.data.email,
+            googleId: response.data.id,
           },
           {
             $set: {
+              googleId: response.data.id,
               name: response.data.name,
               email: response.data.email,
             },
@@ -50,4 +51,4 @@ export const login = {
   },
 };
 
-export default login;
+export default loginGoogle;

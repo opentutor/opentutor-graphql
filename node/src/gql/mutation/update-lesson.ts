@@ -6,7 +6,7 @@ The full terms of this copyright and license should always be found in the root 
 */
 import { GraphQLString, GraphQLObjectType } from 'graphql';
 import LessonType from 'gql/types/lesson';
-import { Lesson as LessonSchema, Session } from 'models';
+import { Lesson as LessonSchema, Session, User } from 'models';
 import { Lesson } from 'models/Lesson';
 
 export const updateLesson = {
@@ -37,6 +37,8 @@ export const updateLesson = {
     }
 
     await Session.updateLesson(args.lessonId, lesson);
+    const createdBy = await User.findOne({ _id: lesson.createdBy });
+    const createdByName = createdBy ? createdBy.name : '';
 
     return await LessonSchema.findOneAndUpdate(
       {
@@ -45,6 +47,7 @@ export const updateLesson = {
       {
         $set: {
           ...lesson,
+          createdByName,
         },
       },
       {

@@ -11,12 +11,14 @@ const mongoPaging = require('mongo-cursor-pagination');
 mongoPaging.config.COLLATION = { locale: 'en', strength: 2 };
 
 export interface User extends Document {
+  googleId: string;
   name: string;
   email: string;
 }
 
 export const UserSchema = new Schema(
   {
+    googleId: { type: String },
     name: { type: String, required: true },
     email: { type: String, required: true },
   },

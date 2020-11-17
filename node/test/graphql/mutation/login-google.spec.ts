@@ -10,7 +10,7 @@ import { Express } from 'express';
 import mongoUnit from 'mongo-unit';
 import request from 'supertest';
 
-describe('login', () => {
+describe('login with google', () => {
   let app: Express;
 
   beforeEach(async () => {
@@ -27,7 +27,7 @@ describe('login', () => {
   it(`returns an error if no accessToken`, async () => {
     const response = await request(app).post('/graphql').send({
       query: `mutation { 
-          login(accessToken: "") { 
+          loginGoogle(accessToken: "") { 
             name
             email
           } 

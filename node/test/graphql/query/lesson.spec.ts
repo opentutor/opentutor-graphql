@@ -76,20 +76,11 @@ describe('lesson', () => {
           conclusion
           lastTrainedAt
           features
+          createdByName
           createdBy {
             name
             email
           }
-          contentManagers {
-            name
-            email
-          }
-          editors {
-            name
-            email
-          }
-          isPrivate
-          isTemplate
         }
       }`,
     });
@@ -128,24 +119,11 @@ describe('lesson', () => {
       conclusion: ['conclusion text'],
       features: null,
       image: null,
+      createdByName: 'Admin',
       createdBy: {
         name: 'Admin',
         email: 'admin@opentutor.com',
       },
-      contentManagers: [
-        {
-          name: 'Content Manager',
-          email: 'manager@opentutor.com',
-        },
-      ],
-      editors: [
-        {
-          name: 'Editor',
-          email: 'editor@opentutor.com',
-        },
-      ],
-      isPrivate: false,
-      isTemplate: false,
       lastTrainedAt: null,
     });
   });

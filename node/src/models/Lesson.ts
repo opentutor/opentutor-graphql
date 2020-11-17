@@ -41,10 +41,7 @@ export interface Lesson extends Document {
   lastTrainedAt: Date;
   features: any;
   createdBy: mongoose.Types.ObjectId;
-  contentManagers: [mongoose.Types.ObjectId];
-  editors: [mongoose.Types.ObjectId];
-  isPrivate: boolean;
-  isTemplate: boolean;
+  createdByName: string;
   deleted: boolean;
 }
 
@@ -60,10 +57,7 @@ export const LessonSchema = new Schema(
     lastTrainedAt: { type: Date },
     features: { type: Object },
     createdBy: { type: Schema.Types.ObjectId, ref: 'User' },
-    contentManagers: { type: [Schema.Types.ObjectId], ref: 'User' },
-    editors: { type: [Schema.Types.ObjectId], ref: 'User' },
-    isPrivate: { type: Boolean },
-    isTemplate: { type: Boolean },
+    createdByName: { type: String },
     deleted: { type: Boolean },
   },
   { timestamps: true, collation: { locale: 'en', strength: 2 } }
@@ -78,7 +72,7 @@ export interface LessonModel extends Model<Lesson> {
 }
 
 LessonSchema.index({ name: -1, _id: -1 });
-LessonSchema.index({ createdBy: -1, _id: -1 });
+LessonSchema.index({ createdByName: -1, _id: -1 });
 LessonSchema.index({ createdAt: -1, _id: -1 });
 LessonSchema.plugin(mongoPaging.mongoosePlugin);
 

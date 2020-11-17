@@ -5,7 +5,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import { GraphQLObjectType } from 'graphql';
-import login from './login';
+import loginGoogle from './login-google';
 import setGrade from './set-grade';
 import updateLesson from './update-lesson';
 import updateSession from './update-session';
@@ -15,7 +15,7 @@ import deleteLesson from './delete-lesson';
 export default new GraphQLObjectType({
   name: 'Mutation',
   fields: {
-    login,
+    loginGoogle,
     setGrade,
     updateLesson,
     updateSession,
