@@ -38,7 +38,6 @@ export const updateLesson = {
 
     await Session.updateLesson(args.lessonId, lesson);
     const createdBy = await User.findOne({ _id: lesson.createdBy });
-    const createdByName = createdBy ? createdBy.name : '';
 
     return await LessonSchema.findOneAndUpdate(
       {
@@ -47,7 +46,7 @@ export const updateLesson = {
       {
         $set: {
           ...lesson,
-          createdByName,
+          createdByName: createdBy ? createdBy.name : '',
         },
       },
       {

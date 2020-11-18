@@ -56,7 +56,6 @@ export const updateSession = {
     const grade = calculateScore(session, 'graderGrade');
     const classifierGrade = calculateScore(session, 'classifierGrade');
     const createdBy = await User.findOne({ _id: lesson.createdBy });
-    const lessonCreatedBy = createdBy ? createdBy.name : '';
 
     return await SessionSchema.findOneAndUpdate(
       {
@@ -68,7 +67,7 @@ export const updateSession = {
           graderGrade: grade,
           classifierGrade: classifierGrade,
           lessonName: lesson.name,
-          lessonCreatedBy,
+          lessonCreatedBy: createdBy ? createdBy.name : '',
         },
       },
       {

@@ -77,10 +77,6 @@ describe('lesson', () => {
           lastTrainedAt
           features
           createdByName
-          createdBy {
-            name
-            email
-          }
         }
       }`,
     });
@@ -120,10 +116,6 @@ describe('lesson', () => {
       features: null,
       image: null,
       createdByName: 'Admin',
-      createdBy: {
-        name: 'Admin',
-        email: 'admin@opentutor.com',
-      },
       lastTrainedAt: null,
     });
   });

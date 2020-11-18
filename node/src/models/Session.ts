@@ -165,7 +165,6 @@ SessionSchema.statics.updateLesson = async function (
   updatedLesson: Lesson
 ) {
   const createdBy = await User.findOne({ _id: updatedLesson.createdBy });
-  const lessonCreatedBy = createdBy ? createdBy.name : '';
   await this.updateMany(
     {
       lessonId: lessonId,
@@ -174,7 +173,7 @@ SessionSchema.statics.updateLesson = async function (
       $set: {
         lessonId: updatedLesson.lessonId,
         lessonName: updatedLesson.name,
-        lessonCreatedBy,
+        lessonCreatedBy: createdBy ? createdBy.name : '',
       },
     }
   );

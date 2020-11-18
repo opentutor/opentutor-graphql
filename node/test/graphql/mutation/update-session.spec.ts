@@ -345,9 +345,7 @@ describe('updateSession', () => {
             username
             lesson {
               name
-              createdBy {
-                name
-              }
+              createdByName
             }
             question {
               text
@@ -371,9 +369,7 @@ describe('updateSession', () => {
       username: 'new username',
       lesson: {
         name: 'lesson name',
-        createdBy: {
-          name: 'Admin',
-        },
+        createdByName: 'Admin',
       },
       question: {
         text: 'new question?',
@@ -431,9 +427,7 @@ describe('updateSession', () => {
               username
               lesson {
                 name
-                createdBy {
-                  name
-                }
+                createdByName
               }
               question {
                 text
@@ -457,9 +451,7 @@ describe('updateSession', () => {
       username: 'new username',
       lesson: {
         name: 'lesson name',
-        createdBy: {
-          name: 'Admin',
-        },
+        createdByName: 'Admin',
       },
       question: {
         text: 'new question?',

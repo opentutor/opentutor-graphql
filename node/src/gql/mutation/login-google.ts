@@ -25,7 +25,7 @@ export const loginGoogle = {
     try {
       const endpoint = `https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${args.accessToken}`;
       const response = await axios.get(endpoint);
-      const user = await UserSchema.findOne({ email: response.data.email });
+      const user = await UserSchema.findOne({ googleId: response.data.id });
       if (!user) {
         return await UserSchema.findOneAndUpdate(
           {

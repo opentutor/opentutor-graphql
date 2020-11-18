@@ -19,8 +19,8 @@ export interface User extends Document {
 export const UserSchema = new Schema(
   {
     googleId: { type: String },
-    name: { type: String, required: true },
-    email: { type: String, required: true },
+    name: { type: String },
+    email: { type: String },
   },
   { timestamps: true, collation: { locale: 'en', strength: 2 } }
 );

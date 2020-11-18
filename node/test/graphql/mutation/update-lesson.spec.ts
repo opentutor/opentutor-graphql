@@ -203,7 +203,6 @@ describe('updateLesson', () => {
             }
             conclusion
             createdByName
-            createdBy { name email }
           } 
         }`,
       });
@@ -225,10 +224,6 @@ describe('updateLesson', () => {
       ],
       conclusion: ['new conclusion'],
       createdByName: 'Admin',
-      createdBy: {
-        name: 'Admin',
-        email: 'admin@opentutor.com',
-      },
     });
   });
 
@@ -337,7 +332,6 @@ describe('updateLesson', () => {
             }
             conclusion
             createdByName
-            createdBy { name email }
           } 
         }`,
       });
@@ -359,10 +353,6 @@ describe('updateLesson', () => {
       ],
       conclusion: ['updated conclusion'],
       createdByName: 'Editor',
-      createdBy: {
-        name: 'Editor',
-        email: 'editor@opentutor.com',
-      },
     });
   });
 

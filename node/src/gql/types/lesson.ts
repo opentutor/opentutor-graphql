@@ -14,8 +14,6 @@ import {
 import { Session } from 'models';
 import DateType from './date';
 import GraphQLJSON from 'graphql-type-json';
-import UserType from './user';
-import User from 'models/User';
 
 const HintType = new GraphQLObjectType({
   name: 'Hint',
@@ -30,6 +28,14 @@ const LessonExpectationType = new GraphQLObjectType({
     expectation: { type: GraphQLString },
     hints: { type: GraphQLList(HintType) },
     features: { type: GraphQLJSON },
+  },
+});
+
+const UserPermissionType = new GraphQLObjectType({
+  name: 'UserPermission',
+  fields: {
+    view: { type: GraphQLBoolean },
+    edit: { type: GraphQLBoolean },
   },
 });
 
@@ -51,10 +57,20 @@ export const LessonType = new GraphQLObjectType({
     updatedAt: { type: DateType },
     trainingConfig: { type: GraphQLString },
     createdByName: { type: GraphQLString },
-    createdBy: {
-      type: UserType,
-      resolve: async function (lesson) {
-        return await User.findOne({ _id: lesson.createdBy });
+    userPermissions: {
+      type: UserPermissionType,
+      args: {
+        user: { type: GraphQLID },
+      },
+      resolve: async function (lesson, args: { user: string }) {
+        if (!args.user) {
+          throw new Error('missing required param user id');
+        }
+        // TODO: graphql should require authorized user
+        return {
+          view: true,
+          edit: true,
+        };
       },
     },
     isTrainable: {
