@@ -56,6 +56,7 @@ export const LessonType = new GraphQLObjectType({
     createdAt: { type: DateType },
     updatedAt: { type: DateType },
     trainingConfig: { type: GraphQLString },
+    createdBy: { type: GraphQLID },
     createdByName: { type: GraphQLString },
     userPermissions: {
       type: UserPermissionType,
@@ -63,13 +64,10 @@ export const LessonType = new GraphQLObjectType({
         user: { type: GraphQLID },
       },
       resolve: async function (lesson, args: { user: string }) {
-        if (!args.user) {
-          throw new Error('missing required param user id');
-        }
-        // TODO: graphql should require authorized user
+        // TODO: should have context.user and check for permissions
         return {
           view: true,
-          edit: true,
+          edit: false,
         };
       },
     },
