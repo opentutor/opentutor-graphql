@@ -60,9 +60,6 @@ export const LessonType = new GraphQLObjectType({
     createdByName: { type: GraphQLString },
     userPermissions: {
       type: UserPermissionType,
-      args: {
-        user: { type: GraphQLID },
-      },
       resolve: async function (lesson, args: { user: string }) {
         // TODO: should have context.user and check for permissions
         return {

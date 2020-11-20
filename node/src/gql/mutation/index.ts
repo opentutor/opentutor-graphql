@@ -6,20 +6,12 @@ The full terms of this copyright and license should always be found in the root 
 */
 import { GraphQLObjectType } from 'graphql';
 import loginGoogle from './login-google';
-import setGrade from './set-grade';
-import updateLesson from './update-lesson';
-import updateSession from './update-session';
-import updateLastTrainedAt from './update-last-trained-at';
-import deleteLesson from './delete-lesson';
+import me from './me';
 
 export default new GraphQLObjectType({
   name: 'Mutation',
   fields: {
     loginGoogle,
-    setGrade,
-    updateLesson,
-    updateSession,
-    updateLastTrainedAt,
-    deleteLesson,
+    me,
   },
 });

@@ -6,54 +6,49 @@ The full terms of this copyright and license should always be found in the root 
 */
 import { GraphQLString, GraphQLObjectType } from 'graphql';
 import LessonType from 'gql/types/lesson';
-import { Lesson as LessonSchema, Session } from 'models';
+import DateType from 'gql/types/date';
+import { Lesson as LessonModel } from 'models';
 import { Lesson } from 'models/Lesson';
+import { User } from 'models/User';
 
-export const deleteLesson = {
+export const updateLastTrainedAt = {
   type: LessonType,
   args: {
     lessonId: { type: GraphQLString },
+    date: { type: DateType },
   },
   resolve: async (
     _root: GraphQLObjectType,
-    args: { lessonId: string }
+    args: { lessonId: string; date: Date },
+    context: { user: User }
   ): Promise<Lesson> => {
     if (!args.lessonId) {
       throw new Error('missing required param lessonId');
     }
-    const lesson = await LessonSchema.findOne({ lessonId: args.lessonId });
-    if (lesson.deleted || lesson.lessonId.startsWith('_deleted_')) {
-      throw new Error('lesson was already deleted');
+    const lesson = await LessonModel.findOne({ lessonId: args.lessonId });
+    if (!lesson) {
+      throw new Error(`failed to find lesson with lessonId ${args.lessonId}`);
+    }
+    if (context.user.id !== lesson.createdBy) {
+      throw new Error('user does not have permission to edit this lesson');
+    }
+    if (!args.date) {
+      args.date = new Date();
     }
 
-    const date = new Date();
-    const deletedId = `_deleted_${args.lessonId}_${date.getTime()}`;
-    await Session.updateMany(
+    return await LessonModel.findOneAndUpdate(
       {
         lessonId: args.lessonId,
       },
       {
-        $set: {
-          deleted: true,
-          lessonId: deletedId,
-        },
-      }
-    );
-    return await LessonSchema.findOneAndUpdate(
-      {
-        lessonId: args.lessonId,
-      },
-      {
-        $set: {
-          deleted: true,
-          lessonId: deletedId,
-        },
+        lastTrainedAt: args.date,
       },
       {
         new: true, // return the updated doc rather than pre update
+        upsert: true,
       }
     );
   },
 };
 
-export default deleteLesson;
+export default updateLastTrainedAt;

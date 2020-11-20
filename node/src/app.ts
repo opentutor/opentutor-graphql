@@ -7,15 +7,13 @@ The full terms of this copyright and license should always be found in the root 
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import express, { Request, Response, NextFunction, Express } from 'express';
-import { graphqlHTTP } from 'express-graphql';
 import mongoose from 'mongoose';
 import morgan from 'morgan';
 import path from 'path';
-
 import { logger } from 'utils/logging';
-import schema from 'gql/schema';
 
 export default async function createApp(): Promise<Express> {
+  const gqlMiddleware = (await import('gql/middleware')).default;
   if (process.env.NODE_ENV !== 'production') {
     require('longjohn'); // full stack traces when testing
   }
@@ -29,13 +27,7 @@ export default async function createApp(): Promise<Express> {
     app.use(morgan('dev'));
   }
   app.use(cors());
-  app.use(
-    '/graphql',
-    graphqlHTTP({
-      schema: schema,
-      graphiql: true,
-    })
-  );
+  app.use('/graphql', gqlMiddleware);
   app.use(bodyParser.json());
   app.use(express.static(path.join(__dirname, 'public')));
   app.use(function (

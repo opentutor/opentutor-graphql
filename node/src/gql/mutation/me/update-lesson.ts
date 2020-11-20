@@ -6,33 +6,53 @@ The full terms of this copyright and license should always be found in the root 
 */
 import { GraphQLString, GraphQLObjectType } from 'graphql';
 import LessonType from 'gql/types/lesson';
-import DateType from 'gql/types/date';
-import { Lesson as LessonModel } from 'models';
+import { Lesson as LessonSchema, Session, User as UserModel } from 'models';
 import { Lesson } from 'models/Lesson';
+import { User } from 'models/User';
 
-export const updateLastTrainedAt = {
+export const updateLesson = {
   type: LessonType,
   args: {
     lessonId: { type: GraphQLString },
-    date: { type: DateType },
+    lesson: { type: GraphQLString },
   },
   resolve: async (
     _root: GraphQLObjectType,
-    args: { lessonId: string; date: Date }
+    args: { lessonId: string; lesson: string },
+    context: { user: User }
   ): Promise<Lesson> => {
     if (!args.lessonId) {
       throw new Error('missing required param lessonId');
     }
-    if (!args.date) {
-      args.date = new Date();
+    if (!args.lesson) {
+      throw new Error('missing required param lesson');
+    }
+    const lesson: Lesson = JSON.parse(decodeURI(args.lesson));
+    if (lesson.deleted) {
+      throw new Error('lesson was deleted');
+    }
+    if (
+      !args.lessonId.match(/^[a-z0-9\-]+$/) ||
+      !lesson.lessonId.match(/^[a-z0-9\-]+$/)
+    ) {
+      throw new Error('lessonId must match [a-z0-9-]');
+    }
+    if (context.user.id !== lesson.createdBy) {
+      throw new Error('user does not have permission to edit this lesson');
     }
 
-    return await LessonModel.findOneAndUpdate(
+    await Session.updateLesson(args.lessonId, lesson);
+    const createdBy = await UserModel.findOne({ _id: lesson.createdBy });
+
+    return await LessonSchema.findOneAndUpdate(
       {
         lessonId: args.lessonId,
       },
       {
-        lastTrainedAt: args.date,
+        $set: {
+          ...lesson,
+          createdByName: createdBy ? createdBy.name : '',
+        },
       },
       {
         new: true, // return the updated doc rather than pre update
@@ -42,4 +62,4 @@ export const updateLastTrainedAt = {
   },
 };
 
-export default updateLastTrainedAt;
+export default updateLesson;
