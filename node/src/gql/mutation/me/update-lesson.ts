@@ -37,7 +37,7 @@ export const updateLesson = {
     ) {
       throw new Error('lessonId must match [a-z0-9-]');
     }
-    if (context.user.id !== lesson.createdBy) {
+    if (`${context.user.id}` !== `${lesson.createdBy}`) {
       throw new Error('user does not have permission to edit this lesson');
     }
 

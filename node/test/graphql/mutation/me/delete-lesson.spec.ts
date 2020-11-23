@@ -9,6 +9,7 @@ import { expect } from 'chai';
 import { Express } from 'express';
 import mongoUnit from 'mongo-unit';
 import request from 'supertest';
+import { getToken } from '../../../helpers';
 
 describe('deleteLesson', () => {
   let app: Express;
@@ -24,15 +25,35 @@ describe('deleteLesson', () => {
     await mongoUnit.drop();
   });
 
+  it(`returns an error if not logged in`, async () => {
+    const response = await request(app).post('/graphql').send({
+      query: `mutation {
+          me {
+            deleteLesson(lessonId: "") { 
+              deleted
+            } 
+          }
+        }`,
+    });
+    expect(response.status).to.equal(200);
+    expect(response.body).to.have.deep.nested.property(
+      'errors[0].message',
+      'Only authenticated users'
+    );
+  });
+
   it(`returns an error if no lessonId`, async () => {
+    const token = getToken('5f0cfea3395d762ca65405d1');
     const response = await request(app)
       .post('/graphql')
-      .set('Authorization', `access_token`)
+      .set('Authorization', `bearer ${token}`)
       .send({
-        query: `mutation { 
-          deleteLesson(lessonId: "") { 
-            deleted
-          } 
+        query: `mutation {
+          me {
+            deleteLesson(lessonId: "") {
+              deleted
+            }  
+          }
         }`,
       });
     expect(response.status).to.equal(200);
@@ -43,14 +64,17 @@ describe('deleteLesson', () => {
   });
 
   it(`returns an error if lesson was already deleted`, async () => {
+    const token = getToken('5f0cfea3395d762ca65405d1');
     const response = await request(app)
       .post('/graphql')
-      .set('Authorization', `access_token`)
+      .set('Authorization', `bearer ${token}`)
       .send({
-        query: `mutation { 
-          deleteLesson(lessonId: "_deleted_lesson") { 
-            deleted
-          } 
+        query: `mutation {
+          me {
+            deleteLesson(lessonId: "_deleted_lesson") { 
+              deleted
+            }  
+          }
         }`,
       });
     expect(response.status).to.equal(200);
@@ -60,24 +84,47 @@ describe('deleteLesson', () => {
     );
   });
 
-  it(`deletes lesson`, async () => {
+  it(`returns an error if no edit permission`, async () => {
+    const token = getToken('5f0cfea3395d762ca65405d2');
     const response = await request(app)
       .post('/graphql')
-      .set('Authorization', `access_token`)
+      .set('Authorization', `bearer ${token}`)
       .send({
-        query: `mutation { 
-          deleteLesson(lessonId: "lesson1") {
-            lessonId
-            deleted
-          } 
+        query: `mutation {
+          me {
+            deleteLesson(lessonId: "lesson1") {
+              deleted
+            }  
+          }
         }`,
       });
     expect(response.status).to.equal(200);
-    expect(response.body.data.deleteLesson.lessonId).to.contain(
+    expect(response.body).to.have.deep.nested.property(
+      'errors[0].message',
+      'user does not have permission to edit this lesson'
+    );
+  });
+
+  it(`deletes lesson`, async () => {
+    const token = getToken('5f0cfea3395d762ca65405d1');
+    const response = await request(app)
+      .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
+      .send({
+        query: `mutation {
+          me {
+            deleteLesson(lessonId: "lesson1") {
+              lessonId
+              deleted
+            }  
+          }
+        }`,
+      });
+    expect(response.status).to.equal(200);
+    expect(response.body.data.me.deleteLesson.lessonId).to.contain(
       '_deleted_lesson1'
     );
-    expect(response.body.data.deleteLesson.deleted).to.eql(true);
-
+    expect(response.body.data.me.deleteLesson.deleted).to.eql(true);
     const lessons = await request(app).post('/graphql').send({
       query: '{ lessons { edges { node { lessonId } } } }',
     });
@@ -123,14 +170,17 @@ describe('deleteLesson', () => {
   });
 
   it(`deletes related sessions`, async () => {
+    const token = getToken('5f0cfea3395d762ca65405d1');
     await request(app)
       .post('/graphql')
-      .set('Authorization', `access_token`)
+      .set('Authorization', `bearer ${token}`)
       .send({
-        query: `mutation { 
-          deleteLesson(lessonId: "lesson1") {
-            deleted
-          } 
+        query: `mutation {
+          me {
+            deleteLesson(lessonId: "lesson1") {
+              deleted
+            }  
+          }
         }`,
       });
     const response = await request(app).post('/graphql').send({
@@ -159,11 +209,6 @@ describe('deleteLesson', () => {
             {
               node: {
                 sessionId: 'session 6',
-              },
-            },
-            {
-              node: {
-                sessionId: 'session 2',
               },
             },
           ],

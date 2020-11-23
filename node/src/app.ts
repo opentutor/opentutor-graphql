@@ -22,6 +22,7 @@ export default async function createApp(): Promise<Express> {
   if (process.env['APP_DISABLE_AUTO_START'] !== 'true') {
     await appStart();
   }
+  require('./auth');
   const app = express();
   if (process.env['NODE_ENV'] !== 'test') {
     app.use(morgan('dev'));

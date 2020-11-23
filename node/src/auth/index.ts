@@ -4,18 +4,30 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import path from 'path';
-import jwt from 'jsonwebtoken';
+import passport from 'passport';
+import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt';
+import requireEnv from 'utils/require-env';
+import { User as UserSchema } from 'models';
 
-export function fixturePath(p: string): string {
-  return path.join(__dirname, 'fixtures', p);
-}
-
-export function getToken(userId: string, expirationDate = new Date()): string {
-  expirationDate.setMonth(expirationDate.getMonth() + 3);
-  const accessToken = jwt.sign(
-    { id: userId, expirationDate },
-    process.env.JWT_SECRET
-  );
-  return accessToken;
-}
+passport.use(
+  new JwtStrategy(
+    {
+      secretOrKey: requireEnv('JWT_SECRET'),
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+    },
+    async (token, done) => {
+      try {
+        if (token.expirationDate < new Date()) {
+          return done('token expired', null);
+        }
+        const user = await UserSchema.findOne({ _id: token.id });
+        if (user) {
+          return done(null, user);
+        }
+        return done('token invalid', null);
+      } catch (error) {
+        done(error);
+      }
+    }
+  )
+);

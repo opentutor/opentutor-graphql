@@ -12,15 +12,17 @@ mongoPaging.config.COLLATION = { locale: 'en', strength: 2 };
 
 export interface User extends Document {
   googleId: string;
-  name: string;
   email: string;
+  name: string;
+  password: string;
 }
 
 export const UserSchema = new Schema(
   {
     googleId: { type: String },
-    name: { type: String },
     email: { type: String },
+    name: { type: String },
+    password: { type: String },
   },
   { timestamps: true, collation: { locale: 'en', strength: 2 } }
 );

@@ -4,18 +4,20 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import path from 'path';
-import jwt from 'jsonwebtoken';
+import { GraphQLObjectType } from 'graphql';
+import { UserAccessToken, generateToken } from 'models/UserAccessToken';
+import UserAccessTokenType from 'gql/types/user-access-token';
+import { User } from 'models/User';
 
-export function fixturePath(p: string): string {
-  return path.join(__dirname, 'fixtures', p);
-}
+export const login = {
+  type: UserAccessTokenType,
+  resolve: async (
+    _root: GraphQLObjectType,
+    args: any,
+    context: { user: User }
+  ): Promise<UserAccessToken> => {
+    return generateToken(context.user);
+  },
+};
 
-export function getToken(userId: string, expirationDate = new Date()): string {
-  expirationDate.setMonth(expirationDate.getMonth() + 3);
-  const accessToken = jwt.sign(
-    { id: userId, expirationDate },
-    process.env.JWT_SECRET
-  );
-  return accessToken;
-}
+export default login;

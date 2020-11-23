@@ -6,28 +6,28 @@ The full terms of this copyright and license should always be found in the root 
 */
 import axios from 'axios';
 import { GraphQLString, GraphQLObjectType } from 'graphql';
-import UserType from 'gql/types/user';
-import { User } from 'models/User';
 import { User as UserSchema } from 'models';
+import { UserAccessToken, generateToken } from 'models/UserAccessToken';
+import UserAccessTokenType from 'gql/types/user-access-token';
 
 export const loginGoogle = {
-  type: UserType,
+  type: UserAccessTokenType,
   args: {
     accessToken: { type: GraphQLString },
   },
   resolve: async (
     _root: GraphQLObjectType,
     args: { accessToken: string }
-  ): Promise<User> => {
+  ): Promise<UserAccessToken> => {
     if (!args.accessToken) {
       throw new Error('missing required param accessToken');
     }
     try {
       const endpoint = `https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${args.accessToken}`;
       const response = await axios.get(endpoint);
-      const user = await UserSchema.findOne({ googleId: response.data.id });
+      let user = await UserSchema.findOne({ googleId: response.data.id });
       if (!user) {
-        return await UserSchema.findOneAndUpdate(
+        user = await UserSchema.findOneAndUpdate(
           {
             googleId: response.data.id,
           },
@@ -44,7 +44,7 @@ export const loginGoogle = {
           }
         );
       }
-      return user;
+      return generateToken(user);
     } catch (error) {
       throw new Error(error);
     }

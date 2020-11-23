@@ -50,7 +50,7 @@ export const setGrade = {
     if (!lesson) {
       throw new Error(`session does not have an associated lesson`);
     }
-    if (context.user.id !== lesson.createdBy) {
+    if (`${context.user.id}` !== `${lesson.createdBy}`) {
       throw new Error('user does not have permission to grade this lesson');
     }
     return await SessionModel.setGrade(

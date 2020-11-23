@@ -4,18 +4,25 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import path from 'path';
+import { User } from './User';
 import jwt from 'jsonwebtoken';
 
-export function fixturePath(p: string): string {
-  return path.join(__dirname, 'fixtures', p);
+export interface UserAccessToken {
+  user: User;
+  accessToken: string;
+  expirationDate: Date;
 }
 
-export function getToken(userId: string, expirationDate = new Date()): string {
+export function generateToken(user: User): UserAccessToken {
+  const expirationDate = new Date();
   expirationDate.setMonth(expirationDate.getMonth() + 3);
   const accessToken = jwt.sign(
-    { id: userId, expirationDate },
+    { id: user._id, expirationDate: expirationDate },
     process.env.JWT_SECRET
   );
-  return accessToken;
+  return {
+    user,
+    accessToken,
+    expirationDate,
+  };
 }

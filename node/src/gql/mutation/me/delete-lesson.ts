@@ -27,7 +27,7 @@ export const deleteLesson = {
     if (lesson.deleted || lesson.lessonId.startsWith('_deleted_')) {
       throw new Error('lesson was already deleted');
     }
-    if (context.user.id !== lesson.createdBy) {
+    if (`${context.user.id}` !== `${lesson.createdBy}`) {
       throw new Error('user does not have permission to edit this lesson');
     }
 

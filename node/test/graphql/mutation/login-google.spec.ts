@@ -27,9 +27,13 @@ describe('login with google', () => {
   it(`returns an error if no accessToken`, async () => {
     const response = await request(app).post('/graphql').send({
       query: `mutation { 
-          loginGoogle(accessToken: "") { 
-            name
-            email
+          loginGoogle(accessToken: "") {
+            user {
+              name
+              email  
+            }
+            accessToken
+            expirationDate
           } 
         }`,
     });

@@ -203,6 +203,11 @@ describe('sessions', () => {
             },
             {
               node: {
+                sessionId: 'session 2',
+              },
+            },
+            {
+              node: {
                 sessionId: 'session 1',
               },
             },

@@ -220,6 +220,7 @@ module.exports = {
     {
       _id: ObjectId('5f20c63646f6110a6a5b2132'),
       sessionId: 'session 2',
+      lessonId: 'lesson1',
       username: 'username2',
       question: {
         text: 'question',

@@ -9,6 +9,7 @@ import { expect } from 'chai';
 import { Express } from 'express';
 import mongoUnit from 'mongo-unit';
 import request from 'supertest';
+import { getToken } from '../../../helpers';
 
 describe('updateLesson', () => {
   let app: Express;
@@ -24,14 +25,37 @@ describe('updateLesson', () => {
     await mongoUnit.drop();
   });
 
-  it(`returns an error if no lessonId`, async () => {
+  it(`returns an error if not logged in`, async () => {
     const response = await request(app).post('/graphql').send({
-      query: `mutation { 
-          updateLesson(lesson: "") { 
-            lessonId
-          } 
+      query: `mutation {
+          me {
+            updateLesson(lesson: "") { 
+              lessonId
+            }   
+          }
         }`,
     });
+    expect(response.status).to.equal(200);
+    expect(response.body).to.have.deep.nested.property(
+      'errors[0].message',
+      'Only authenticated users'
+    );
+  });
+
+  it(`returns an error if no lessonId`, async () => {
+    const token = getToken('5f0cfea3395d762ca65405d1');
+    const response = await request(app)
+      .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
+      .send({
+        query: `mutation {
+          me {
+            updateLesson(lesson: "") { 
+              lessonId
+            }   
+          }
+        }`,
+      });
     expect(response.status).to.equal(200);
     expect(response.body).to.have.deep.nested.property(
       'errors[0].message',
@@ -40,13 +64,19 @@ describe('updateLesson', () => {
   });
 
   it(`returns an error if no lesson`, async () => {
-    const response = await request(app).post('/graphql').send({
-      query: `mutation { 
-          updateLesson(lessonId: "lesson1") { 
-            lessonId
-          } 
+    const token = getToken('5f0cfea3395d762ca65405d1');
+    const response = await request(app)
+      .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
+      .send({
+        query: `mutation {
+          me {
+            updateLesson(lessonId: "lesson1") { 
+              lessonId
+            }   
+          }
         }`,
-    });
+      });
     expect(response.status).to.equal(200);
     expect(response.body).to.have.deep.nested.property(
       'errors[0].message',
@@ -55,6 +85,7 @@ describe('updateLesson', () => {
   });
 
   it(`args.lessonId must be lowercase`, async () => {
+    const token = getToken('5f0cfea3395d762ca65405d1');
     const lesson = encodeURI(
       JSON.stringify({
         lessonId: 'a',
@@ -62,11 +93,14 @@ describe('updateLesson', () => {
     );
     const response = await request(app)
       .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
       .send({
-        query: `mutation { 
-          updateLesson(lessonId: "A", lesson: "${lesson}") {
-            lessonId
-          } 
+        query: `mutation {
+          me {
+            updateLesson(lessonId: "A", lesson: "${lesson}") {
+              lessonId
+            }   
+          }
         }`,
       });
     expect(response.status).to.equal(200);
@@ -77,6 +111,7 @@ describe('updateLesson', () => {
   });
 
   it(`lesson.lessonId must be lowercase`, async () => {
+    const token = getToken('5f0cfea3395d762ca65405d1');
     const lesson = encodeURI(
       JSON.stringify({
         lessonId: 'A',
@@ -84,11 +119,14 @@ describe('updateLesson', () => {
     );
     const response = await request(app)
       .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
       .send({
-        query: `mutation { 
-          updateLesson(lessonId: "a", lesson: "${lesson}") {
-            lessonId
-          } 
+        query: `mutation {
+          me {
+            updateLesson(lessonId: "a", lesson: "${lesson}") {
+              lessonId
+            }   
+          }
         }`,
       });
     expect(response.status).to.equal(200);
@@ -99,6 +137,7 @@ describe('updateLesson', () => {
   });
 
   it(`args.lessonId cannot contain special chars`, async () => {
+    const token = getToken('5f0cfea3395d762ca65405d1');
     const lesson = encodeURI(
       JSON.stringify({
         lessonId: 'a',
@@ -106,11 +145,14 @@ describe('updateLesson', () => {
     );
     const response = await request(app)
       .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
       .send({
-        query: `mutation { 
-          updateLesson(lessonId: "!", lesson: "${lesson}") {
-            lessonId
-          } 
+        query: `mutation {
+          me {
+            updateLesson(lessonId: "!", lesson: "${lesson}") {
+              lessonId
+            }   
+          }
         }`,
       });
     expect(response.status).to.equal(200);
@@ -121,6 +163,7 @@ describe('updateLesson', () => {
   });
 
   it(`lesson.lessonId cannot contain special chars`, async () => {
+    const token = getToken('5f0cfea3395d762ca65405d1');
     const lesson = encodeURI(
       JSON.stringify({
         lessonId: '!',
@@ -128,11 +171,14 @@ describe('updateLesson', () => {
     );
     const response = await request(app)
       .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
       .send({
-        query: `mutation { 
-          updateLesson(lessonId: "a", lesson: "${lesson}") {
-            lessonId
-          } 
+        query: `mutation {
+          me {
+            updateLesson(lessonId: "a", lesson: "${lesson}") {
+              lessonId
+            }   
+          }
         }`,
       });
     expect(response.status).to.equal(200);
@@ -143,6 +189,7 @@ describe('updateLesson', () => {
   });
 
   it(`throws an error if lesson was deleted`, async () => {
+    const token = getToken('5f0cfea3395d762ca65405d1');
     const lesson = encodeURI(
       JSON.stringify({
         lessonId: '_deleted_lesson',
@@ -151,11 +198,14 @@ describe('updateLesson', () => {
     );
     const response = await request(app)
       .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
       .send({
-        query: `mutation { 
-          updateLesson(lessonId: "_deleted_lesson", lesson: "${lesson}") {
-            lessonId
-          } 
+        query: `mutation {
+          me {
+            updateLesson(lessonId: "_deleted_lesson", lesson: "${lesson}") {
+              lessonId
+            }   
+          }
         }`,
       });
     expect(response.status).to.equal(200);
@@ -165,7 +215,8 @@ describe('updateLesson', () => {
     );
   });
 
-  it(`creates a new lesson`, async () => {
+  it(`returns an error if no edit permission`, async () => {
+    const token = getToken('5f0cfea3395d762ca65405d2');
     const lesson = encodeURI(
       JSON.stringify({
         lessonId: 'newlesson',
@@ -188,26 +239,70 @@ describe('updateLesson', () => {
     );
     const response = await request(app)
       .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
       .send({
-        query: `mutation { 
-          updateLesson(lessonId: "newlesson", lesson: "${lesson}") {
-            lessonId
-            name
-            intro
-            question
-            expectations {
-              expectation
-              hints {
-                text
-              }
-            }
-            conclusion
-            createdByName
-          } 
+        query: `mutation {
+          me {
+            updateLesson(lessonId: "newlesson", lesson: "${lesson}") {
+              lessonId
+            }   
+          }
         }`,
       });
     expect(response.status).to.equal(200);
-    expect(response.body.data.updateLesson).to.eql({
+    expect(response.body).to.have.deep.nested.property(
+      'errors[0].message',
+      'user does not have permission to edit this lesson'
+    );
+  });
+
+  it(`creates a new lesson`, async () => {
+    const token = getToken('5f0cfea3395d762ca65405d1');
+    const lesson = encodeURI(
+      JSON.stringify({
+        lessonId: 'newlesson',
+        name: 'new name',
+        intro: 'new intro',
+        question: 'new question',
+        conclusion: ['new conclusion'],
+        createdBy: '5f0cfea3395d762ca65405d1',
+        expectations: [
+          {
+            expectation: 'new expectation',
+            hints: [
+              {
+                text: 'new hint',
+              },
+            ],
+          },
+        ],
+      })
+    );
+    const response = await request(app)
+      .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
+      .send({
+        query: `mutation {
+          me {
+            updateLesson(lessonId: "newlesson", lesson: "${lesson}") {
+              lessonId
+              name
+              intro
+              question
+              expectations {
+                expectation
+                hints {
+                  text
+                }
+              }
+              conclusion
+              createdByName
+            }   
+          }
+        }`,
+      });
+    expect(response.status).to.equal(200);
+    expect(response.body.data.me.updateLesson).to.eql({
       lessonId: 'newlesson',
       name: 'new name',
       intro: 'new intro',
@@ -228,9 +323,11 @@ describe('updateLesson', () => {
   });
 
   it(`adds new lesson to database`, async () => {
+    const token = getToken('5f0cfea3395d762ca65405d1');
     const lesson = encodeURI(
       JSON.stringify({
         lessonId: 'newlesson',
+        createdBy: '5f0cfea3395d762ca65405d1',
         name: 'new name',
         intro: 'new intro',
         question: 'new question',
@@ -249,11 +346,14 @@ describe('updateLesson', () => {
     );
     await request(app)
       .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
       .send({
-        query: `mutation { 
-          updateLesson(lessonId: "newlesson", lesson: "${lesson}") {
-            lessonId
-          } 
+        query: `mutation {
+          me {
+            updateLesson(lessonId: "newlesson", lesson: "${lesson}") {
+              lessonId
+            }   
+          }
         }`,
       });
 
@@ -295,6 +395,7 @@ describe('updateLesson', () => {
   });
 
   it(`returns updated lesson`, async () => {
+    const token = getToken('5f0cfea3395d762ca65405d3');
     const lesson = encodeURI(
       JSON.stringify({
         lessonId: 'lesson1',
@@ -317,26 +418,29 @@ describe('updateLesson', () => {
     );
     const response = await request(app)
       .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
       .send({
-        query: `mutation { 
-          updateLesson(lessonId: "lesson1", lesson: "${lesson}") {
-            lessonId
-            name
-            intro
-            question
-            expectations {
-              expectation
-              hints {
-                text
+        query: `mutation {
+          me {
+            updateLesson(lessonId: "lesson1", lesson: "${lesson}") {
+              lessonId
+              name
+              intro
+              question
+              expectations {
+                expectation
+                hints {
+                  text
+                }
               }
-            }
-            conclusion
-            createdByName
-          } 
+              conclusion
+              createdByName
+            }   
+          }
         }`,
       });
     expect(response.status).to.equal(200);
-    expect(response.body.data.updateLesson).to.eql({
+    expect(response.body.data.me.updateLesson).to.eql({
       lessonId: 'lesson1',
       name: 'updated name',
       intro: 'updated intro',
@@ -357,8 +461,10 @@ describe('updateLesson', () => {
   });
 
   it(`updates lesson in database`, async () => {
+    const token = getToken('5f0cfea3395d762ca65405d1');
     const lesson = encodeURI(
       JSON.stringify({
+        createdBy: '5f0cfea3395d762ca65405d1',
         lessonId: 'lesson1',
         name: 'updated name',
         intro: 'updated intro',
@@ -378,11 +484,14 @@ describe('updateLesson', () => {
     );
     await request(app)
       .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
       .send({
-        query: `mutation { 
-          updateLesson(lessonId: "lesson1", lesson: "${lesson}") {
-            lessonId
-          } 
+        query: `mutation {
+          me {
+            updateLesson(lessonId: "lesson1", lesson: "${lesson}") {
+              lessonId
+            }   
+          }
         }`,
       });
 
@@ -424,20 +533,25 @@ describe('updateLesson', () => {
   });
 
   it(`updates lessonId`, async () => {
+    const token = getToken('5f0cfea3395d762ca65405d1');
     const lesson = encodeURI(
       JSON.stringify({
+        createdBy: '5f0cfea3395d762ca65405d1',
         lessonId: 'newlessonid',
         name: 'lesson name',
       })
     );
     await request(app)
       .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
       .send({
-        query: `mutation { 
-          updateLesson(lessonId: "lesson1", lesson: "${lesson}") {
-            lessonId
-            name
-          } 
+        query: `mutation {
+          me {
+            updateLesson(lessonId: "lesson1", lesson: "${lesson}") {
+              lessonId
+              name
+            }   
+          }
         }`,
       });
 
@@ -468,6 +582,7 @@ describe('updateLesson', () => {
   });
 
   it(`updates session lesson`, async () => {
+    const token = getToken('5f0cfea3395d762ca65405d1');
     const lesson = encodeURI(
       JSON.stringify({
         lessonId: 'newlessonid',
@@ -477,11 +592,14 @@ describe('updateLesson', () => {
     );
     await request(app)
       .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
       .send({
-        query: `mutation { 
-          updateLesson(lessonId: "lesson1", lesson: "${lesson}") {
-            lessonId
-          } 
+        query: `mutation {
+          me {
+            updateLesson(lessonId: "lesson1", lesson: "${lesson}") {
+              lessonId
+            }   
+          }
         }`,
       });
 
