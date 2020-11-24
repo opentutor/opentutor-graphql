@@ -116,7 +116,7 @@ describe('deleteLesson', () => {
             deleteLesson(lessonId: "lesson1") {
               lessonId
               deleted
-            }  
+            }
           }
         }`,
       });
@@ -125,46 +125,57 @@ describe('deleteLesson', () => {
       '_deleted_lesson1'
     );
     expect(response.body.data.me.deleteLesson.deleted).to.eql(true);
-    const lessons = await request(app).post('/graphql').send({
-      query: '{ lessons { edges { node { lessonId } } } }',
-    });
+    const lessons = await request(app)
+      .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
+      .send({
+        query: `query {
+          me {
+            lessons {
+              edges {
+                node {
+                  lessonId
+                }
+              }
+            }  
+          }
+        }`,
+      });
     expect(lessons.status).to.equal(200);
-    expect(lessons.body).to.eql({
-      data: {
-        lessons: {
-          edges: [
-            {
-              node: {
-                lessonId: 'lesson8',
-              },
+    expect(lessons.body.data.me).to.eql({
+      lessons: {
+        edges: [
+          {
+            node: {
+              lessonId: 'lesson8',
             },
-            {
-              node: {
-                lessonId: 'lesson6',
-              },
+          },
+          {
+            node: {
+              lessonId: 'lesson6',
             },
-            {
-              node: {
-                lessonId: 'lesson5',
-              },
+          },
+          {
+            node: {
+              lessonId: 'lesson5',
             },
-            {
-              node: {
-                lessonId: 'lesson4',
-              },
+          },
+          {
+            node: {
+              lessonId: 'lesson4',
             },
-            {
-              node: {
-                lessonId: 'lesson3',
-              },
+          },
+          {
+            node: {
+              lessonId: 'lesson3',
             },
-            {
-              node: {
-                lessonId: 'lesson2',
-              },
+          },
+          {
+            node: {
+              lessonId: 'lesson2',
             },
-          ],
-        },
+          },
+        ],
       },
     });
   });
@@ -183,36 +194,47 @@ describe('deleteLesson', () => {
           }
         }`,
       });
-    const response = await request(app).post('/graphql').send({
-      query: '{ sessions { edges { node { sessionId } } } }',
-    });
+    const response = await request(app)
+      .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
+      .send({
+        query: `query {
+          me {
+            sessions {
+              edges {
+                node {
+                  sessionId
+                }
+              }
+            }  
+          }
+        }`,
+      });
     expect(response.status).to.equal(200);
-    expect(response.body).to.eql({
-      data: {
-        sessions: {
-          edges: [
-            {
-              node: {
-                sessionId: 'session 9',
-              },
+    expect(response.body.data.me).to.eql({
+      sessions: {
+        edges: [
+          {
+            node: {
+              sessionId: 'session 9',
             },
-            {
-              node: {
-                sessionId: 'session 8',
-              },
+          },
+          {
+            node: {
+              sessionId: 'session 8',
             },
-            {
-              node: {
-                sessionId: 'session 7',
-              },
+          },
+          {
+            node: {
+              sessionId: 'session 7',
             },
-            {
-              node: {
-                sessionId: 'session 6',
-              },
+          },
+          {
+            node: {
+              sessionId: 'session 6',
             },
-          ],
-        },
+          },
+        ],
       },
     });
   });

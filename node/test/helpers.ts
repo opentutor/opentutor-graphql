@@ -11,11 +11,18 @@ export function fixturePath(p: string): string {
   return path.join(__dirname, 'fixtures', p);
 }
 
-export function getToken(userId: string, expirationDate = new Date()): string {
-  expirationDate.setMonth(expirationDate.getMonth() + 3);
+export function getToken(
+  userId: string,
+  expirationDate = new Date(
+    new Date().getFullYear(),
+    new Date().getMonth() + 3,
+    new Date().getDate()
+  )
+): string {
   const accessToken = jwt.sign(
     { id: userId, expirationDate },
-    process.env.JWT_SECRET
+    process.env.JWT_SECRET,
+    { expiresIn: expirationDate.getTime() - new Date().getTime() }
   );
   return accessToken;
 }

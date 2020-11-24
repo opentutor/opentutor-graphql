@@ -6,7 +6,6 @@ The full terms of this copyright and license should always be found in the root 
 */
 import { GraphQLObjectType } from 'graphql';
 import { User } from 'models/User';
-import login from './login';
 import deleteLesson from './delete-lesson';
 import setGrade from './set-grade';
 import updateLastTrainedAt from './update-last-trained-at';
@@ -14,9 +13,8 @@ import updateLesson from './update-lesson';
 import updateSession from './update-session';
 
 export const Me: GraphQLObjectType = new GraphQLObjectType({
-  name: 'Me',
+  name: 'MeMutation',
   fields: {
-    login,
     deleteLesson,
     setGrade,
     updateLastTrainedAt,

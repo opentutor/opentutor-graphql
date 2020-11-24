@@ -17,12 +17,21 @@ export function generateToken(user: User): UserAccessToken {
   const expirationDate = new Date();
   expirationDate.setMonth(expirationDate.getMonth() + 3);
   const accessToken = jwt.sign(
-    { id: user._id, expirationDate: expirationDate },
-    process.env.JWT_SECRET
+    { id: user._id, expirationDate },
+    process.env.JWT_SECRET,
+    { expiresIn: expirationDate.getTime() - new Date().getTime() }
   );
   return {
     user,
     accessToken,
     expirationDate,
   };
+}
+
+export function decodeToken(token: string): any {
+  try {
+    return jwt.verify(token, process.env.JWT_SECRET);
+  } catch (error) {
+    throw new Error(error);
+  }
 }

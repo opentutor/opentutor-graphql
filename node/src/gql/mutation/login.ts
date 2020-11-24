@@ -4,21 +4,39 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { GraphQLString } from 'graphql';
-import { Lesson } from 'models';
-import findOne from './find-one';
-import LessonType from 'gql/types/lesson';
+import { GraphQLString, GraphQLObjectType } from 'graphql';
+import {
+  UserAccessToken,
+  generateToken,
+  decodeToken,
+} from 'models/UserAccessToken';
+import { User as UserSchema } from 'models';
+import UserAccessTokenType from 'gql/types/user-access-token';
 
-export const lesson = findOne({
-  model: Lesson,
-  type: LessonType,
-  typeName: 'lesson',
-  argsConfig: {
-    lessonId: {
-      description: 'id of the lesson',
-      type: GraphQLString,
-    },
+export const login = {
+  type: UserAccessTokenType,
+  args: {
+    accessToken: { type: GraphQLString },
   },
-});
+  resolve: async (
+    _root: GraphQLObjectType,
+    args: { accessToken: string }
+  ): Promise<UserAccessToken> => {
+    if (!args.accessToken) {
+      throw new Error('missing required param accessToken');
+    }
+    try {
+      const decoded = decodeToken(args.accessToken);
+      const userId = decoded.id;
+      const user = await UserSchema.findOne({ _id: userId });
+      if (!user) {
+        throw new Error('invalid token');
+      }
+      return generateToken(user);
+    } catch (error) {
+      throw new Error(error);
+    }
+  },
+};
 
-export default lesson;
+export default login;

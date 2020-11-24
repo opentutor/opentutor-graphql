@@ -357,25 +357,30 @@ describe('updateLesson', () => {
         }`,
       });
 
-    const newLesson = await request(app).post('/graphql').send({
-      query: `query {
-        lesson(lessonId: "newlesson") { 
-          lessonId
-          name
-          intro
-          question
-          expectations {
-            expectation
-            hints {
-              text
+    const newLesson = await request(app)
+      .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
+      .send({
+        query: `query {
+        me {
+          lesson(lessonId: "newlesson") { 
+            lessonId
+            name
+            intro
+            question
+            expectations {
+              expectation
+              hints {
+                text
+              }
             }
-          }
-          conclusion
-        } 
+            conclusion
+          }   
+        }
       }`,
-    });
+      });
     expect(newLesson.status).to.equal(200);
-    expect(newLesson.body.data.lesson).to.eql({
+    expect(newLesson.body.data.me.lesson).to.eql({
       lessonId: 'newlesson',
       name: 'new name',
       intro: 'new intro',
@@ -494,26 +499,30 @@ describe('updateLesson', () => {
           }
         }`,
       });
-
-    const newLesson = await request(app).post('/graphql').send({
-      query: `query {
-        lesson(lessonId: "lesson1") { 
-          lessonId
-          name
-          intro
-          question
-          expectations {
-            expectation
-            hints {
-              text
+    const newLesson = await request(app)
+      .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
+      .send({
+        query: `query {
+        me {
+          lesson(lessonId: "lesson1") { 
+            lessonId
+            name
+            intro
+            question
+            expectations {
+              expectation
+              hints {
+                text
+              }
             }
-          }
-          conclusion
-        } 
+            conclusion
+          }  
+        }
       }`,
-    });
+      });
     expect(newLesson.status).to.equal(200);
-    expect(newLesson.body.data.lesson).to.eql({
+    expect(newLesson.body.data.me.lesson).to.eql({
       lessonId: 'lesson1',
       name: 'updated name',
       intro: 'updated intro',
@@ -555,25 +564,34 @@ describe('updateLesson', () => {
         }`,
       });
 
-    const newLesson = await request(app).post('/graphql').send({
-      query: `query {
-        lesson(lessonId: "newlessonid") {
-          lessonId
+    const newLesson = await request(app)
+      .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
+      .send({
+        query: `query {
+        me {
+          lesson(lessonId: "newlessonid") {
+            lessonId
+          }  
         }
       }`,
-    });
+      });
     expect(newLesson.status).to.equal(200);
-    expect(newLesson.body.data.lesson).to.eql({
+    expect(newLesson.body.data.me.lesson).to.eql({
       lessonId: 'newlessonid',
     });
-
-    const oldLesson = await request(app).post('/graphql').send({
-      query: `query {
-        lesson(lessonId: "lesson1") {
-          lessonId
+    const oldLesson = await request(app)
+      .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
+      .send({
+        query: `query {
+        me {
+          lesson(lessonId: "lesson1") {
+            lessonId
+          }  
         }
       }`,
-    });
+      });
     expect(oldLesson.status).to.equal(200);
     expect(oldLesson.body).to.have.deep.nested.property(
       'errors[0].message',
@@ -603,17 +621,22 @@ describe('updateLesson', () => {
         }`,
       });
 
-    const response = await request(app).post('/graphql').send({
-      query: `query {
-        session(sessionId: "session 1") {
-          lessonId
-          lessonName
-          lessonCreatedBy
-        } 
-      }`,
-    });
+    const response = await request(app)
+      .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
+      .send({
+        query: `query {
+          me {
+            session(sessionId: "session 1") {
+              lessonId
+              lessonName
+              lessonCreatedBy
+            }
+          }
+        }`,
+      });
     expect(response.status).to.equal(200);
-    expect(response.body.data.session).to.eql({
+    expect(response.body.data.me.session).to.eql({
       lessonId: 'newlessonid',
       lessonName: 'new lesson name',
       lessonCreatedBy: 'Admin',

@@ -4,48 +4,21 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import mongoose from 'mongoose';
-const { ObjectId } = mongoose.Types;
+import { GraphQLString } from 'graphql';
+import SessionType from 'gql/types/session';
+import { Session } from 'models';
+import findOne from '../find-one';
 
-module.exports = {
-  lessons: [
-    {
-      _id: ObjectId('5f0cfea3395d762ca65405c1'),
-      lessonId: 'lesson-1',
-      name: '123',
-      createdBy: '123',
+export const session = findOne({
+  model: Session,
+  type: SessionType,
+  typeName: 'session',
+  argsConfig: {
+    sessionId: {
+      description: 'id of the session',
+      type: GraphQLString,
     },
-    {
-      _id: ObjectId('5f0cfea3395d762ca65405c2'),
-      lessonId: 'lesson-2',
-      name: 'aaa',
-      createdBy: 'aaa',
-    },
-    {
-      _id: ObjectId('5f0cfea3395d762ca65405c3'),
-      lessonId: 'lesson-3',
-      name: 'AAA',
-      createdBy: 'AAA',
-    },
-    {
-      _id: ObjectId('5f0cfea3395d762ca65405c4'),
-      lessonId: 'lesson-4',
-      name: 'bbb',
-      createdBy: 'bbb',
-    },
-    {
-      _id: ObjectId('5f0cfea3395d762ca65405c5'),
-      lessonId: 'lesson-5',
-      name: 'BBB',
-      createdBy: 'BBB',
-    },
-  ],
+  },
+});
 
-  users: [
-    {
-      _id: ObjectId('5f0cfea3395d762ca65405d1'),
-      name: 'Admin',
-      email: 'admin@opentutor.com',
-    },
-  ],
-};
+export default session;

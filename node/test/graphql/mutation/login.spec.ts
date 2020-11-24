@@ -9,7 +9,7 @@ import { expect } from 'chai';
 import { Express } from 'express';
 import mongoUnit from 'mongo-unit';
 import request from 'supertest';
-import { getToken } from '../../../helpers';
+import { getToken } from '../../helpers';
 
 describe('login', () => {
   let app: Express;
@@ -28,83 +28,74 @@ describe('login', () => {
   it(`returns an error if no accessToken`, async () => {
     const response = await request(app).post('/graphql').send({
       query: `mutation {
-          me {
-            login {
-              user {
-                name
-                email  
-              }
-              accessToken
-              expirationDate
-            } 
-          }
+          login {
+            user {
+              name
+              email  
+            }
+            accessToken
+            expirationDate
+          } 
         }`,
     });
-
     expect(response.status).to.equal(200);
     expect(response.body).to.have.deep.nested.property(
       'errors[0].message',
-      'Only authenticated users'
+      'missing required param accessToken'
     );
   });
 
-  // it(`returns an error if token expired`, async () => {
-  //   const expirationDate = new Date();
-  //   expirationDate.setMonth(expirationDate.getMonth() - 10);
-  //   const token = getToken('5f0cfea3395d762ca65405d1', expirationDate);
-  //   const response = await request(app)
-  //     .post('/graphql')
-  //     .set('Authorization', `bearer ${token}`)
-  //     .send({
-  //       query: `mutation {
-  //         me {
-  //           login {
-  //             user {
-  //               name
-  //               email
-  //             }
-  //             accessToken
-  //             expirationDate
-  //           }
-  //         }
-  //       }`,
-  //     });
-  //   expect(response.status).to.equal(200);
-  //   expect(response.body).to.have.deep.nested.property(
-  //     'errors[0].message',
-  //     'Only authenticated users'
-  //   );
-  // });
-
-  it(`returns user and updates token`, async () => {
+  it(`returns an error if token expired`, async () => {
     const expirationDate = new Date();
-    expirationDate.setMonth(expirationDate.getMonth() - 2);
+    expirationDate.setMonth(expirationDate.getMonth() - 10);
     const token = getToken('5f0cfea3395d762ca65405d1', expirationDate);
     const response = await request(app)
       .post('/graphql')
-      .set('Authorization', `bearer ${token}`)
       .send({
         query: `mutation {
-          me {
-            login {
-              user {
-                name
-                email  
-              }
-              accessToken
-              expirationDate
-            } 
+          login(accessToken: "${token}") {
+            user {
+              name
+              email
+            }
+            accessToken
+            expirationDate
           }
         }`,
       });
     expect(response.status).to.equal(200);
-    expect(response.body.data.me.login.user).to.eql({
+    expect(response.body).to.have.deep.nested.property(
+      'errors[0].message',
+      'Error: TokenExpiredError: jwt expired'
+    );
+  });
+
+  it(`returns user and updates token`, async () => {
+    const expirationDate = new Date();
+    expirationDate.setMonth(expirationDate.getMonth() + 1);
+    const token = getToken('5f0cfea3395d762ca65405d1', expirationDate);
+    const response = await request(app)
+      .post('/graphql')
+      .send({
+        query: `mutation {
+          login(accessToken: "${token}") {
+            user {
+              name
+              email  
+            }
+            accessToken
+            expirationDate
+          } 
+        }`,
+      });
+    expect(response.status).to.equal(200);
+    expect(response.body.data.login.user).to.eql({
       name: 'Admin',
       email: 'admin@opentutor.com',
     });
-    expect(response.body.data.me.login.accessToken).to.not.eql(token);
-    expect(
-      new Date(response.body.data.me.login.expirationDate)
-    ).to.be.greaterThan(expirationDate);
+    expect(response.body.data.login.accessToken).to.not.eql(token);
+    expect(new Date(response.body.data.login.expirationDate)).to.be.greaterThan(
+      expirationDate
+    );
   });
 });

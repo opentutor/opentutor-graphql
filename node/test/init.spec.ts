@@ -12,6 +12,7 @@ import { fixturePath } from './helpers';
 before(() => {
   process.env.DOTENV_PATH = fixturePath('.env');
   process.env.JWT_SECRET = fixturePath('.env');
+  process.env.API_SECRET = fixturePath('.env');
 });
 
 after(async () => {

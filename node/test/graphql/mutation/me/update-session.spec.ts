@@ -475,33 +475,38 @@ describe('updateSession', () => {
             }
           }`,
       });
-    const response = await request(app).post('/graphql').send({
-      query: `query {
-        session(sessionId: "new session") {
-          sessionId
-          username
-          lesson {
-            name
-            createdByName
-          }
-          question {
-            text
-            expectations {
-              text
+    const response = await request(app)
+      .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
+      .send({
+        query: `query {
+        me {
+          session(sessionId: "new session") {
+            sessionId
+            username
+            lesson {
+              name
+              createdByName
             }
-          }
-          userResponses {
-            text
-            expectationScores {
-              classifierGrade
-              graderGrade
+            question {
+              text
+              expectations {
+                text
+              }
+            }
+            userResponses {
+              text
+              expectationScores {
+                classifierGrade
+                graderGrade
+              }
             }
           }
         }
       }`,
-    });
+      });
     expect(response.status).to.equal(200);
-    expect(response.body.data.session).to.eql({
+    expect(response.body.data.me.session).to.eql({
       sessionId: 'new session',
       username: 'new username',
       lesson: {
@@ -562,29 +567,34 @@ describe('updateSession', () => {
           }`,
       });
 
-    const response = await request(app).post('/graphql').send({
-      query: `query {
-        session(sessionId: "session 1") {
-          sessionId
-          username
-          question {
-            text
-            expectations {
+    const response = await request(app)
+      .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
+      .send({
+        query: `query {
+        me {
+          session(sessionId: "session 1") {
+            sessionId
+            username
+            question {
               text
+              expectations {
+                text
+              }
             }
-          }
-          userResponses {
-            text
-            expectationScores {
-              classifierGrade
-              graderGrade
+            userResponses {
+              text
+              expectationScores {
+                classifierGrade
+                graderGrade
+              }
             }
-          }
+          }  
         }
       }`,
-    });
+      });
     expect(response.status).to.equal(200);
-    expect(response.body.data.session).to.eql({
+    expect(response.body.data.me.session).to.eql({
       sessionId: 'session 1',
       username: 'new username',
       question: {

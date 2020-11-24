@@ -6,8 +6,24 @@ The full terms of this copyright and license should always be found in the root 
 */
 import passport from 'passport';
 import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt';
-import requireEnv from 'utils/require-env';
+import { Strategy as BearerStrategy } from 'passport-http-bearer';
 import { User as UserSchema } from 'models';
+import requireEnv from 'utils/require-env';
+
+passport.use(
+  new BearerStrategy(function (token, done) {
+    if (token !== requireEnv('API_SECRET')) {
+      return done('invalid api key');
+    } else {
+      const api_user = {
+        _id: 'api_user',
+        name: 'api_user',
+        email: 'api_user',
+      };
+      return done(null, api_user);
+    }
+  })
+);
 
 passport.use(
   new JwtStrategy(
@@ -19,14 +35,16 @@ passport.use(
       try {
         if (token.expirationDate < new Date()) {
           return done('token expired', null);
+        } else {
+          const user = await UserSchema.findOne({ _id: token.id });
+          if (user) {
+            return done(null, user);
+          } else {
+            return done('token invalid', null);
+          }
         }
-        const user = await UserSchema.findOne({ _id: token.id });
-        if (user) {
-          return done(null, user);
-        }
-        return done('token invalid', null);
       } catch (error) {
-        done(error);
+        return done(error);
       }
     }
   )

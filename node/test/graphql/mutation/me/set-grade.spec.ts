@@ -246,30 +246,35 @@ describe('setGrade', () => {
           }
         }`,
       });
-    const session = await request(app).post('/graphql').send({
-      query: `query { 
-          session(sessionId: "session 1") { 
-            username
-            graderGrade
-            classifierGrade
-            question {
-              text
-              expectations {
+    const session = await request(app)
+      .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
+      .send({
+        query: `query {
+          me {
+            session(sessionId: "session 1") { 
+              username
+              graderGrade
+              classifierGrade
+              question {
                 text
+                expectations {
+                  text
+                }
+              }
+              userResponses {
+                text
+                expectationScores {
+                  classifierGrade
+                  graderGrade
+                }
               }
             }
-            userResponses {
-              text
-              expectationScores {
-                classifierGrade
-                graderGrade
-              }
-            }
-          } 
+          }
         }`,
-    });
+      });
     expect(session.status).to.equal(200);
-    expect(session.body.data.session).to.eql({
+    expect(session.body.data.me.session).to.eql({
       username: 'username1',
       graderGrade: null,
       classifierGrade: null,
@@ -317,15 +322,20 @@ describe('setGrade', () => {
           }
         }`,
       });
-    const session = await request(app).post('/graphql').send({
-      query: `query { 
-          session(sessionId: "session 2") { 
-            graderGrade
-          } 
+    const session = await request(app)
+      .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
+      .send({
+        query: `query {
+          me {
+            session(sessionId: "session 2") { 
+              graderGrade
+            }   
+          }
         }`,
-    });
+      });
     expect(session.status).to.equal(200);
-    expect(session.body.data.session).to.eql({
+    expect(session.body.data.me.session).to.eql({
       graderGrade: 1,
     });
   });
@@ -344,15 +354,20 @@ describe('setGrade', () => {
           }
         }`,
       });
-    const session = await request(app).post('/graphql').send({
-      query: `query { 
-          session(sessionId: "session 2") { 
-            graderGrade
-          } 
+    const session = await request(app)
+      .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
+      .send({
+        query: `query {
+          me {
+            session(sessionId: "session 2") { 
+              graderGrade
+            }
+          }
         }`,
-    });
+      });
     expect(session.status).to.equal(200);
-    expect(session.body.data.session).to.eql({
+    expect(session.body.data.me.session).to.eql({
       graderGrade: 0,
     });
   });
@@ -371,15 +386,20 @@ describe('setGrade', () => {
           }
         }`,
       });
-    const session = await request(app).post('/graphql').send({
-      query: `query { 
-          session(sessionId: "session 2") { 
-            graderGrade
-          } 
+    const session = await request(app)
+      .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
+      .send({
+        query: `query {
+          me {
+            session(sessionId: "session 2") { 
+              graderGrade
+            }   
+          }
         }`,
-    });
+      });
     expect(session.status).to.equal(200);
-    expect(session.body.data.session).to.eql({
+    expect(session.body.data.me.session).to.eql({
       graderGrade: 0.5,
     });
   });
@@ -398,15 +418,20 @@ describe('setGrade', () => {
           }
         }`,
       });
-    const session = await request(app).post('/graphql').send({
-      query: `query { 
-          session(sessionId: "session 2") { 
-            graderGrade
-          } 
+    const session = await request(app)
+      .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
+      .send({
+        query: `query {
+          me {
+            session(sessionId: "session 2") { 
+              graderGrade
+            }   
+          }
         }`,
-    });
+      });
     expect(session.status).to.equal(200);
-    expect(session.body.data.session).to.eql({
+    expect(session.body.data.me.session).to.eql({
       graderGrade: null,
     });
   });

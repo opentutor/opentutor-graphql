@@ -5,19 +5,34 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import { GraphQLObjectType } from 'graphql';
-import { UserAccessToken, generateToken } from 'models/UserAccessToken';
-import UserAccessTokenType from 'gql/types/user-access-token';
 import { User } from 'models/User';
+import lesson from './lesson';
+import lessons from './lessons';
+import session from './session';
+import sessions from './sessions';
+import trainingData from './training-data';
 
-export const login = {
-  type: UserAccessTokenType,
-  resolve: async (
-    _root: GraphQLObjectType,
-    args: any,
-    context: { user: User }
-  ): Promise<UserAccessToken> => {
-    return generateToken(context.user);
+export const Me: GraphQLObjectType = new GraphQLObjectType({
+  name: 'MeQuery',
+  fields: {
+    lesson,
+    lessons,
+    session,
+    sessions,
+    trainingData,
+  },
+});
+
+export const me = {
+  type: Me,
+  resolve: (_: any, args: any, context: { user: User }) => {
+    if (!context.user) {
+      throw new Error('Only authenticated users');
+    }
+    return {
+      user: context.user,
+    };
   },
 };
 
-export default login;
+export default me;
