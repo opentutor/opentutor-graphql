@@ -15,6 +15,8 @@ export interface User extends Document {
   email: string;
   name: string;
   password: string;
+  isAdmin: boolean;
+  isContentManager: boolean;
 }
 
 export const UserSchema = new Schema(
@@ -23,6 +25,8 @@ export const UserSchema = new Schema(
     email: { type: String },
     name: { type: String },
     password: { type: String },
+    isAdmin: { type: Boolean },
+    isContentManager: { type: Boolean },
   },
   { timestamps: true, collation: { locale: 'en', strength: 2 } }
 );

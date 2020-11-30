@@ -11,6 +11,7 @@ import setGrade from './set-grade';
 import updateLastTrainedAt from './update-last-trained-at';
 import updateLesson from './update-lesson';
 import updateSession from './update-session';
+import updateUserPermissions from './update-user-permissions';
 
 export const Me: GraphQLObjectType = new GraphQLObjectType({
   name: 'MeMutation',
@@ -20,6 +21,7 @@ export const Me: GraphQLObjectType = new GraphQLObjectType({
     updateLastTrainedAt,
     updateLesson,
     updateSession,
+    updateUserPermissions,
   },
 });
 

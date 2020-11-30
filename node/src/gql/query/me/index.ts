@@ -11,6 +11,7 @@ import lessons from './lessons';
 import session from './session';
 import sessions from './sessions';
 import trainingData from './training-data';
+import users from './users';
 
 export const Me: GraphQLObjectType = new GraphQLObjectType({
   name: 'MeQuery',
@@ -20,6 +21,7 @@ export const Me: GraphQLObjectType = new GraphQLObjectType({
     session,
     sessions,
     trainingData,
+    users,
   },
 });
 

@@ -610,16 +610,22 @@ module.exports = {
       _id: ObjectId('5f0cfea3395d762ca65405d1'),
       name: 'Admin',
       email: 'admin@opentutor.com',
+      isAdmin: true,
+      isContentManager: false,
     },
     {
       _id: ObjectId('5f0cfea3395d762ca65405d2'),
       name: 'Content Manager',
       email: 'manager@opentutor.com',
+      isAdmin: false,
+      isContentManager: true,
     },
     {
       _id: ObjectId('5f0cfea3395d762ca65405d3'),
       name: 'Editor',
       email: 'editor@opentutor.com',
+      isAdmin: false,
+      isContentManager: false,
     },
   ],
 };
