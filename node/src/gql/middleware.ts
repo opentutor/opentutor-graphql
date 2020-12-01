@@ -4,29 +4,34 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import path from 'path';
-import jwt from 'jsonwebtoken';
+import passport from 'passport';
+import { graphqlHTTP } from 'express-graphql';
+import schema from './schema';
+import { Request, Response } from 'express';
+import { User } from 'models/User';
 
-export function fixturePath(p: string): string {
-  return path.join(__dirname, 'fixtures', p);
+function isApiReq(req: Request): boolean {
+  return Boolean(req.headers['opentutor-api-req']);
 }
 
-// duration of access token in seconds before it expires
-export function accessTokenDuration(): number {
-  return process.env.ACCESS_TOKEN_LENGTH
-    ? parseInt(process.env.ACCESS_TOKEN_LENGTH)
-    : 60 * 60 * 24 * 90;
-}
-
-export function getToken(userId: string, expiresIn?: number): string {
-  if (!expiresIn) {
-    expiresIn = accessTokenDuration();
-  }
-  const expirationDate = new Date(Date.now() + expiresIn * 1000);
-  const accessToken = jwt.sign(
-    { id: userId, expirationDate },
-    process.env.JWT_SECRET,
-    { expiresIn: expirationDate.getTime() - new Date().getTime() }
-  );
-  return accessToken;
-}
+export default graphqlHTTP((req: Request, res: Response) => {
+  return new Promise((resolve) => {
+    const next = (user: User) => {
+      resolve({
+        schema,
+        graphiql: true,
+        context: {
+          user: user || null,
+        },
+      });
+    };
+    /**
+     * Try to authenticate using passport,
+     * but never block the call from here.
+     */
+    const authType = isApiReq(req) ? 'bearer' : 'jwt';
+    passport.authenticate(authType, { session: false }, (err, user) => {
+      next(user);
+    })(req, res, next);
+  });
+});

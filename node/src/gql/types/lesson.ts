@@ -31,14 +31,6 @@ const LessonExpectationType = new GraphQLObjectType({
   },
 });
 
-const UserPermissionType = new GraphQLObjectType({
-  name: 'UserPermission',
-  fields: {
-    view: { type: GraphQLBoolean },
-    edit: { type: GraphQLBoolean },
-  },
-});
-
 export const LessonType = new GraphQLObjectType({
   name: 'Lesson',
   fields: {
@@ -58,19 +50,6 @@ export const LessonType = new GraphQLObjectType({
     trainingConfig: { type: GraphQLString },
     createdBy: { type: GraphQLID },
     createdByName: { type: GraphQLString },
-    userPermissions: {
-      type: UserPermissionType,
-      args: {
-        user: { type: GraphQLID },
-      },
-      resolve: async function (lesson, args: { user: string }) {
-        // TODO: should have context.user and check for permissions
-        return {
-          view: true,
-          edit: false,
-        };
-      },
-    },
     isTrainable: {
       type: GraphQLBoolean,
       resolve: async function (lesson) {

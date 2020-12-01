@@ -10,6 +10,7 @@ import { Express } from 'express';
 import { describe } from 'mocha';
 import mongoUnit from 'mongo-unit';
 import request from 'supertest';
+import { getToken } from '../../../helpers';
 
 describe('lesson', () => {
   let app: Express;
@@ -25,15 +26,37 @@ describe('lesson', () => {
     await mongoUnit.drop();
   });
 
-  it(`returns an error if invalid id`, async () => {
+  it(`returns an error if not logged in`, async () => {
     const response = await request(app).post('/graphql').send({
       query: `query {
-        lesson(lessonId: "111111111111111111111111") {
-          lessonId
+        me {
+          lesson(lessonId: "111111111111111111111111") {
+            lessonId
+          }
         }
       }`,
     });
+    expect(response.status).to.equal(200);
+    expect(response.body).to.have.deep.nested.property(
+      'errors[0].message',
+      'Only authenticated users'
+    );
+  });
 
+  it(`returns an error if invalid id`, async () => {
+    const token = getToken('5f0cfea3395d762ca65405d1');
+    const response = await request(app)
+      .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
+      .send({
+        query: `query {
+        me {
+          lesson(lessonId: "111111111111111111111111") {
+            lessonId
+          }  
+        }
+      }`,
+      });
     expect(response.status).to.equal(200);
     expect(response.body).to.have.deep.nested.property(
       'errors[0].message',
@@ -42,14 +65,19 @@ describe('lesson', () => {
   });
 
   it(`cannot find a deleted lesson`, async () => {
-    const response = await request(app).post('/graphql').send({
-      query: `query {
-        lesson(lessonId: "_deleted_lesson") {
-          lessonId
+    const token = getToken('5f0cfea3395d762ca65405d1');
+    const response = await request(app)
+      .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
+      .send({
+        query: `query {
+        me {
+          lesson(lessonId: "_deleted_lesson") {
+            lessonId
+          }  
         }
       }`,
-    });
-
+      });
     expect(response.status).to.equal(200);
     expect(response.body).to.have.deep.nested.property(
       'errors[0].message',
@@ -57,32 +85,58 @@ describe('lesson', () => {
     );
   });
 
-  it('succeeds with valid id', async () => {
-    const response = await request(app).post('/graphql').send({
-      query: `query {
-        lesson(lessonId: "lesson1") {
-          lessonId
-          name
-          intro
-          question
-          image
-          expectations {
-            expectation
-            hints {
-              text
-            }
-            features
+  it('succeeds with api key', async () => {
+    const response = await request(app)
+      .post('/graphql')
+      .set('opentutor-api-req', 'true')
+      .set('Authorization', `bearer ${process.env.API_SECRET}`)
+      .send({
+        query: `query {
+        me {
+          lesson(lessonId: "lesson1") {
+            lessonId
           }
-          conclusion
-          lastTrainedAt
-          features
-          createdBy
-          createdByName
         }
       }`,
-    });
+      });
     expect(response.status).to.equal(200);
-    expect(response.body.data.lesson).to.eql({
+    expect(response.body.data.me.lesson).to.eql({
+      lessonId: 'lesson1',
+    });
+  });
+
+  it('succeeds with logged in user', async () => {
+    const token = getToken('5f0cfea3395d762ca65405d1');
+    const response = await request(app)
+      .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
+      .send({
+        query: `query {
+        me {
+          lesson(lessonId: "lesson1") {
+            lessonId
+            name
+            intro
+            question
+            image
+            expectations {
+              expectation
+              hints {
+                text
+              }
+              features
+            }
+            conclusion
+            lastTrainedAt
+            features
+            createdBy
+            createdByName
+          }
+        }
+      }`,
+      });
+    expect(response.status).to.equal(200);
+    expect(response.body.data.me.lesson).to.eql({
       lessonId: 'lesson1',
       name: 'lesson name',
       intro: 'intro text',
@@ -123,18 +177,24 @@ describe('lesson', () => {
   });
 
   it('get training additional features', async () => {
-    const response = await request(app).post('/graphql').send({
-      query: `query {
-        lesson(lessonId: "lesson8") {
-          features
-          expectations {
-            features
+    const token = getToken('5f0cfea3395d762ca65405d1');
+    const response = await request(app)
+      .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
+      .send({
+        query: `query {
+          me {
+            lesson(lessonId: "lesson8") {
+              features
+              expectations {
+                features
+              }
+            }  
           }
-        }
-      }`,
-    });
+        }`,
+      });
     expect(response.status).to.equal(200);
-    expect(response.body.data.lesson).to.eql({
+    expect(response.body.data.me.lesson).to.eql({
       features: {
         test: 'test',
         question: 'fake question',
@@ -158,64 +218,88 @@ describe('lesson', () => {
   });
 
   it('is not trainable if fewer than 10 grades per expectation', async () => {
-    const response = await request(app).post('/graphql').send({
-      query: `query {
-        lesson(lessonId: "lesson3") {
-          lessonId
-          isTrainable
-        }
-      }`,
-    });
+    const token = getToken('5f0cfea3395d762ca65405d1');
+    const response = await request(app)
+      .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
+      .send({
+        query: `query {
+          me {
+            lesson(lessonId: "lesson3") {
+              lessonId
+              isTrainable
+            }  
+          }
+        }`,
+      });
     expect(response.status).to.equal(200);
-    expect(response.body.data.lesson).to.eql({
+    expect(response.body.data.me.lesson).to.eql({
       lessonId: 'lesson3',
       isTrainable: false,
     });
   });
 
   it('is not trainable if fewer than 2 Good grades per expectation', async () => {
-    const response = await request(app).post('/graphql').send({
-      query: `query {
-        lesson(lessonId: "lesson4") {
-          lessonId
-          isTrainable
-        }
-      }`,
-    });
+    const token = getToken('5f0cfea3395d762ca65405d1');
+    const response = await request(app)
+      .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
+      .send({
+        query: `query {
+          me {
+            lesson(lessonId: "lesson4") {
+              lessonId
+              isTrainable
+            }    
+          }
+        }`,
+      });
     expect(response.status).to.equal(200);
-    expect(response.body.data.lesson).to.eql({
+    expect(response.body.data.me.lesson).to.eql({
       lessonId: 'lesson4',
       isTrainable: false,
     });
   });
 
   it('is not trainable if fewer than 2 Bad grades per expectation', async () => {
-    const response = await request(app).post('/graphql').send({
-      query: `query {
-        lesson(lessonId: "lesson5") {
-          lessonId
-          isTrainable
+    const token = getToken('5f0cfea3395d762ca65405d1');
+    const response = await request(app)
+      .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
+      .send({
+        query: `query {
+        me {
+          lesson(lessonId: "lesson5") {
+            lessonId
+            isTrainable
+          }  
         }
       }`,
-    });
+      });
     expect(response.status).to.equal(200);
-    expect(response.body.data.lesson).to.eql({
+    expect(response.body.data.me.lesson).to.eql({
       lessonId: 'lesson5',
       isTrainable: false,
     });
   });
 
   it('is trainable if at least 2 good, 2 bad, and 10 total grades per expectation', async () => {
-    const response = await request(app).post('/graphql').send({
-      query: `query {
-        lesson(lessonId: "lesson6") {
-          lessonId
-          isTrainable
+    const token = getToken('5f0cfea3395d762ca65405d1');
+    const response = await request(app)
+      .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
+      .send({
+        query: `query {
+        me {
+          lesson(lessonId: "lesson6") {
+            lessonId
+            isTrainable
+          }  
         }
       }`,
-    });
+      });
     expect(response.status).to.equal(200);
-    expect(response.body.data.lesson).to.eql({
+    expect(response.body.data.me.lesson).to.eql({
       lessonId: 'lesson6',
       isTrainable: true,
     });

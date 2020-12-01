@@ -6,55 +6,59 @@ The full terms of this copyright and license should always be found in the root 
 */
 import { GraphQLString, GraphQLObjectType } from 'graphql';
 import LessonType from 'gql/types/lesson';
-import { Lesson as LessonSchema, Session, User } from 'models';
+import { Lesson as LessonModel, Session as SessionModel } from 'models';
 import { Lesson } from 'models/Lesson';
+import { User } from 'models/User';
 
-export const updateLesson = {
+export const deleteLesson = {
   type: LessonType,
   args: {
     lessonId: { type: GraphQLString },
-    lesson: { type: GraphQLString },
   },
   resolve: async (
     _root: GraphQLObjectType,
-    args: { lessonId: string; lesson: string }
+    args: { lessonId: string },
+    context: { user: User }
   ): Promise<Lesson> => {
     if (!args.lessonId) {
       throw new Error('missing required param lessonId');
     }
-    if (!args.lesson) {
-      throw new Error('missing required param lesson');
+    const lesson = await LessonModel.findOne({ lessonId: args.lessonId });
+    if (lesson.deleted || lesson.lessonId.startsWith('_deleted_')) {
+      throw new Error('lesson was already deleted');
     }
-    const lesson: Lesson = JSON.parse(decodeURI(args.lesson));
-    if (lesson.deleted) {
-      throw new Error('lesson was deleted');
-    }
-    if (
-      !args.lessonId.match(/^[a-z0-9\-]+$/) ||
-      !lesson.lessonId.match(/^[a-z0-9\-]+$/)
-    ) {
-      throw new Error('lessonId must match [a-z0-9-]');
+    if (!LessonModel.userCanEdit(context.user, lesson)) {
+      throw new Error('user does not have permission to edit this lesson');
     }
 
-    await Session.updateLesson(args.lessonId, lesson);
-    const createdBy = await User.findOne({ _id: lesson.createdBy });
-
-    return await LessonSchema.findOneAndUpdate(
+    const date = new Date();
+    const deletedId = `_deleted_${args.lessonId}_${date.getTime()}`;
+    await SessionModel.updateMany(
       {
         lessonId: args.lessonId,
       },
       {
         $set: {
-          ...lesson,
-          createdByName: createdBy ? createdBy.name : '',
+          deleted: true,
+          lessonId: deletedId,
+        },
+      }
+    );
+    return await LessonModel.findOneAndUpdate(
+      {
+        lessonId: args.lessonId,
+      },
+      {
+        $set: {
+          deleted: true,
+          lessonId: deletedId,
         },
       },
       {
         new: true, // return the updated doc rather than pre update
-        upsert: true,
       }
     );
   },
 };
 
-export default updateLesson;
+export default deleteLesson;

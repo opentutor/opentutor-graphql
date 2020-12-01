@@ -5,43 +5,51 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import { GraphQLString, GraphQLObjectType } from 'graphql';
-import { Lesson, Session } from 'models';
-import TrainingDataType from 'gql/types/training-data';
-import * as YAML from 'yaml';
+import { User as UserSchema } from 'models';
+import {
+  UserAccessTokenType,
+  UserAccessToken,
+  generateAccessToken,
+  decodeAccessToken,
+} from 'gql/types/user-access-token';
 
-export interface TrainingData {
-  config: string;
-  training: string;
-  isTrainable: boolean;
-}
-
-export const trainingData = {
-  type: TrainingDataType,
+export const login = {
+  type: UserAccessTokenType,
   args: {
-    lessonId: { type: GraphQLString },
+    accessToken: { type: GraphQLString },
   },
   resolve: async (
     _root: GraphQLObjectType,
-    args: { lessonId: string }
-  ): Promise<TrainingData> => {
-    if (!args.lessonId) {
-      throw new Error('missing required param lessonId');
+    args: { accessToken: string }
+  ): Promise<UserAccessToken> => {
+    if (!args.accessToken) {
+      throw new Error('missing required param accessToken');
     }
-    const trainingData = await Session.getTrainingData(args.lessonId);
-    const lesson = await Lesson.findOne({ lessonId: args.lessonId });
-    const config = {
-      expectations: lesson.expectations.map((exp) => {
-        return { ideal: exp.expectation, features: exp.features };
-      }),
-      question: lesson.question,
-    };
-
-    return {
-      config: YAML.stringify(config),
-      training: trainingData.csv,
-      isTrainable: trainingData.isTrainable,
-    };
+    try {
+      const decoded = decodeAccessToken(args.accessToken);
+      const userId = decoded.id;
+      const user = await UserSchema.findOneAndUpdate(
+        {
+          _id: userId,
+        },
+        {
+          $set: {
+            lastLoginAt: new Date(),
+          },
+        },
+        {
+          new: true,
+          upsert: false,
+        }
+      );
+      if (!user) {
+        throw new Error('invalid token');
+      }
+      return generateAccessToken(user);
+    } catch (error) {
+      throw new Error(error);
+    }
   },
 };
 
-export default trainingData;
+export default login;

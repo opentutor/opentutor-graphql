@@ -6,8 +6,9 @@ The full terms of this copyright and license should always be found in the root 
 */
 import { GraphQLString, GraphQLInt, GraphQLObjectType } from 'graphql';
 import SessionType from 'gql/types/session';
-import { Session as SessionModel } from 'models';
+import { Session as SessionModel, Lesson as LessonModel } from 'models';
 import { Session } from 'models/Session';
+import { User } from 'models/User';
 
 export const setGrade = {
   type: SessionType,
@@ -24,7 +25,8 @@ export const setGrade = {
       userAnswerIndex: number;
       userExpectationIndex: number;
       grade: string;
-    }
+    },
+    context: { user: User }
   ): Promise<Session> => {
     if (!args.sessionId) {
       throw new Error('missing required param sessionId');
@@ -37,6 +39,19 @@ export const setGrade = {
     }
     if (!args.grade) {
       throw new Error('missing required param grade');
+    }
+    const session = await SessionModel.findOne({ sessionId: args.sessionId });
+    if (!session) {
+      throw new Error(
+        `failed to find session with sessionId ${args.sessionId}`
+      );
+    }
+    const lesson = await LessonModel.findOne({ lessonId: session.lessonId });
+    if (!lesson) {
+      throw new Error(`session does not have an associated lesson`);
+    }
+    if (!LessonModel.userCanEdit(context.user, lesson)) {
+      throw new Error('user does not have permission to grade this lesson');
     }
     return await SessionModel.setGrade(
       args.sessionId,

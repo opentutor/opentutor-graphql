@@ -5,41 +5,50 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import { GraphQLString, GraphQLObjectType } from 'graphql';
-import LessonType from 'gql/types/lesson';
-import DateType from 'gql/types/date';
-import { Lesson as LessonModel } from 'models';
-import { Lesson } from 'models/Lesson';
+import { Lesson as LessonModel, Session } from 'models';
+import { User } from 'models/User';
+import TrainingDataType from 'gql/types/training-data';
+import * as YAML from 'yaml';
 
-export const updateLastTrainedAt = {
-  type: LessonType,
+export interface TrainingData {
+  config: string;
+  training: string;
+  isTrainable: boolean;
+}
+
+export const trainingData = {
+  type: TrainingDataType,
   args: {
     lessonId: { type: GraphQLString },
-    date: { type: DateType },
   },
   resolve: async (
     _root: GraphQLObjectType,
-    args: { lessonId: string; date: Date }
-  ): Promise<Lesson> => {
+    args: { lessonId: string },
+    context: { user: User }
+  ): Promise<TrainingData> => {
     if (!args.lessonId) {
       throw new Error('missing required param lessonId');
     }
-    if (!args.date) {
-      args.date = new Date();
+    const lesson = await LessonModel.findOne({ lessonId: args.lessonId });
+    if (!LessonModel.userCanEdit(context.user, lesson)) {
+      throw new Error(
+        'user does not have permission to get training data for this lesson'
+      );
     }
+    const trainingData = await Session.getTrainingData(args.lessonId);
+    const config = {
+      expectations: lesson.expectations.map((exp) => {
+        return { ideal: exp.expectation, features: exp.features };
+      }),
+      question: lesson.question,
+    };
 
-    return await LessonModel.findOneAndUpdate(
-      {
-        lessonId: args.lessonId,
-      },
-      {
-        lastTrainedAt: args.date,
-      },
-      {
-        new: true, // return the updated doc rather than pre update
-        upsert: true,
-      }
-    );
+    return {
+      config: YAML.stringify(config),
+      training: trainingData.csv,
+      isTrainable: trainingData.isTrainable,
+    };
   },
 };
 
-export default updateLastTrainedAt;
+export default trainingData;

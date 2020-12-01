@@ -40,4 +40,12 @@ module.exports = {
       createdBy: 'BBB',
     },
   ],
+
+  users: [
+    {
+      _id: ObjectId('5f0cfea3395d762ca65405d1'),
+      name: 'Admin',
+      email: 'admin@opentutor.com',
+    },
+  ],
 };

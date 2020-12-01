@@ -10,17 +10,33 @@ import { PaginatedResolveResult } from './PaginatedResolveResult';
 const mongoPaging = require('mongo-cursor-pagination');
 mongoPaging.config.COLLATION = { locale: 'en', strength: 2 };
 
+export const UserRole = {
+  AUTHOR: 'author',
+  CONTENT_MANAGER: 'contentManager',
+  ADMIN: 'admin',
+};
+
 export interface User extends Document {
   googleId: string;
-  name: string;
   email: string;
+  name: string;
+  password: string;
+  userRole: string;
+  lastLoginAt: Date;
 }
 
 export const UserSchema = new Schema(
   {
     googleId: { type: String },
-    name: { type: String },
     email: { type: String },
+    name: { type: String },
+    password: { type: String },
+    userRole: {
+      type: String,
+      enum: [UserRole.AUTHOR, UserRole.CONTENT_MANAGER, UserRole.ADMIN],
+      default: UserRole.AUTHOR,
+    },
+    lastLoginAt: { type: Date },
   },
   { timestamps: true, collation: { locale: 'en', strength: 2 } }
 );
@@ -35,6 +51,7 @@ export interface UserModel extends Model<User> {
 
 UserSchema.index({ name: -1, _id: -1 });
 UserSchema.index({ email: -1, _id: -1 });
+UserSchema.index({ userRole: -1, _id: -1 });
 UserSchema.plugin(mongoPaging.mongoosePlugin);
 
 export default mongoose.model<User, UserModel>('User', UserSchema);

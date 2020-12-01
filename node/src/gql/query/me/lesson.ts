@@ -4,29 +4,21 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import path from 'path';
-import jwt from 'jsonwebtoken';
+import { GraphQLString } from 'graphql';
+import { Lesson } from 'models';
+import LessonType from 'gql/types/lesson';
+import findOne from 'gql/query/find-one';
 
-export function fixturePath(p: string): string {
-  return path.join(__dirname, 'fixtures', p);
-}
+export const lesson = findOne({
+  model: Lesson,
+  type: LessonType,
+  typeName: 'lesson',
+  argsConfig: {
+    lessonId: {
+      description: 'id of the lesson',
+      type: GraphQLString,
+    },
+  },
+});
 
-// duration of access token in seconds before it expires
-export function accessTokenDuration(): number {
-  return process.env.ACCESS_TOKEN_LENGTH
-    ? parseInt(process.env.ACCESS_TOKEN_LENGTH)
-    : 60 * 60 * 24 * 90;
-}
-
-export function getToken(userId: string, expiresIn?: number): string {
-  if (!expiresIn) {
-    expiresIn = accessTokenDuration();
-  }
-  const expirationDate = new Date(Date.now() + expiresIn * 1000);
-  const accessToken = jwt.sign(
-    { id: userId, expirationDate },
-    process.env.JWT_SECRET,
-    { expiresIn: expirationDate.getTime() - new Date().getTime() }
-  );
-  return accessToken;
-}
+export default lesson;
