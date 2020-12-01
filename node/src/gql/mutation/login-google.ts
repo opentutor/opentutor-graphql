@@ -7,8 +7,11 @@ The full terms of this copyright and license should always be found in the root 
 import axios from 'axios';
 import { GraphQLString, GraphQLObjectType } from 'graphql';
 import { User as UserSchema } from 'models';
-import { UserAccessToken, generateToken } from 'models/UserAccessToken';
-import UserAccessTokenType from 'gql/types/user-access-token';
+import {
+  UserAccessTokenType,
+  UserAccessToken,
+  generateAccessToken,
+} from 'gql/types/user-access-token';
 
 export const loginGoogle = {
   type: UserAccessTokenType,
@@ -25,26 +28,24 @@ export const loginGoogle = {
     try {
       const endpoint = `https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${args.accessToken}`;
       const response = await axios.get(endpoint);
-      let user = await UserSchema.findOne({ googleId: response.data.id });
-      if (!user) {
-        user = await UserSchema.findOneAndUpdate(
-          {
+      const user = await UserSchema.findOneAndUpdate(
+        {
+          googleId: response.data.id,
+        },
+        {
+          $set: {
             googleId: response.data.id,
+            name: response.data.name,
+            email: response.data.email,
+            lastLoginAt: new Date(),
           },
-          {
-            $set: {
-              googleId: response.data.id,
-              name: response.data.name,
-              email: response.data.email,
-            },
-          },
-          {
-            new: true,
-            upsert: true,
-          }
-        );
-      }
-      return generateToken(user);
+        },
+        {
+          new: true,
+          upsert: true,
+        }
+      );
+      return generateAccessToken(user);
     } catch (error) {
       throw new Error(error);
     }

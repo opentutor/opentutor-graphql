@@ -29,7 +29,7 @@ export const updateLastTrainedAt = {
     if (!lesson) {
       throw new Error(`failed to find lesson with lessonId ${args.lessonId}`);
     }
-    if (`${context.user.id}` !== `${lesson.createdBy}`) {
+    if (!LessonModel.userCanEdit(context.user, lesson)) {
       throw new Error('user does not have permission to edit this lesson');
     }
     if (!args.date) {

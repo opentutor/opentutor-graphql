@@ -6,7 +6,7 @@ The full terms of this copyright and license should always be found in the root 
 */
 import { GraphQLString, GraphQLObjectType } from 'graphql';
 import LessonType from 'gql/types/lesson';
-import { Lesson as LessonSchema, Session } from 'models';
+import { Lesson as LessonModel, Session as SessionModel } from 'models';
 import { Lesson } from 'models/Lesson';
 import { User } from 'models/User';
 
@@ -23,17 +23,17 @@ export const deleteLesson = {
     if (!args.lessonId) {
       throw new Error('missing required param lessonId');
     }
-    const lesson = await LessonSchema.findOne({ lessonId: args.lessonId });
+    const lesson = await LessonModel.findOne({ lessonId: args.lessonId });
     if (lesson.deleted || lesson.lessonId.startsWith('_deleted_')) {
       throw new Error('lesson was already deleted');
     }
-    if (`${context.user.id}` !== `${lesson.createdBy}`) {
+    if (!LessonModel.userCanEdit(context.user, lesson)) {
       throw new Error('user does not have permission to edit this lesson');
     }
 
     const date = new Date();
     const deletedId = `_deleted_${args.lessonId}_${date.getTime()}`;
-    await Session.updateMany(
+    await SessionModel.updateMany(
       {
         lessonId: args.lessonId,
       },
@@ -44,7 +44,7 @@ export const deleteLesson = {
         },
       }
     );
-    return await LessonSchema.findOneAndUpdate(
+    return await LessonModel.findOneAndUpdate(
       {
         lessonId: args.lessonId,
       },

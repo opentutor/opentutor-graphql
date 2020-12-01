@@ -5,13 +5,13 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import { GraphQLString, GraphQLObjectType } from 'graphql';
-import {
-  UserAccessToken,
-  generateToken,
-  decodeToken,
-} from 'models/UserAccessToken';
 import { User as UserSchema } from 'models';
-import UserAccessTokenType from 'gql/types/user-access-token';
+import {
+  UserAccessTokenType,
+  UserAccessToken,
+  generateAccessToken,
+  decodeAccessToken,
+} from 'gql/types/user-access-token';
 
 export const login = {
   type: UserAccessTokenType,
@@ -26,13 +26,26 @@ export const login = {
       throw new Error('missing required param accessToken');
     }
     try {
-      const decoded = decodeToken(args.accessToken);
+      const decoded = decodeAccessToken(args.accessToken);
       const userId = decoded.id;
-      const user = await UserSchema.findOne({ _id: userId });
+      const user = await UserSchema.findOneAndUpdate(
+        {
+          _id: userId,
+        },
+        {
+          $set: {
+            lastLoginAt: new Date(),
+          },
+        },
+        {
+          new: true,
+          upsert: false,
+        }
+      );
       if (!user) {
         throw new Error('invalid token');
       }
-      return generateToken(user);
+      return generateAccessToken(user);
     } catch (error) {
       throw new Error(error);
     }

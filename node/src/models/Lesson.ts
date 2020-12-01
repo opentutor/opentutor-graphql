@@ -6,6 +6,7 @@ The full terms of this copyright and license should always be found in the root 
 */
 import mongoose, { Schema, Document, Model } from 'mongoose';
 import { PaginatedResolveResult } from './PaginatedResolveResult';
+import { User, UserRole } from './User';
 
 const mongoPaging = require('mongo-cursor-pagination');
 mongoPaging.config.COLLATION = { locale: 'en', strength: 2 };
@@ -69,7 +70,17 @@ export interface LessonModel extends Model<Lesson> {
     options?: any,
     callback?: any
   ): Promise<PaginatedResolveResult<Lesson>>;
+
+  userCanEdit(user: User, lesson: Lesson): boolean;
 }
+
+LessonSchema.statics.userCanEdit = function (user: User, lesson: Lesson) {
+  return (
+    user.userRole === UserRole.ADMIN ||
+    user.userRole === UserRole.CONTENT_MANAGER ||
+    `${user._id}` === `${lesson.createdBy}`
+  );
+};
 
 LessonSchema.index({ name: -1, _id: -1 });
 LessonSchema.index({ createdByName: -1, _id: -1 });

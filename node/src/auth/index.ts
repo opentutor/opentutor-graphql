@@ -8,7 +8,10 @@ import passport from 'passport';
 import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt';
 import { Strategy as BearerStrategy } from 'passport-http-bearer';
 import { User as UserSchema } from 'models';
+import { UserRole } from 'models/User';
 import requireEnv from 'utils/require-env';
+
+export const API_USER = 'api_user';
 
 passport.use(
   new BearerStrategy(function (token, done) {
@@ -16,9 +19,10 @@ passport.use(
       return done('invalid api key');
     } else {
       const api_user = {
-        _id: 'api_user',
-        name: 'api_user',
-        email: 'api_user',
+        _id: API_USER,
+        name: API_USER,
+        email: API_USER,
+        userRole: UserRole.ADMIN,
       };
       return done(null, api_user);
     }

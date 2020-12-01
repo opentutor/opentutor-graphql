@@ -7,8 +7,11 @@ The full terms of this copyright and license should always be found in the root 
 import bcrypt from 'bcrypt';
 import { GraphQLString, GraphQLObjectType } from 'graphql';
 import { User as UserSchema } from 'models';
-import { UserAccessToken, generateToken } from 'models/UserAccessToken';
-import UserAccessTokenType from 'gql/types/user-access-token';
+import {
+  UserAccessTokenType,
+  UserAccessToken,
+  generateAccessToken,
+} from 'gql/types/user-access-token';
 
 const BCRYPT_SALT_ROUNDS = 12;
 
@@ -49,6 +52,7 @@ export const signup = {
                 email: args.email,
                 name: args.name,
                 password: hashedPassword,
+                lastLoginAt: new Date(),
               },
             },
             {
@@ -57,7 +61,7 @@ export const signup = {
             }
           )
             .then((user) => {
-              const token = generateToken(user);
+              const token = generateAccessToken(user);
               resolve(token);
             })
             .catch((err) => reject(err));

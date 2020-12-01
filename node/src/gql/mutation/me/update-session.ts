@@ -7,8 +7,8 @@ The full terms of this copyright and license should always be found in the root 
 import { GraphQLString, GraphQLObjectType } from 'graphql';
 import SessionType from 'gql/types/session';
 import {
-  Lesson as LessonSchema,
-  Session as SessionSchema,
+  Lesson as LessonModel,
+  Session as SessionModel,
   User as UserModel,
 } from 'models';
 import { Session } from 'models/Session';
@@ -53,19 +53,18 @@ export const updateSession = {
         throw new Error('session has an invalid answer (empty response text)');
       }
     });
-    const lesson = await LessonSchema.findOne({ lessonId: session.lessonId });
+    const lesson = await LessonModel.findOne({ lessonId: session.lessonId });
     if (lesson.deleted || lesson.lessonId.startsWith('_deleted_')) {
       throw new Error('lesson was deleted');
     }
-    if (`${context.user.id}` !== `${lesson.createdBy}`) {
+    if (!LessonModel.userCanEdit(context.user, lesson)) {
       throw new Error('user does not have permission to edit this lesson');
     }
-
     const grade = calculateScore(session, 'graderGrade');
     const classifierGrade = calculateScore(session, 'classifierGrade');
     const createdBy = await UserModel.findOne({ _id: lesson.createdBy });
 
-    return await SessionSchema.findOneAndUpdate(
+    return await SessionModel.findOneAndUpdate(
       {
         sessionId: args.sessionId,
       },

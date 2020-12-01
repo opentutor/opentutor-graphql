@@ -6,7 +6,7 @@ The full terms of this copyright and license should always be found in the root 
 */
 import { Session } from 'models';
 import SessionType from 'gql/types/session';
-import findAll from '../find-all';
+import findAll from 'gql/query/find-all';
 
 export const sessions = findAll({
   nodeType: SessionType,

@@ -365,11 +365,6 @@ describe('sessions', () => {
         },
         {
           node: {
-            sessionId: 'session 3',
-          },
-        },
-        {
-          node: {
             sessionId: 'session 2',
           },
         },

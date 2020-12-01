@@ -90,7 +90,7 @@ describe('updateUserPermissions', () => {
     expect(response.status).to.equal(200);
     expect(response.body).to.have.deep.nested.property(
       'errors[0].message',
-      'permissionLevel must be "admin", "contentManager", or "author"'
+      'permissionLevel must be "author", "contentManager", or "admin"'
     );
   });
 
@@ -195,91 +195,173 @@ describe('updateUserPermissions', () => {
     );
   });
 
-  it(`admin can give admin`, async () => {
-    const token = getToken('5f0cfea3395d762ca65405d1');
-    const response = await request(app)
-      .post('/graphql')
-      .set('Authorization', `bearer ${token}`)
-      .send({
-        query: `mutation {
+  [
+    {
+      user: '5f0cfea3395d762ca65405d2',
+      userToEdit: '5f0cfea3395d762ca65405d1',
+      userRole: 'contentManager',
+      userToEditRole: 'admin',
+      permissionLevel: 'contentManager',
+    },
+    {
+      user: '5f0cfea3395d762ca65405d2',
+      userToEdit: '5f0cfea3395d762ca65405d1',
+      userRole: 'contentManager',
+      userToEditRole: 'admin',
+      permissionLevel: 'author',
+    },
+    {
+      user: '5f0cfea3395d762ca65405d2',
+      userToEdit: '5f0cfea3395d762ca65405d2',
+      userRole: 'contentManager',
+      userToEditRole: 'contentManager',
+      permissionLevel: 'admin',
+    },
+    {
+      user: '5f0cfea3395d762ca65405d2',
+      userToEdit: '5f0cfea3395d762ca65405d3',
+      userRole: 'contentManager',
+      userToEditRole: 'author',
+      permissionLevel: 'admin',
+    },
+    {
+      user: '5f0cfea3395d762ca65405d3',
+      userToEdit: '5f0cfea3395d762ca65405d3',
+      userRole: 'author',
+      userToEditRole: 'author',
+      permissionLevel: 'admin',
+    },
+    {
+      user: '5f0cfea3395d762ca65405d3',
+      userToEdit: '5f0cfea3395d762ca65405d3',
+      userRole: 'author',
+      userToEditRole: 'author',
+      permissionLevel: 'contentManager',
+    },
+    {
+      user: '5f0cfea3395d762ca65405d3',
+      userToEdit: '5f0cfea3395d762ca65405d2',
+      userRole: 'author',
+      userToEditRole: 'contentManager',
+      permissionLevel: 'admin',
+    },
+    {
+      user: '5f0cfea3395d762ca65405d3',
+      userToEdit: '5f0cfea3395d762ca65405d2',
+      userRole: 'author',
+      userToEditRole: 'contentManager',
+      permissionLevel: 'author',
+    },
+    {
+      user: '5f0cfea3395d762ca65405d3',
+      userToEdit: '5f0cfea3395d762ca65405d1',
+      userRole: 'author',
+      userToEditRole: 'admin',
+      permissionLevel: 'author',
+    },
+    {
+      user: '5f0cfea3395d762ca65405d3',
+      userToEdit: '5f0cfea3395d762ca65405d1',
+      userRole: 'author',
+      userToEditRole: 'admin',
+      permissionLevel: 'contentManager',
+    },
+  ].forEach((item: any) => {
+    it(`${item.userRole} user cannot change ${item.userToEditRole} user's role to ${item.permissionLevel}`, async () => {
+      const token = getToken(item.user);
+      const response = await request(app)
+        .post('/graphql')
+        .set('Authorization', `bearer ${token}`)
+        .send({
+          query: `mutation {
           me {
-            updateUserPermissions(userId: "5f0cfea3395d762ca65405d3", permissionLevel: "admin") {
-              isAdmin
-              isContentManager
+            updateUserPermissions(userId: "${item.userToEdit}", permissionLevel: "${item.permissionLevel}") {
+              userRole
             }
           }
         }`,
-      });
-    expect(response.status).to.equal(200);
-    expect(response.body.data.me.updateUserPermissions).to.eql({
-      isAdmin: true,
-      isContentManager: false,
+        });
+      expect(response.status).to.equal(200);
+      expect(response.body).to.have.deep.nested.property('errors[0].message');
     });
   });
 
-  it(`admin can edit an admin`, async () => {
-    const token = getToken('5f0cfea3395d762ca65405d1');
-    const response = await request(app)
-      .post('/graphql')
-      .set('Authorization', `bearer ${token}`)
-      .send({
-        query: `mutation {
+  [
+    {
+      user: '5f0cfea3395d762ca65405d1',
+      userToEdit: '5f0cfea3395d762ca65405d1',
+      userRole: 'admin',
+      userToEditRole: 'admin',
+      permissionLevel: 'contentManager',
+    },
+    {
+      user: '5f0cfea3395d762ca65405d1',
+      userToEdit: '5f0cfea3395d762ca65405d1',
+      userRole: 'admin',
+      userToEditRole: 'admin',
+      permissionLevel: 'author',
+    },
+    {
+      user: '5f0cfea3395d762ca65405d1',
+      userToEdit: '5f0cfea3395d762ca65405d2',
+      userRole: 'admin',
+      userToEditRole: 'contentManager',
+      permissionLevel: 'admin',
+    },
+    {
+      user: '5f0cfea3395d762ca65405d1',
+      userToEdit: '5f0cfea3395d762ca65405d2',
+      userRole: 'admin',
+      userToEditRole: 'contentManager',
+      permissionLevel: 'author',
+    },
+    {
+      user: '5f0cfea3395d762ca65405d1',
+      userToEdit: '5f0cfea3395d762ca65405d3',
+      userRole: 'admin',
+      userToEditRole: 'author',
+      permissionLevel: 'admin',
+    },
+    {
+      user: '5f0cfea3395d762ca65405d1',
+      userToEdit: '5f0cfea3395d762ca65405d3',
+      userRole: 'admin',
+      userToEditRole: 'author',
+      permissionLevel: 'contentManager',
+    },
+    {
+      user: '5f0cfea3395d762ca65405d2',
+      userToEdit: '5f0cfea3395d762ca65405d2',
+      userRole: 'contentManager',
+      userToEditRole: 'contentManager',
+      permissionLevel: 'author',
+    },
+    {
+      user: '5f0cfea3395d762ca65405d2',
+      userToEdit: '5f0cfea3395d762ca65405d3',
+      userRole: 'contentManager',
+      userToEditRole: 'author',
+      permissionLevel: 'contentManager',
+    },
+  ].forEach((item: any) => {
+    it(`${item.userRole} user can change ${item.userToEditRole} user's role to ${item.permissionLevel}`, async () => {
+      const token = getToken(item.user);
+      const response = await request(app)
+        .post('/graphql')
+        .set('Authorization', `bearer ${token}`)
+        .send({
+          query: `mutation {
           me {
-            updateUserPermissions(userId: "5f0cfea3395d762ca65405d1", permissionLevel: "author") {
-              isAdmin
-              isContentManager
+            updateUserPermissions(userId: "${item.userToEdit}", permissionLevel: "${item.permissionLevel}") {
+              userRole
             }
           }
         }`,
+        });
+      expect(response.status).to.equal(200);
+      expect(response.body.data.me.updateUserPermissions).to.eql({
+        userRole: item.permissionLevel,
       });
-    expect(response.status).to.equal(200);
-    expect(response.body.data.me.updateUserPermissions).to.eql({
-      isAdmin: false,
-      isContentManager: false,
-    });
-  });
-
-  it(`contentManager can give contentManager`, async () => {
-    const token = getToken('5f0cfea3395d762ca65405d2');
-    const response = await request(app)
-      .post('/graphql')
-      .set('Authorization', `bearer ${token}`)
-      .send({
-        query: `mutation {
-          me {
-            updateUserPermissions(userId: "5f0cfea3395d762ca65405d3", permissionLevel: "contentManager") {
-              isAdmin
-              isContentManager
-            }
-          }
-        }`,
-      });
-    expect(response.status).to.equal(200);
-    expect(response.body.data.me.updateUserPermissions).to.eql({
-      isAdmin: false,
-      isContentManager: true,
-    });
-  });
-
-  it(`contentManager can edit a contentManager`, async () => {
-    const token = getToken('5f0cfea3395d762ca65405d2');
-    const response = await request(app)
-      .post('/graphql')
-      .set('Authorization', `bearer ${token}`)
-      .send({
-        query: `mutation {
-          me {
-            updateUserPermissions(userId: "5f0cfea3395d762ca65405d2", permissionLevel: "author") {
-              isAdmin
-              isContentManager
-            }
-          }
-        }`,
-      });
-    expect(response.status).to.equal(200);
-    expect(response.body.data.me.updateUserPermissions).to.eql({
-      isAdmin: false,
-      isContentManager: false,
     });
   });
 });

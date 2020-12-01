@@ -25,7 +25,7 @@ describe('updateLastTrainedAt', () => {
     await mongoUnit.drop();
   });
 
-  it(`returns an error if not logged in`, async () => {
+  it(`throws an error if not logged in`, async () => {
     const response = await request(app).post('/graphql').send({
       query: `mutation {
           me {
@@ -42,7 +42,29 @@ describe('updateLastTrainedAt', () => {
     );
   });
 
-  it(`returns an error if no lessonId`, async () => {
+  it(`throws an error if user does not have permissions`, async () => {
+    const token = getToken('5f0cfea3395d762ca65405d3');
+    const date = new Date();
+    const response = await request(app)
+      .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
+      .send({
+        query: `mutation {
+          me {
+            updateLastTrainedAt(lessonId: "lesson1", date: "${date}") { 
+              lastTrainedAt
+            }   
+          }
+        }`,
+      });
+    expect(response.status).to.equal(200);
+    expect(response.body).to.have.deep.nested.property(
+      'errors[0].message',
+      'user does not have permission to edit this lesson'
+    );
+  });
+
+  it(`throws an error if no lessonId`, async () => {
     const token = getToken('5f0cfea3395d762ca65405d1');
     const response = await request(app)
       .post('/graphql')
@@ -63,7 +85,49 @@ describe('updateLastTrainedAt', () => {
     );
   });
 
-  it(`returns an error if no edit permission`, async () => {
+  it('succeeds for api key', async () => {
+    const date = new Date();
+    const response = await request(app)
+      .post('/graphql')
+      .set('opentutor-api-req', 'true')
+      .set('Authorization', `bearer ${process.env.API_SECRET}`)
+      .send({
+        query: `mutation {
+          me {
+            updateLastTrainedAt(lessonId: "lesson1", date: "${date}") { 
+              lastTrainedAt
+            }   
+          }
+        }`,
+      });
+    expect(response.status).to.equal(200);
+    expect(response.body.data.me.updateLastTrainedAt).to.eql({
+      lastTrainedAt: date.toLocaleString(),
+    });
+  });
+
+  it('succeeds for admin', async () => {
+    const token = getToken('5f0cfea3395d762ca65405d1');
+    const date = new Date();
+    const response = await request(app)
+      .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
+      .send({
+        query: `mutation {
+          me {
+            updateLastTrainedAt(lessonId: "lesson1", date: "${date}") { 
+              lastTrainedAt
+            }   
+          }
+        }`,
+      });
+    expect(response.status).to.equal(200);
+    expect(response.body.data.me.updateLastTrainedAt).to.eql({
+      lastTrainedAt: date.toLocaleString(),
+    });
+  });
+
+  it('succeeds for content manager', async () => {
     const token = getToken('5f0cfea3395d762ca65405d2');
     const date = new Date();
     const response = await request(app)
@@ -79,10 +143,30 @@ describe('updateLastTrainedAt', () => {
         }`,
       });
     expect(response.status).to.equal(200);
-    expect(response.body).to.have.deep.nested.property(
-      'errors[0].message',
-      'user does not have permission to edit this lesson'
-    );
+    expect(response.body.data.me.updateLastTrainedAt).to.eql({
+      lastTrainedAt: date.toLocaleString(),
+    });
+  });
+
+  it('succeeds for lesson creator', async () => {
+    const token = getToken('5f0cfea3395d762ca65405d3');
+    const date = new Date();
+    const response = await request(app)
+      .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
+      .send({
+        query: `mutation {
+          me {
+            updateLastTrainedAt(lessonId: "lesson2", date: "${date}") { 
+              lastTrainedAt
+            }   
+          }
+        }`,
+      });
+    expect(response.status).to.equal(200);
+    expect(response.body.data.me.updateLastTrainedAt).to.eql({
+      lastTrainedAt: date.toLocaleString(),
+    });
   });
 
   it(`update with given date`, async () => {

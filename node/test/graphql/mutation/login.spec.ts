@@ -46,9 +46,7 @@ describe('login', () => {
   });
 
   it(`returns an error if token expired`, async () => {
-    const expirationDate = new Date();
-    expirationDate.setMonth(expirationDate.getMonth() - 10);
-    const token = getToken('5f0cfea3395d762ca65405d1', expirationDate);
+    const token = getToken('5f0cfea3395d762ca65405d1', -1);
     const response = await request(app)
       .post('/graphql')
       .send({
@@ -71,9 +69,8 @@ describe('login', () => {
   });
 
   it(`returns user and updates token`, async () => {
-    const expirationDate = new Date();
-    expirationDate.setMonth(expirationDate.getMonth() + 1);
-    const token = getToken('5f0cfea3395d762ca65405d1', expirationDate);
+    const date = new Date(Date.now() + 3000);
+    const token = getToken('5f0cfea3395d762ca65405d1', 300);
     const response = await request(app)
       .post('/graphql')
       .send({
@@ -95,7 +92,27 @@ describe('login', () => {
     });
     expect(response.body.data.login.accessToken).to.not.eql(token);
     expect(new Date(response.body.data.login.expirationDate)).to.be.greaterThan(
-      expirationDate
+      date
     );
+  });
+
+  it(`updates lastLoginAt`, async () => {
+    const date = new Date(Date.now() - 1000);
+    const token = getToken('5f0cfea3395d762ca65405d1');
+    const response = await request(app)
+      .post('/graphql')
+      .send({
+        query: `mutation {
+          login(accessToken: "${token}") {
+            user {
+              lastLoginAt
+            }
+          } 
+        }`,
+      });
+    expect(response.status).to.equal(200);
+    expect(
+      new Date(response.body.data.login.user.lastLoginAt)
+    ).to.be.greaterThan(date);
   });
 });

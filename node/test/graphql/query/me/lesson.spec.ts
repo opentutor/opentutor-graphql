@@ -105,7 +105,7 @@ describe('lesson', () => {
     });
   });
 
-  it('succeeds with valid id', async () => {
+  it('succeeds with logged in user', async () => {
     const token = getToken('5f0cfea3395d762ca65405d1');
     const response = await request(app)
       .post('/graphql')

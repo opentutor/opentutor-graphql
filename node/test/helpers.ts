@@ -11,14 +11,18 @@ export function fixturePath(p: string): string {
   return path.join(__dirname, 'fixtures', p);
 }
 
-export function getToken(
-  userId: string,
-  expirationDate = new Date(
-    new Date().getFullYear(),
-    new Date().getMonth() + 3,
-    new Date().getDate()
-  )
-): string {
+// duration of access token in seconds before it expires
+export function accessTokenDuration(): number {
+  return process.env.ACCESS_TOKEN_LENGTH
+    ? parseInt(process.env.ACCESS_TOKEN_LENGTH)
+    : 60 * 60 * 24 * 90;
+}
+
+export function getToken(userId: string, expiresIn?: number): string {
+  if (!expiresIn) {
+    expiresIn = accessTokenDuration();
+  }
+  const expirationDate = new Date(Date.now() + expiresIn * 1000);
   const accessToken = jwt.sign(
     { id: userId, expirationDate },
     process.env.JWT_SECRET,

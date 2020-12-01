@@ -60,6 +60,8 @@ module.exports = {
         },
       ],
       conclusion: ['conclusion'],
+      createdBy: ObjectId('5f0cfea3395d762ca65405d3'),
+      createdByName: 'Author',
     },
     {
       _id: ObjectId('5f0cfea3395d762ca65405c3'),
@@ -251,7 +253,7 @@ module.exports = {
     },
     {
       _id: ObjectId('5f20c63646f6110a6a5b2133'),
-      lessonId: 'lesson1',
+      lessonId: 'lesson2',
       sessionId: 'session 3',
       userResponses: [
         {
@@ -610,22 +612,19 @@ module.exports = {
       _id: ObjectId('5f0cfea3395d762ca65405d1'),
       name: 'Admin',
       email: 'admin@opentutor.com',
-      isAdmin: true,
-      isContentManager: false,
+      userRole: 'admin',
     },
     {
       _id: ObjectId('5f0cfea3395d762ca65405d2'),
       name: 'Content Manager',
       email: 'manager@opentutor.com',
-      isAdmin: false,
-      isContentManager: true,
+      userRole: 'contentManager',
     },
     {
       _id: ObjectId('5f0cfea3395d762ca65405d3'),
       name: 'Editor',
       email: 'editor@opentutor.com',
-      isAdmin: false,
-      isContentManager: false,
+      userRole: 'author',
     },
   ],
 };

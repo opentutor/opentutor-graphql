@@ -27,7 +27,7 @@ describe('training data', () => {
     await mongoUnit.drop();
   });
 
-  it(`returns an error if not logged in`, async () => {
+  it(`throws an error if not logged in`, async () => {
     const response = await request(app).post('/graphql').send({
       query: `query {
         me {
@@ -46,7 +46,30 @@ describe('training data', () => {
     );
   });
 
-  it('succeeds with api key', async () => {
+  it(`throws an error if user does not have permissions`, async () => {
+    const token = getToken('5f0cfea3395d762ca65405d3');
+    const response = await request(app)
+      .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
+      .send({
+        query: `query {
+        me {
+          trainingData(lessonId: "lesson1") {
+            isTrainable
+            training
+            config
+          }  
+        }
+      }`,
+      });
+    expect(response.status).to.equal(200);
+    expect(response.body).to.have.deep.nested.property(
+      'errors[0].message',
+      'user does not have permission to get training data for this lesson'
+    );
+  });
+
+  it('succeeds for api key', async () => {
     const response = await request(app)
       .post('/graphql')
       .set('opentutor-api-req', 'true')
@@ -56,33 +79,69 @@ describe('training data', () => {
           me {
             trainingData(lessonId: "lesson1") {
               isTrainable
-              training
-              config
             }  
           }
         }`,
       });
     expect(response.status).to.equal(200);
-    expect(response.body.data.me.trainingData.training).to.eql(
-      'exp_num,text,label\n0,a good answer,Good\n0,a bad answer,Bad\n'
-    );
-    expect(YAML.parse(response.body.data.me.trainingData.config)).to.eql({
-      question: 'question?',
-      expectations: [
-        {
-          ideal: 'expected text 1',
-          features: null,
-        },
-        {
-          ideal: 'expected text 2',
-          features: null,
-        },
-      ],
-    });
     expect(response.body.data.me.trainingData.isTrainable).to.eql(false);
   });
 
-  it(`return all training data for lesson`, async () => {
+  it('succeeds for admin', async () => {
+    const token = getToken('5f0cfea3395d762ca65405d1');
+    const response = await request(app)
+      .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
+      .send({
+        query: `query {
+          me {
+            trainingData(lessonId: "lesson1") {
+              isTrainable
+            }  
+          }
+        }`,
+      });
+    expect(response.status).to.equal(200);
+    expect(response.body.data.me.trainingData.isTrainable).to.eql(false);
+  });
+
+  it('succeeds for content manager', async () => {
+    const token = getToken('5f0cfea3395d762ca65405d2');
+    const response = await request(app)
+      .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
+      .send({
+        query: `query {
+          me {
+            trainingData(lessonId: "lesson1") {
+              isTrainable
+            }  
+          }
+        }`,
+      });
+    expect(response.status).to.equal(200);
+    expect(response.body.data.me.trainingData.isTrainable).to.eql(false);
+  });
+
+  it('succeeds for lesson creator', async () => {
+    const token = getToken('5f0cfea3395d762ca65405d2');
+    const response = await request(app)
+      .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
+      .send({
+        query: `query {
+          me {
+            trainingData(lessonId: "lesson2") {
+              isTrainable
+            }  
+          }
+        }`,
+      });
+    expect(response.status).to.equal(200);
+    expect(response.body.data.me.trainingData.isTrainable).to.eql(false);
+  });
+
+  it(`returns all training data for lesson`, async () => {
     const token = getToken('5f0cfea3395d762ca65405d1');
     const response = await request(app)
       .post('/graphql')
@@ -100,7 +159,7 @@ describe('training data', () => {
       });
     expect(response.status).to.equal(200);
     expect(response.body.data.me.trainingData.training).to.eql(
-      'exp_num,text,label\n0,a good answer,Good\n0,a bad answer,Bad\n'
+      'exp_num,text,label\n0,a bad answer,Bad\n'
     );
     expect(YAML.parse(response.body.data.me.trainingData.config)).to.eql({
       question: 'question?',

@@ -25,7 +25,7 @@ describe('deleteLesson', () => {
     await mongoUnit.drop();
   });
 
-  it(`returns an error if not logged in`, async () => {
+  it(`throws an error if not logged in`, async () => {
     const response = await request(app).post('/graphql').send({
       query: `mutation {
           me {
@@ -42,7 +42,28 @@ describe('deleteLesson', () => {
     );
   });
 
-  it(`returns an error if no lessonId`, async () => {
+  it(`throws an error if user does not have permissions`, async () => {
+    const token = getToken('5f0cfea3395d762ca65405d3');
+    const response = await request(app)
+      .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
+      .send({
+        query: `mutation {
+          me {
+            deleteLesson(lessonId: "lesson1") {
+              deleted
+            }  
+          }
+        }`,
+      });
+    expect(response.status).to.equal(200);
+    expect(response.body).to.have.deep.nested.property(
+      'errors[0].message',
+      'user does not have permission to edit this lesson'
+    );
+  });
+
+  it(`throws an error if no lessonId`, async () => {
     const token = getToken('5f0cfea3395d762ca65405d1');
     const response = await request(app)
       .post('/graphql')
@@ -63,7 +84,7 @@ describe('deleteLesson', () => {
     );
   });
 
-  it(`returns an error if lesson was already deleted`, async () => {
+  it(`throws an error if lesson was already deleted`, async () => {
     const token = getToken('5f0cfea3395d762ca65405d1');
     const response = await request(app)
       .post('/graphql')
@@ -84,7 +105,43 @@ describe('deleteLesson', () => {
     );
   });
 
-  it(`returns an error if no edit permission`, async () => {
+  it('succeeds for api key', async () => {
+    const response = await request(app)
+      .post('/graphql')
+      .set('opentutor-api-req', 'true')
+      .set('Authorization', `bearer ${process.env.API_SECRET}`)
+      .send({
+        query: `mutation {
+          me {
+            deleteLesson(lessonId: "lesson1") {
+              deleted
+            }
+          }
+        }`,
+      });
+    expect(response.status).to.equal(200);
+    expect(response.body.data.me.deleteLesson.deleted).to.eql(true);
+  });
+
+  it('succeeds for admin', async () => {
+    const token = getToken('5f0cfea3395d762ca65405d1');
+    const response = await request(app)
+      .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
+      .send({
+        query: `mutation {
+          me {
+            deleteLesson(lessonId: "lesson1") {
+              deleted
+            }
+          }
+        }`,
+      });
+    expect(response.status).to.equal(200);
+    expect(response.body.data.me.deleteLesson.deleted).to.eql(true);
+  });
+
+  it('succeeds for content manager', async () => {
     const token = getToken('5f0cfea3395d762ca65405d2');
     const response = await request(app)
       .post('/graphql')
@@ -94,15 +151,30 @@ describe('deleteLesson', () => {
           me {
             deleteLesson(lessonId: "lesson1") {
               deleted
-            }  
+            }
           }
         }`,
       });
     expect(response.status).to.equal(200);
-    expect(response.body).to.have.deep.nested.property(
-      'errors[0].message',
-      'user does not have permission to edit this lesson'
-    );
+    expect(response.body.data.me.deleteLesson.deleted).to.eql(true);
+  });
+
+  it('succeeds for lesson creator', async () => {
+    const token = getToken('5f0cfea3395d762ca65405d3');
+    const response = await request(app)
+      .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
+      .send({
+        query: `mutation {
+          me {
+            deleteLesson(lessonId: "lesson2") {
+              deleted
+            }
+          }
+        }`,
+      });
+    expect(response.status).to.equal(200);
+    expect(response.body.data.me.deleteLesson.deleted).to.eql(true);
   });
 
   it(`deletes lesson`, async () => {
@@ -232,6 +304,11 @@ describe('deleteLesson', () => {
           {
             node: {
               sessionId: 'session 6',
+            },
+          },
+          {
+            node: {
+              sessionId: 'session 3',
             },
           },
         ],

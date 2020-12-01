@@ -31,7 +31,74 @@ describe('updateSession', () => {
     await mongoUnit.drop();
   });
 
-  it(`returns an error if no sessionId`, async () => {
+  it(`throws an error if not logged in`, async () => {
+    const session = encodeURI(
+      JSON.stringify({
+        lessonId: 'lesson1',
+        sessionId: 'new session',
+      })
+    );
+    const response = await request(app)
+      .post('/graphql')
+      .send({
+        query: `mutation {
+          me {
+            updateSession(sessionId: "new session", session: "${session}") {
+              sessionId
+            }  
+          }
+        }`,
+      });
+    expect(response.status).to.equal(200);
+    expect(response.body).to.have.deep.nested.property(
+      'errors[0].message',
+      'Only authenticated users'
+    );
+  });
+
+  it(`throws an error if no edit permission`, async () => {
+    const token = getToken('5f0cfea3395d762ca65405d3');
+    const session = encodeURI(
+      JSON.stringify({
+        lessonId: 'lesson1',
+        sessionId: 'new session',
+        username: 'new username',
+        question: {
+          text: 'new question?',
+          expectations: [{ text: 'new expected text' }],
+        },
+        userResponses: [
+          {
+            text: 'new answer',
+            expectationScores: [
+              {
+                classifierGrade: 'Good',
+              },
+            ],
+          },
+        ],
+      })
+    );
+    const response = await request(app)
+      .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
+      .send({
+        query: `mutation {
+          me {
+            updateSession(sessionId: "new session", session: "${session}") {
+              sessionId
+            }  
+          }
+        }`,
+      });
+    expect(response.status).to.equal(200);
+    expect(response.body).to.have.deep.nested.property(
+      'errors[0].message',
+      'user does not have permission to edit this lesson'
+    );
+  });
+
+  it(`throws an error if no sessionId`, async () => {
     const token = getToken('5f0cfea3395d762ca65405d1');
     const response = await request(app)
       .post('/graphql')
@@ -52,7 +119,7 @@ describe('updateSession', () => {
     );
   });
 
-  it(`returns an error if no session`, async () => {
+  it(`throws an error if no session`, async () => {
     const token = getToken('5f0cfea3395d762ca65405d1');
     const response = await request(app)
       .post('/graphql')
@@ -73,7 +140,7 @@ describe('updateSession', () => {
     );
   });
 
-  it(`returns an error if session has no lessonId`, async () => {
+  it(`throws an error if session has no lessonId`, async () => {
     const token = getToken('5f0cfea3395d762ca65405d1');
     const session = encodeURI(
       JSON.stringify({
@@ -114,7 +181,7 @@ describe('updateSession', () => {
     );
   });
 
-  it(`returns an error if session has no sessionId`, async () => {
+  it(`throws an error if session has no sessionId`, async () => {
     const token = getToken('5f0cfea3395d762ca65405d1');
     const session = encodeURI(
       JSON.stringify({
@@ -155,7 +222,7 @@ describe('updateSession', () => {
     );
   });
 
-  it(`returns an error if session has no username`, async () => {
+  it(`throws an error if session has no username`, async () => {
     const token = getToken('5f0cfea3395d762ca65405d1');
     const session = encodeURI(
       JSON.stringify({
@@ -196,7 +263,7 @@ describe('updateSession', () => {
     );
   });
 
-  it(`returns an error if session has no question`, async () => {
+  it(`throws an error if session has no question`, async () => {
     const token = getToken('5f0cfea3395d762ca65405d1');
     const session = encodeURI(
       JSON.stringify({
@@ -234,7 +301,7 @@ describe('updateSession', () => {
     );
   });
 
-  it(`returns an error if session has invalid answer`, async () => {
+  it(`throws an error if session has invalid answer`, async () => {
     const token = getToken('5f0cfea3395d762ca65405d1');
     const session = encodeURI(
       JSON.stringify({
@@ -359,6 +426,129 @@ describe('updateSession', () => {
       'errors[0].message',
       'lesson was deleted'
     );
+  });
+
+  it('succeeds for admin', async () => {
+    const token = getToken('5f0cfea3395d762ca65405d1');
+    const session = encodeURI(
+      JSON.stringify({
+        lessonId: 'lesson1',
+        sessionId: 'new session',
+        username: 'new username',
+        question: {
+          text: 'new question?',
+          expectations: [{ text: 'new expected text' }],
+        },
+        userResponses: [
+          {
+            text: 'new answer',
+            expectationScores: [
+              {
+                classifierGrade: 'Good',
+              },
+            ],
+          },
+        ],
+      })
+    );
+    const response = await request(app)
+      .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
+      .send({
+        query: `mutation {
+          me {
+            updateSession(sessionId: "new session", session: "${session}") {
+              sessionId
+            }  
+          }
+        }`,
+      });
+    expect(response.status).to.equal(200);
+    expect(response.body.data.me.updateSession).to.eql({
+      sessionId: 'new session',
+    });
+  });
+
+  it('succeeds for content manager', async () => {
+    const token = getToken('5f0cfea3395d762ca65405d2');
+    const session = encodeURI(
+      JSON.stringify({
+        lessonId: 'lesson1',
+        sessionId: 'new session',
+        username: 'new username',
+        question: {
+          text: 'new question?',
+          expectations: [{ text: 'new expected text' }],
+        },
+        userResponses: [
+          {
+            text: 'new answer',
+            expectationScores: [
+              {
+                classifierGrade: 'Good',
+              },
+            ],
+          },
+        ],
+      })
+    );
+    const response = await request(app)
+      .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
+      .send({
+        query: `mutation {
+          me {
+            updateSession(sessionId: "new session", session: "${session}") {
+              sessionId
+            }  
+          }
+        }`,
+      });
+    expect(response.status).to.equal(200);
+    expect(response.body.data.me.updateSession).to.eql({
+      sessionId: 'new session',
+    });
+  });
+
+  it('succeeds for lesson creator', async () => {
+    const token = getToken('5f0cfea3395d762ca65405d3');
+    const session = encodeURI(
+      JSON.stringify({
+        lessonId: 'lesson2',
+        sessionId: 'new session',
+        username: 'new username',
+        question: {
+          text: 'new question?',
+          expectations: [{ text: 'new expected text' }],
+        },
+        userResponses: [
+          {
+            text: 'new answer',
+            expectationScores: [
+              {
+                classifierGrade: 'Good',
+              },
+            ],
+          },
+        ],
+      })
+    );
+    const response = await request(app)
+      .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
+      .send({
+        query: `mutation {
+          me {
+            updateSession(sessionId: "new session", session: "${session}") {
+              sessionId
+            }  
+          }
+        }`,
+      });
+    expect(response.status).to.equal(200);
+    expect(response.body.data.me.updateSession).to.eql({
+      sessionId: 'new session',
+    });
   });
 
   it(`returns updated session`, async () => {

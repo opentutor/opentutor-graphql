@@ -6,7 +6,11 @@ The full terms of this copyright and license should always be found in the root 
 */
 import { GraphQLString, GraphQLObjectType } from 'graphql';
 import LessonType from 'gql/types/lesson';
-import { Lesson as LessonSchema, Session, User as UserModel } from 'models';
+import {
+  Lesson as LessonModel,
+  Session as SessionModel,
+  User as UserModel,
+} from 'models';
 import { Lesson } from 'models/Lesson';
 import { User } from 'models/User';
 
@@ -37,14 +41,13 @@ export const updateLesson = {
     ) {
       throw new Error('lessonId must match [a-z0-9-]');
     }
-    if (`${context.user.id}` !== `${lesson.createdBy}`) {
+    if (!LessonModel.userCanEdit(context.user, lesson)) {
       throw new Error('user does not have permission to edit this lesson');
     }
-
-    await Session.updateLesson(args.lessonId, lesson);
+    await SessionModel.updateLesson(args.lessonId, lesson);
     const createdBy = await UserModel.findOne({ _id: lesson.createdBy });
 
-    return await LessonSchema.findOneAndUpdate(
+    return await LessonModel.findOneAndUpdate(
       {
         lessonId: args.lessonId,
       },

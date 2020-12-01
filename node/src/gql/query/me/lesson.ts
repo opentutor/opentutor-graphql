@@ -6,8 +6,8 @@ The full terms of this copyright and license should always be found in the root 
 */
 import { GraphQLString } from 'graphql';
 import { Lesson } from 'models';
-import findOne from '../find-one';
 import LessonType from 'gql/types/lesson';
+import findOne from 'gql/query/find-one';
 
 export const lesson = findOne({
   model: Lesson,

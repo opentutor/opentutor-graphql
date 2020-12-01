@@ -5,9 +5,9 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import { GraphQLString } from 'graphql';
-import SessionType from 'gql/types/session';
 import { Session } from 'models';
-import findOne from '../find-one';
+import SessionType from 'gql/types/session';
+import findOne from 'gql/query/find-one';
 
 export const session = findOne({
   model: Session,

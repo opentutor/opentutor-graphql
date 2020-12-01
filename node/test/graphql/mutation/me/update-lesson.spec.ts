@@ -25,7 +25,7 @@ describe('updateLesson', () => {
     await mongoUnit.drop();
   });
 
-  it(`returns an error if not logged in`, async () => {
+  it(`throws an error if not logged in`, async () => {
     const response = await request(app).post('/graphql').send({
       query: `mutation {
           me {
@@ -42,7 +42,48 @@ describe('updateLesson', () => {
     );
   });
 
-  it(`returns an error if no lessonId`, async () => {
+  it(`throws an error if no edit permission`, async () => {
+    const token = getToken('5f0cfea3395d762ca65405d3');
+    const lesson = encodeURI(
+      JSON.stringify({
+        lessonId: 'newlesson',
+        name: 'new name',
+        intro: 'new intro',
+        question: 'new question',
+        conclusion: ['new conclusion'],
+        createdBy: '5f0cfea3395d762ca65405d1',
+        expectations: [
+          {
+            expectation: 'new expectation',
+            hints: [
+              {
+                text: 'new hint',
+              },
+            ],
+          },
+        ],
+      })
+    );
+    const response = await request(app)
+      .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
+      .send({
+        query: `mutation {
+          me {
+            updateLesson(lessonId: "newlesson", lesson: "${lesson}") {
+              lessonId
+            }   
+          }
+        }`,
+      });
+    expect(response.status).to.equal(200);
+    expect(response.body).to.have.deep.nested.property(
+      'errors[0].message',
+      'user does not have permission to edit this lesson'
+    );
+  });
+
+  it(`throws an error if no lessonId`, async () => {
     const token = getToken('5f0cfea3395d762ca65405d1');
     const response = await request(app)
       .post('/graphql')
@@ -63,7 +104,7 @@ describe('updateLesson', () => {
     );
   });
 
-  it(`returns an error if no lesson`, async () => {
+  it(`throws an error if no lesson`, async () => {
     const token = getToken('5f0cfea3395d762ca65405d1');
     const response = await request(app)
       .post('/graphql')
@@ -81,6 +122,33 @@ describe('updateLesson', () => {
     expect(response.body).to.have.deep.nested.property(
       'errors[0].message',
       'missing required param lesson'
+    );
+  });
+
+  it(`throws an error if lesson was deleted`, async () => {
+    const token = getToken('5f0cfea3395d762ca65405d1');
+    const lesson = encodeURI(
+      JSON.stringify({
+        lessonId: '_deleted_lesson',
+        deleted: true,
+      })
+    );
+    const response = await request(app)
+      .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
+      .send({
+        query: `mutation {
+          me {
+            updateLesson(lessonId: "_deleted_lesson", lesson: "${lesson}") {
+              lessonId
+            }   
+          }
+        }`,
+      });
+    expect(response.status).to.equal(200);
+    expect(response.body).to.have.deep.nested.property(
+      'errors[0].message',
+      'lesson was deleted'
     );
   });
 
@@ -188,12 +256,36 @@ describe('updateLesson', () => {
     );
   });
 
-  it(`throws an error if lesson was deleted`, async () => {
+  it('updates for api key', async () => {
+    const lesson = encodeURI(
+      JSON.stringify({
+        lessonId: 'lesson1',
+      })
+    );
+    const response = await request(app)
+      .post('/graphql')
+      .set('opentutor-api-req', 'true')
+      .set('Authorization', `bearer ${process.env.API_SECRET}`)
+      .send({
+        query: `mutation {
+          me {
+            updateLesson(lessonId: "lesson1", lesson: "${lesson}") {
+              lessonId
+            }   
+          }
+        }`,
+      });
+    expect(response.status).to.equal(200);
+    expect(response.body.data.me.updateLesson).to.eql({
+      lessonId: 'lesson1',
+    });
+  });
+
+  it('updates for admin', async () => {
     const token = getToken('5f0cfea3395d762ca65405d1');
     const lesson = encodeURI(
       JSON.stringify({
-        lessonId: '_deleted_lesson',
-        deleted: true,
+        lessonId: 'lesson1',
       })
     );
     const response = await request(app)
@@ -202,39 +294,23 @@ describe('updateLesson', () => {
       .send({
         query: `mutation {
           me {
-            updateLesson(lessonId: "_deleted_lesson", lesson: "${lesson}") {
+            updateLesson(lessonId: "lesson1", lesson: "${lesson}") {
               lessonId
             }   
           }
         }`,
       });
     expect(response.status).to.equal(200);
-    expect(response.body).to.have.deep.nested.property(
-      'errors[0].message',
-      'lesson was deleted'
-    );
+    expect(response.body.data.me.updateLesson).to.eql({
+      lessonId: 'lesson1',
+    });
   });
 
-  it(`returns an error if no edit permission`, async () => {
+  it('updates for content manager', async () => {
     const token = getToken('5f0cfea3395d762ca65405d2');
     const lesson = encodeURI(
       JSON.stringify({
-        lessonId: 'newlesson',
-        name: 'new name',
-        intro: 'new intro',
-        question: 'new question',
-        conclusion: ['new conclusion'],
-        createdBy: '5f0cfea3395d762ca65405d1',
-        expectations: [
-          {
-            expectation: 'new expectation',
-            hints: [
-              {
-                text: 'new hint',
-              },
-            ],
-          },
-        ],
+        lessonId: 'lesson1',
       })
     );
     const response = await request(app)
@@ -243,17 +319,42 @@ describe('updateLesson', () => {
       .send({
         query: `mutation {
           me {
-            updateLesson(lessonId: "newlesson", lesson: "${lesson}") {
+            updateLesson(lessonId: "lesson1", lesson: "${lesson}") {
               lessonId
             }   
           }
         }`,
       });
     expect(response.status).to.equal(200);
-    expect(response.body).to.have.deep.nested.property(
-      'errors[0].message',
-      'user does not have permission to edit this lesson'
+    expect(response.body.data.me.updateLesson).to.eql({
+      lessonId: 'lesson1',
+    });
+  });
+
+  it('updates for lesson creator', async () => {
+    const token = getToken('5f0cfea3395d762ca65405d3');
+    const lesson = encodeURI(
+      JSON.stringify({
+        lessonId: 'lesson2',
+        createdBy: '5f0cfea3395d762ca65405d3',
+      })
     );
+    const response = await request(app)
+      .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
+      .send({
+        query: `mutation {
+          me {
+            updateLesson(lessonId: "lesson2", lesson: "${lesson}") {
+              lessonId
+            }   
+          }
+        }`,
+      });
+    expect(response.status).to.equal(200);
+    expect(response.body.data.me.updateLesson).to.eql({
+      lessonId: 'lesson2',
+    });
   });
 
   it(`creates a new lesson`, async () => {

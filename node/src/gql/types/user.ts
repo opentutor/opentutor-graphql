@@ -4,12 +4,8 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import {
-  GraphQLString,
-  GraphQLID,
-  GraphQLObjectType,
-  GraphQLBoolean,
-} from 'graphql';
+import { GraphQLString, GraphQLObjectType } from 'graphql';
+import { DateType } from './date';
 
 export const UserType = new GraphQLObjectType({
   name: 'User',
@@ -22,8 +18,8 @@ export const UserType = new GraphQLObjectType({
     },
     name: { type: GraphQLString },
     email: { type: GraphQLString },
-    isAdmin: { type: GraphQLBoolean },
-    isContentManager: { type: GraphQLBoolean },
+    userRole: { type: GraphQLString },
+    lastLoginAt: { type: DateType },
   },
 });
 

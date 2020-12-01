@@ -7,7 +7,7 @@ The full terms of this copyright and license should always be found in the root 
 import { GraphQLString, GraphQLObjectType } from 'graphql';
 import UserType from 'gql/types/user';
 import { User as UserSchema } from 'models';
-import { User } from 'models/User';
+import { User, UserRole } from 'models/User';
 
 export const updateUserPermissions = {
   type: UserType,
@@ -27,28 +27,37 @@ export const updateUserPermissions = {
       throw new Error('missing required param permissionLevel');
     }
     if (
-      args.permissionLevel !== 'admin' &&
-      args.permissionLevel !== 'contentManager' &&
-      args.permissionLevel !== 'author'
+      args.permissionLevel !== UserRole.AUTHOR &&
+      args.permissionLevel !== UserRole.CONTENT_MANAGER &&
+      args.permissionLevel !== UserRole.ADMIN
     ) {
       throw new Error(
-        'permissionLevel must be "admin", "contentManager", or "author"'
+        `permissionLevel must be "${UserRole.AUTHOR}", "${UserRole.CONTENT_MANAGER}", or "${UserRole.ADMIN}"`
       );
     }
-    if (!context.user.isAdmin && !context.user.isContentManager) {
+    if (
+      context.user.userRole !== UserRole.ADMIN &&
+      context.user.userRole !== UserRole.CONTENT_MANAGER
+    ) {
       throw new Error(
         'must be an admin or content manager to edit user permissions'
       );
     }
-    if (args.permissionLevel === 'admin' && !context.user.isAdmin) {
+    if (
+      args.permissionLevel === UserRole.ADMIN &&
+      context.user.userRole !== UserRole.ADMIN
+    ) {
       throw new Error('only admins can give admin permissions');
     }
 
-    const user = await UserSchema.findOne({ _id: args.userId });
-    if (!user) {
+    const userToEdit = await UserSchema.findOne({ _id: args.userId });
+    if (!userToEdit) {
       throw new Error(`could not find user for id ${args.userId}`);
     }
-    if (user.isAdmin && !context.user.isAdmin) {
+    if (
+      userToEdit.userRole == UserRole.ADMIN &&
+      context.user.userRole !== UserRole.ADMIN
+    ) {
       throw new Error('only admins can edit an admins permissions');
     }
 
@@ -58,8 +67,7 @@ export const updateUserPermissions = {
       },
       {
         $set: {
-          isAdmin: args.permissionLevel === 'admin',
-          isContentManager: args.permissionLevel === 'contentManager',
+          userRole: args.permissionLevel,
         },
       },
       {

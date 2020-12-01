@@ -5,7 +5,8 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import { GraphQLString, GraphQLObjectType } from 'graphql';
-import { Lesson, Session } from 'models';
+import { Lesson as LessonModel, Session } from 'models';
+import { User } from 'models/User';
 import TrainingDataType from 'gql/types/training-data';
 import * as YAML from 'yaml';
 
@@ -22,13 +23,19 @@ export const trainingData = {
   },
   resolve: async (
     _root: GraphQLObjectType,
-    args: { lessonId: string }
+    args: { lessonId: string },
+    context: { user: User }
   ): Promise<TrainingData> => {
     if (!args.lessonId) {
       throw new Error('missing required param lessonId');
     }
+    const lesson = await LessonModel.findOne({ lessonId: args.lessonId });
+    if (!LessonModel.userCanEdit(context.user, lesson)) {
+      throw new Error(
+        'user does not have permission to get training data for this lesson'
+      );
+    }
     const trainingData = await Session.getTrainingData(args.lessonId);
-    const lesson = await Lesson.findOne({ lessonId: args.lessonId });
     const config = {
       expectations: lesson.expectations.map((exp) => {
         return { ideal: exp.expectation, features: exp.features };
