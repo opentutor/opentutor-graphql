@@ -57,7 +57,8 @@ export const setGrade = {
       args.sessionId,
       args.userAnswerIndex,
       args.userExpectationIndex,
-      args.grade
+      args.grade,
+      context.user
     );
   },
 };

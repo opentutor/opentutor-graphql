@@ -6,10 +6,10 @@ The full terms of this copyright and license should always be found in the root 
 */
 import csvStringify from 'csv-stringify';
 import mongoose, { Schema, Document, Model } from 'mongoose';
+import calculateScore from 'models/utils/calculate-score';
 import { PaginatedResolveResult } from './PaginatedResolveResult';
 import LessonModel, { Lesson } from './Lesson';
-import calculateScore from 'models/utils/calculate-score';
-import { User } from 'models';
+import UserModel, { User } from './User';
 
 const mongoPaging = require('mongo-cursor-pagination');
 mongoPaging.config.COLLATION = { locale: 'en', strength: 2 };
@@ -71,6 +71,9 @@ export interface Session extends Document {
   lessonId: string;
   lessonName: string;
   lessonCreatedBy: string;
+  lastGradedBy: mongoose.Types.ObjectId;
+  lastGradedByName: string;
+  lastGradedAt: Date;
   username: string;
   graderGrade: number;
   classifierGrade: number;
@@ -85,6 +88,9 @@ export const SessionSchema = new Schema<Session>(
     lessonId: { type: String, required: '{PATH} is required!' },
     lessonName: { type: String },
     lessonCreatedBy: { type: String },
+    lastGradedBy: { type: Schema.Types.ObjectId, ref: 'User' },
+    lastGradedByName: { type: String },
+    lastGradedAt: { type: Date },
     username: { type: String },
     graderGrade: { type: Number },
     classifierGrade: { type: Number },
@@ -110,7 +116,8 @@ export interface SessionModel extends Model<Session> {
     sessionId: string,
     userAnswerIndex: number,
     userExpectationIndex: number,
-    grade: string
+    grade: string,
+    grader: User
   ): Promise<Session>;
 }
 
@@ -164,7 +171,7 @@ SessionSchema.statics.updateLesson = async function (
   lessonId: string,
   updatedLesson: Lesson
 ) {
-  const createdBy = await User.findOne({ _id: updatedLesson.createdBy });
+  const createdBy = await UserModel.findOne({ _id: updatedLesson.createdBy });
   await this.updateMany(
     {
       lessonId: lessonId,
@@ -183,7 +190,8 @@ SessionSchema.statics.setGrade = async function (
   sessionId: string,
   userAnswerIndex: number,
   userExpectationIndex: number,
-  grade: string
+  grade: string,
+  grader: User
 ) {
   const session = await this.findOne({ sessionId: sessionId });
   if (!session) {
@@ -198,6 +206,9 @@ SessionSchema.statics.setGrade = async function (
   changesAsSet[
     `userResponses.${userAnswerIndex}.expectationScores.${userExpectationIndex}.graderGrade`
   ] = grade;
+  changesAsSet['lastGradedBy'] = grader.id;
+  changesAsSet['lastGradedByName'] = grader.name;
+  changesAsSet['lastGradedAt'] = new Date();
   changesAsSet['graderGrade'] = score;
   return await this.findOneAndUpdate(
     {
@@ -217,6 +228,8 @@ SessionSchema.index({ lessonCreatedBy: -1, _id: -1 });
 SessionSchema.index({ createdAt: -1, _id: -1 });
 SessionSchema.index({ classifierGrade: -1, _id: -1 });
 SessionSchema.index({ graderGrade: -1, _id: -1 });
+SessionSchema.index({ lastGradedByName: -1, _id: -1 });
+SessionSchema.index({ lastGradedAt: -1, _id: -1 });
 SessionSchema.plugin(mongoPaging.mongoosePlugin);
 
 export default mongoose.model<Session, SessionModel>('Session', SessionSchema);

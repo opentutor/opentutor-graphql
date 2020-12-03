@@ -368,6 +368,94 @@ describe('setGrade', () => {
     });
   });
 
+  it('sets lastGradedBy and lastGradedAt after user grades session', async () => {
+    const token = getToken('5f0cfea3395d762ca65405d1');
+    const session = await request(app)
+      .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
+      .send({
+        query: `query {
+          me {
+            session(sessionId: "session 1") { 
+              lastGradedAt
+              lastGradedByName
+            }
+          }
+        }`,
+      });
+    expect(session.status).to.equal(200);
+    expect(session.body.data.me.session).to.eql({
+      lastGradedByName: null,
+      lastGradedAt: null,
+    });
+    const date0 = new Date(Date.now() - 1000);
+    const setGrade = await request(app)
+      .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
+      .send({
+        query: `mutation {
+          me {
+            setGrade(sessionId: "session 1", userAnswerIndex: 0, userExpectationIndex: 0, grade: "Bad") { 
+              lastGradedAt
+              lastGradedByName
+            } 
+          }
+        }`,
+      });
+    const date1 = new Date(setGrade.body.data.me.setGrade.lastGradedAt);
+    expect(setGrade.status).to.equal(200);
+    expect(setGrade.body.data.me.setGrade.lastGradedByName).to.eql('Admin');
+    expect(date1).to.be.greaterThan(date0);
+  });
+
+  it('update lastGradedBy and lastGradedAt after a new user regrades same session', async () => {
+    const adminToken = getToken('5f0cfea3395d762ca65405d1');
+    const date0 = new Date(Date.now() - 1000);
+    const setGrade = await request(app)
+      .post('/graphql')
+      .set('Authorization', `bearer ${adminToken}`)
+      .send({
+        query: `mutation {
+          me {
+            setGrade(sessionId: "session 1", userAnswerIndex: 0, userExpectationIndex: 0, grade: "Bad") { 
+              sessionId
+              lastGradedAt
+              lastGradedByName
+            } 
+          }
+        }`,
+      });
+    const date1 = new Date(setGrade.body.data.me.setGrade.lastGradedAt);
+    expect(setGrade.status).to.equal(200);
+    expect(setGrade.body.data.me.setGrade.sessionId).to.eql('session 1');
+    expect(setGrade.body.data.me.setGrade.lastGradedByName).to.eql('Admin');
+    expect(date1).to.be.greaterThan(date0);
+    setTimeout(async function () {
+      const managerToken = getToken('5f0cfea3395d762ca65405d2');
+      const updateGrade = await request(app)
+        .post('/graphql')
+        .set('Authorization', `bearer ${managerToken}`)
+        .send({
+          query: `mutation {
+            me {
+              setGrade(sessionId: "session 1", userAnswerIndex: 0, userExpectationIndex: 0, grade: "Bad") { 
+                sessionId
+                lastGradedAt
+                lastGradedByName
+              } 
+            }
+          }`,
+        });
+      const date2 = new Date(updateGrade.body.data.me.setGrade.lastGradedAt);
+      expect(updateGrade.status).to.equal(200);
+      expect(updateGrade.body.data.me.setGrade.lastGradedByName).to.eql(
+        'Content Manager'
+      );
+      expect(date2).to.be.greaterThan(date0);
+      expect(date2).to.be.greaterThan(date1);
+    }, 1000);
+  });
+
   it('calculates and updates GOOD graderGrade', async () => {
     const token = getToken('5f0cfea3395d762ca65405d1');
     await request(app)
