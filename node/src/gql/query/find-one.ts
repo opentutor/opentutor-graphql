@@ -69,10 +69,6 @@ export function findOne<T>(config: {
         },
         {}
       );
-      //const filter = Object.assign({}, mArgs, {
-      //  $or: [{ deleted: false }, { deleted: null }],
-      //});
-
       const item = await model
         .findOne({ deleted: { $ne: true }, ...mArgs })
         .exec();
