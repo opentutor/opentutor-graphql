@@ -69,10 +69,13 @@ export function findOne<T>(config: {
         },
         {}
       );
-      const filter = Object.assign({}, mArgs, {
-        $or: [{ deleted: false }, { deleted: null }],
-      });
-      const item = await model.findOne(filter).exec();
+      //const filter = Object.assign({}, mArgs, {
+      //  $or: [{ deleted: false }, { deleted: null }],
+      //});
+
+      const item = await model
+        .findOne({ deleted: { $ne: true }, ...mArgs })
+        .exec();
       if (!item && !disableExceptionOnNotFound) {
         throw new Error(
           `${typeName} not found for args "${JSON.stringify(args)}"`
