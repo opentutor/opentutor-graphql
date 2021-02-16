@@ -64,7 +64,7 @@ describe('login', () => {
     expect(response.status).to.equal(200);
     expect(response.body).to.have.deep.nested.property(
       'errors[0].message',
-      'Error: TokenExpiredError: jwt expired'
+      'TokenExpiredError: jwt expired'
     );
   });
 
