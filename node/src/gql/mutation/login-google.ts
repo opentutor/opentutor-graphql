@@ -25,30 +25,26 @@ export const loginGoogle = {
     if (!args.accessToken) {
       throw new Error('missing required param accessToken');
     }
-    try {
-      const endpoint = `https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${args.accessToken}`;
-      const response = await axios.get(endpoint);
-      const user = await UserSchema.findOneAndUpdate(
-        {
+    const endpoint = `https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${args.accessToken}`;
+    const response = await axios.get(endpoint);
+    const user = await UserSchema.findOneAndUpdate(
+      {
+        googleId: response.data.id,
+      },
+      {
+        $set: {
           googleId: response.data.id,
+          name: response.data.name,
+          email: response.data.email,
+          lastLoginAt: new Date(),
         },
-        {
-          $set: {
-            googleId: response.data.id,
-            name: response.data.name,
-            email: response.data.email,
-            lastLoginAt: new Date(),
-          },
-        },
-        {
-          new: true,
-          upsert: true,
-        }
-      );
-      return generateAccessToken(user);
-    } catch (error) {
-      throw new Error(error);
-    }
+      },
+      {
+        new: true,
+        upsert: true,
+      }
+    );
+    return generateAccessToken(user);
   },
 };
 

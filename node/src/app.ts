@@ -9,8 +9,16 @@ import cors from 'cors';
 import express, { Request, Response, NextFunction, Express } from 'express';
 import mongoose from 'mongoose';
 import morgan from 'morgan';
+import passport from 'passport';
 import path from 'path';
 import { logger } from 'utils/logging';
+import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt';
+import { Strategy as BearerStrategy } from 'passport-http-bearer';
+import { User as UserSchema } from 'models';
+import { UserRole } from 'models/User';
+import requireEnv from 'utils/require-env';
+
+const API_USER = 'api_user';
 
 export default async function createApp(): Promise<Express> {
   const gqlMiddleware = (await import('gql/middleware')).default;
@@ -22,7 +30,46 @@ export default async function createApp(): Promise<Express> {
   if (process.env['APP_DISABLE_AUTO_START'] !== 'true') {
     await appStart();
   }
-  require('./auth');
+  passport.use(
+    new BearerStrategy(function (token, done) {
+      if (token !== requireEnv('API_SECRET')) {
+        return done('invalid api key');
+      } else {
+        const api_user = {
+          _id: API_USER,
+          name: API_USER,
+          email: API_USER,
+          userRole: UserRole.ADMIN,
+        };
+        return done(null, api_user);
+      }
+    })
+  );
+
+  passport.use(
+    new JwtStrategy(
+      {
+        secretOrKey: requireEnv('JWT_SECRET'),
+        jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      },
+      async (token, done) => {
+        try {
+          if (token.expirationDate < new Date()) {
+            return done('token expired', null);
+          } else {
+            const user = await UserSchema.findOne({ _id: token.id });
+            if (user) {
+              return done(null, user);
+            } else {
+              return done('token invalid', null);
+            }
+          }
+        } catch (error) {
+          return done(error);
+        }
+      }
+    )
+  );
   const app = express();
   if (process.env['NODE_ENV'] !== 'test') {
     app.use(morgan('dev'));

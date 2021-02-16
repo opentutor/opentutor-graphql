@@ -25,30 +25,26 @@ export const login = {
     if (!args.accessToken) {
       throw new Error('missing required param accessToken');
     }
-    try {
-      const decoded = decodeAccessToken(args.accessToken);
-      const userId = decoded.id;
-      const user = await UserSchema.findOneAndUpdate(
-        {
-          _id: userId,
+    const decoded = decodeAccessToken(args.accessToken);
+    const userId = decoded.id;
+    const user = await UserSchema.findOneAndUpdate(
+      {
+        _id: userId,
+      },
+      {
+        $set: {
+          lastLoginAt: new Date(),
         },
-        {
-          $set: {
-            lastLoginAt: new Date(),
-          },
-        },
-        {
-          new: true,
-          upsert: false,
-        }
-      );
-      if (!user) {
-        throw new Error('invalid token');
+      },
+      {
+        new: true,
+        upsert: false,
       }
-      return generateAccessToken(user);
-    } catch (error) {
-      throw new Error(error);
+    );
+    if (!user) {
+      throw new Error('invalid token');
     }
+    return generateAccessToken(user);
   },
 };
 
