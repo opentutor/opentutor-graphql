@@ -7,15 +7,21 @@ The full terms of this copyright and license should always be found in the root 
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import express, { Request, Response, NextFunction, Express } from 'express';
-import { graphqlHTTP } from 'express-graphql';
 import mongoose from 'mongoose';
 import morgan from 'morgan';
+import passport from 'passport';
 import path from 'path';
-
 import { logger } from 'utils/logging';
-import schema from 'gql/schema';
+import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt';
+import { Strategy as BearerStrategy } from 'passport-http-bearer';
+import { User as UserSchema } from 'models';
+import { UserRole } from 'models/User';
+import requireEnv from 'utils/require-env';
+
+const API_USER = 'api_user';
 
 export default async function createApp(): Promise<Express> {
+  const gqlMiddleware = (await import('gql/middleware')).default;
   if (process.env.NODE_ENV !== 'production') {
     require('longjohn'); // full stack traces when testing
   }
@@ -24,18 +30,53 @@ export default async function createApp(): Promise<Express> {
   if (process.env['APP_DISABLE_AUTO_START'] !== 'true') {
     await appStart();
   }
+  const API_SECRET = requireEnv('API_SECRET');
+  passport.use(
+    new BearerStrategy(function (token, done) {
+      if (token !== API_SECRET) {
+        return done('invalid api key');
+      } else {
+        const api_user = {
+          _id: API_USER,
+          name: API_USER,
+          email: API_USER,
+          userRole: UserRole.ADMIN,
+        };
+        return done(null, api_user);
+      }
+    })
+  );
+  const JWT_SECRET = requireEnv('JWT_SECRET');
+  passport.use(
+    new JwtStrategy(
+      {
+        secretOrKey: JWT_SECRET,
+        jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      },
+      async (token, done) => {
+        try {
+          if (token.expirationDate < new Date()) {
+            return done('token expired', null);
+          } else {
+            const user = await UserSchema.findOne({ _id: token.id });
+            if (user) {
+              return done(null, user);
+            } else {
+              return done('token invalid', null);
+            }
+          }
+        } catch (error) {
+          return done(error);
+        }
+      }
+    )
+  );
   const app = express();
   if (process.env['NODE_ENV'] !== 'test') {
     app.use(morgan('dev'));
   }
   app.use(cors());
-  app.use(
-    '/graphql',
-    graphqlHTTP({
-      schema: schema,
-      graphiql: true,
-    })
-  );
+  app.use('/graphql', gqlMiddleware);
   app.use(bodyParser.json());
   app.use(express.static(path.join(__dirname, 'public')));
   app.use(function (

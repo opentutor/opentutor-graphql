@@ -5,54 +5,50 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import { GraphQLString, GraphQLObjectType } from 'graphql';
-import LessonType from 'gql/types/lesson';
-import { Lesson as LessonSchema, Session } from 'models';
-import { Lesson } from 'models/Lesson';
+import { Lesson as LessonModel, Session } from 'models';
+import { User } from 'models/User';
+import TrainingDataType from 'gql/types/training-data';
+import * as YAML from 'yaml';
 
-export const updateLesson = {
-  type: LessonType,
+export interface TrainingData {
+  config: string;
+  training: string;
+  isTrainable: boolean;
+}
+
+export const trainingData = {
+  type: TrainingDataType,
   args: {
     lessonId: { type: GraphQLString },
-    lesson: { type: GraphQLString },
   },
   resolve: async (
     _root: GraphQLObjectType,
-    args: { lessonId: string; lesson: string }
-  ): Promise<Lesson> => {
+    args: { lessonId: string },
+    context: { user: User }
+  ): Promise<TrainingData> => {
     if (!args.lessonId) {
       throw new Error('missing required param lessonId');
     }
-    if (!args.lesson) {
-      throw new Error('missing required param lesson');
+    const lesson = await LessonModel.findOne({ lessonId: args.lessonId });
+    if (!LessonModel.userCanEdit(context.user, lesson)) {
+      throw new Error(
+        'user does not have permission to get training data for this lesson'
+      );
     }
-    const lesson: Lesson = JSON.parse(decodeURI(args.lesson));
-    if (lesson.deleted) {
-      throw new Error('lesson was deleted');
-    }
-    if (
-      !args.lessonId.match(/^[a-z0-9\-]+$/) ||
-      !lesson.lessonId.match(/^[a-z0-9\-]+$/)
-    ) {
-      throw new Error('lessonId must match [a-z0-9-]');
-    }
+    const trainingData = await Session.getTrainingData(args.lessonId);
+    const config = {
+      expectations: lesson.expectations.map((exp) => {
+        return { ideal: exp.expectation, features: exp.features };
+      }),
+      question: lesson.question,
+    };
 
-    await Session.updateLesson(args.lessonId, lesson);
-
-    return await LessonSchema.findOneAndUpdate(
-      {
-        lessonId: args.lessonId,
-      },
-      {
-        $set: {
-          ...lesson,
-        },
-      },
-      {
-        new: true, // return the updated doc rather than pre update
-        upsert: true,
-      }
-    );
+    return {
+      config: YAML.stringify(config),
+      training: trainingData.csv,
+      isTrainable: trainingData.isTrainable,
+    };
   },
 };
 
-export default updateLesson;
+export default trainingData;

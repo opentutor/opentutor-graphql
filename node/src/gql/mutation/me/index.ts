@@ -4,13 +4,37 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { Session } from 'models';
-import SessionType from 'gql/types/session';
-import findAll from './find-all';
+import { GraphQLObjectType } from 'graphql';
+import { User } from 'models/User';
+import deleteLesson from './delete-lesson';
+import setGrade from './set-grade';
+import updateLastTrainedAt from './update-last-trained-at';
+import updateLesson from './update-lesson';
+import updateSession from './update-session';
+import updateUserPermissions from './update-user-permissions';
 
-export const sessions = findAll({
-  nodeType: SessionType,
-  model: Session,
+export const Me: GraphQLObjectType = new GraphQLObjectType({
+  name: 'MeMutation',
+  fields: {
+    deleteLesson,
+    setGrade,
+    updateLastTrainedAt,
+    updateLesson,
+    updateSession,
+    updateUserPermissions,
+  },
 });
 
-export default sessions;
+export const me = {
+  type: Me,
+  resolve: (_: any, args: any, context: { user: User }) => {
+    if (!context.user) {
+      throw new Error('Only authenticated users');
+    }
+    return {
+      user: context.user,
+    };
+  },
+};
+
+export default me;

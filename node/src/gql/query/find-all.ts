@@ -21,10 +21,6 @@ export function findAll<T extends PaginatedResolveResult>(config: {
     nodeType,
     resolve: async (resolveArgs: PaginatedResolveArgs) => {
       const { args } = resolveArgs;
-      const query = args.filter ? JSON.parse(decodeURI(args.filter)) : {};
-      const filter = Object.assign({}, query, {
-        $or: [{ deleted: false }, { deleted: null }],
-      });
 
       const cursor = args.cursor;
       let next = null;
@@ -40,7 +36,10 @@ export function findAll<T extends PaginatedResolveResult>(config: {
       }
 
       return await model.paginate({
-        query: filter,
+        query: {
+          deleted: { $ne: true },
+          ...(args.filter ? JSON.parse(decodeURI(args.filter)) : {}),
+        },
         limit: Number(args.limit) || 100,
         paginatedField: args.sortBy || '_id',
         sortAscending: args.sortAscending,

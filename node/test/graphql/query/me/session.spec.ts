@@ -9,6 +9,7 @@ import { expect } from 'chai';
 import { Express } from 'express';
 import mongoUnit from 'mongo-unit';
 import request from 'supertest';
+import { getToken } from '../../../helpers';
 
 describe('session', () => {
   let app: Express;
@@ -24,14 +25,37 @@ describe('session', () => {
     await mongoUnit.drop();
   });
 
-  it(`returns an error if invalid sessionId`, async () => {
+  it(`returns an error if not logged in`, async () => {
     const response = await request(app).post('/graphql').send({
       query: `query { 
+        me {
           session(sessionId: "111111111111111111111111") { 
             username
-          } 
-        }`,
+          }   
+        }
+      }`,
     });
+    expect(response.status).to.equal(200);
+    expect(response.body).to.have.deep.nested.property(
+      'errors[0].message',
+      'Only authenticated users'
+    );
+  });
+
+  it(`returns an error if invalid sessionId`, async () => {
+    const token = getToken('5f0cfea3395d762ca65405d1');
+    const response = await request(app)
+      .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
+      .send({
+        query: `query { 
+        me {
+          session(sessionId: "111111111111111111111111") { 
+            username
+          }   
+        }
+      }`,
+      });
     expect(response.status).to.equal(200);
     expect(response.body).to.have.deep.nested.property(
       'errors[0].message',
@@ -40,13 +64,19 @@ describe('session', () => {
   });
 
   it(`cannot find a deleted session`, async () => {
-    const response = await request(app).post('/graphql').send({
-      query: `query { 
+    const token = getToken('5f0cfea3395d762ca65405d1');
+    const response = await request(app)
+      .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
+      .send({
+        query: `query { 
+        me {
           session(sessionId: "session 10") { 
             username
-          } 
-        }`,
-    });
+          }
+        }
+      }`,
+      });
     expect(response.status).to.equal(200);
     expect(response.body).to.have.deep.nested.property(
       'errors[0].message',
@@ -54,33 +84,58 @@ describe('session', () => {
     );
   });
 
-  it('succeeds with valid sessionId', async () => {
-    const response = await request(app).post('/graphql').send({
-      query: `query { 
-        session(sessionId: "session 1") { 
-          sessionId
-          username
-          lesson {
-            lessonId
-          }
-          question {
-            text
-            expectations {
-              text
+  it('succeeds with api key', async () => {
+    const response = await request(app)
+      .post('/graphql')
+      .set('opentutor-api-req', 'true')
+      .set('Authorization', `bearer ${process.env.API_SECRET}`)
+      .send({
+        query: `query {
+          me {
+            session(sessionId: "session 1") {
+              sessionId
             }
           }
-          userResponses {
-            text
-            expectationScores {
-              classifierGrade
-              graderGrade
-            }
-          }
-        } 
-      }`,
+        }`,
+      });
+    expect(response.status).to.equal(200);
+    expect(response.body.data.me.session).to.eql({
+      sessionId: 'session 1',
     });
+  });
 
-    const session = response.body.data.session;
+  it('succeeds with valid sessionId', async () => {
+    const token = getToken('5f0cfea3395d762ca65405d1');
+    const response = await request(app)
+      .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
+      .send({
+        query: `query { 
+        me {
+          session(sessionId: "session 1") { 
+            sessionId
+            username
+            lesson {
+              lessonId
+            }
+            question {
+              text
+              expectations {
+                text
+              }
+            }
+            userResponses {
+              text
+              expectationScores {
+                classifierGrade
+                graderGrade
+              }
+            }
+          }
+        }
+      }`,
+      });
+    const session = response.body.data.me.session;
     expect(response.status).to.equal(200);
     expect(session).to.eql({
       sessionId: 'session 1',

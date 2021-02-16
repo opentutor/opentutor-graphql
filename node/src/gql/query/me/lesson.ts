@@ -4,24 +4,21 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import mongoose from 'mongoose';
-import requireEnv from './require-env';
-mongoose.set('useCreateIndex', true);
+import { GraphQLString } from 'graphql';
+import { Lesson } from 'models';
+import LessonType from 'gql/types/lesson';
+import findOne from 'gql/query/find-one';
 
-/**
- * Connect mongoose using env variables:
- * MONGO_URI
- */
-export default async function mongooseConnect(uri: string): Promise<void> {
-  const mongoUri = uri || requireEnv('MONGO_URI');
-  await mongoose.connect(mongoUri, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  });
-  mongoose.set('useCreateIndex', true);
-  if (process.env['NODE_ENV'] !== 'test') {
-    console.log(
-      'mongoose: connection successful ' + mongoUri.replace(/^.*@/g, '')
-    );
-  }
-}
+export const lesson = findOne({
+  model: Lesson,
+  type: LessonType,
+  typeName: 'lesson',
+  argsConfig: {
+    lessonId: {
+      description: 'id of the lesson',
+      type: GraphQLString,
+    },
+  },
+});
+
+export default lesson;

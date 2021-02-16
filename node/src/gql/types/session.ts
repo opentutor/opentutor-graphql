@@ -63,6 +63,9 @@ export const SessionType = new GraphQLObjectType({
     lessonId: { type: GraphQLString },
     lessonName: { type: GraphQLString },
     lessonCreatedBy: { type: GraphQLString },
+    lastGradedBy: { type: GraphQLString },
+    lastGradedByName: { type: GraphQLString },
+    lastGradedAt: { type: DateType },
     lesson: {
       type: LessonType,
       resolve: async function (session) {

@@ -40,6 +40,8 @@ module.exports = {
         },
       ],
       conclusion: ['conclusion text'],
+      createdBy: ObjectId('5f0cfea3395d762ca65405d1'),
+      createdByName: 'Admin',
     },
     {
       _id: ObjectId('5f0cfea3395d762ca65405c2'),
@@ -58,6 +60,8 @@ module.exports = {
         },
       ],
       conclusion: ['conclusion'],
+      createdBy: ObjectId('5f0cfea3395d762ca65405d3'),
+      createdByName: 'Author',
     },
     {
       _id: ObjectId('5f0cfea3395d762ca65405c3'),
@@ -186,8 +190,12 @@ module.exports = {
       question: {
         text: 'question?',
         expectations: [
-          { text: 'expected text 1' },
-          { text: 'expected text 2' },
+          {
+            text: 'expected text 1',
+          },
+          {
+            text: 'expected text 2',
+          },
         ],
       },
       userResponses: [
@@ -214,10 +222,18 @@ module.exports = {
     {
       _id: ObjectId('5f20c63646f6110a6a5b2132'),
       sessionId: 'session 2',
+      lessonId: 'lesson1',
       username: 'username2',
       question: {
         text: 'question',
-        expectations: [{ text: 'expectation 1' }, { text: 'expectation 2' }],
+        expectations: [
+          {
+            text: 'expectation 1',
+          },
+          {
+            text: 'expectation 2',
+          },
+        ],
       },
       userResponses: [
         {
@@ -237,7 +253,7 @@ module.exports = {
     },
     {
       _id: ObjectId('5f20c63646f6110a6a5b2133'),
-      lessonId: 'lesson1',
+      lessonId: 'lesson2',
       sessionId: 'session 3',
       userResponses: [
         {
@@ -588,6 +604,27 @@ module.exports = {
       sessionId: 'session 10',
       lessonId: '_deleted_lesson',
       deleted: true,
+    },
+  ],
+
+  users: [
+    {
+      _id: ObjectId('5f0cfea3395d762ca65405d1'),
+      name: 'Admin',
+      email: 'admin@opentutor.com',
+      userRole: 'admin',
+    },
+    {
+      _id: ObjectId('5f0cfea3395d762ca65405d2'),
+      name: 'Content Manager',
+      email: 'manager@opentutor.com',
+      userRole: 'contentManager',
+    },
+    {
+      _id: ObjectId('5f0cfea3395d762ca65405d3'),
+      name: 'Editor',
+      email: 'editor@opentutor.com',
+      userRole: 'author',
     },
   ],
 };

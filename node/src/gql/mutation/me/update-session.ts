@@ -6,9 +6,14 @@ The full terms of this copyright and license should always be found in the root 
 */
 import { GraphQLString, GraphQLObjectType } from 'graphql';
 import SessionType from 'gql/types/session';
-import { Lesson as LessonSchema, Session as SessionSchema } from 'models';
+import {
+  Lesson as LessonModel,
+  Session as SessionModel,
+  User as UserModel,
+} from 'models';
 import { Session } from 'models/Session';
 import calculateScore from 'models/utils/calculate-score';
+import { User } from 'models/User';
 
 export const updateSession = {
   type: SessionType,
@@ -18,7 +23,8 @@ export const updateSession = {
   },
   resolve: async (
     _root: GraphQLObjectType,
-    args: { sessionId: string; session: string }
+    args: { sessionId: string; session: string },
+    context: { user: User }
   ): Promise<Session> => {
     if (!args.sessionId) {
       throw new Error('missing required param sessionId');
@@ -26,7 +32,6 @@ export const updateSession = {
     if (!args.session) {
       throw new Error('missing required param session');
     }
-
     const session: Session = JSON.parse(decodeURI(args.session));
     if (session.deleted) {
       throw new Error('session was deleted');
@@ -48,15 +53,18 @@ export const updateSession = {
         throw new Error('session has an invalid answer (empty response text)');
       }
     });
-
-    const lesson = await LessonSchema.findOne({ lessonId: session.lessonId });
+    const lesson = await LessonModel.findOne({ lessonId: session.lessonId });
     if (lesson.deleted || lesson.lessonId.startsWith('_deleted_')) {
       throw new Error('lesson was deleted');
     }
+    if (!LessonModel.userCanEdit(context.user, lesson)) {
+      throw new Error('user does not have permission to edit this lesson');
+    }
     const grade = calculateScore(session, 'graderGrade');
     const classifierGrade = calculateScore(session, 'classifierGrade');
+    const createdBy = await UserModel.findOne({ _id: lesson.createdBy });
 
-    return await SessionSchema.findOneAndUpdate(
+    return await SessionModel.findOneAndUpdate(
       {
         sessionId: args.sessionId,
       },
@@ -66,7 +74,7 @@ export const updateSession = {
           graderGrade: grade,
           classifierGrade: classifierGrade,
           lessonName: lesson.name,
-          lessonCreatedBy: lesson.createdBy,
+          lessonCreatedBy: createdBy ? createdBy.name : '',
         },
       },
       {

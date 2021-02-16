@@ -4,13 +4,13 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { Lesson } from 'models';
-import findAll from './find-all';
-import LessonType from 'gql/types/lesson';
+import { Session } from 'models';
+import SessionType from 'gql/types/session';
+import findAll from 'gql/query/find-all';
 
-export const lessons = findAll({
-  nodeType: LessonType,
-  model: Lesson,
+export const sessions = findAll({
+  nodeType: SessionType,
+  model: Session,
 });
 
-export default lessons;
+export default sessions;

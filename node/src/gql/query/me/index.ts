@@ -4,24 +4,37 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import mongoose from 'mongoose';
-import requireEnv from './require-env';
-mongoose.set('useCreateIndex', true);
+import { GraphQLObjectType } from 'graphql';
+import { User } from 'models/User';
+import lesson from './lesson';
+import lessons from './lessons';
+import session from './session';
+import sessions from './sessions';
+import trainingData from './training-data';
+import users from './users';
 
-/**
- * Connect mongoose using env variables:
- * MONGO_URI
- */
-export default async function mongooseConnect(uri: string): Promise<void> {
-  const mongoUri = uri || requireEnv('MONGO_URI');
-  await mongoose.connect(mongoUri, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  });
-  mongoose.set('useCreateIndex', true);
-  if (process.env['NODE_ENV'] !== 'test') {
-    console.log(
-      'mongoose: connection successful ' + mongoUri.replace(/^.*@/g, '')
-    );
-  }
-}
+export const Me: GraphQLObjectType = new GraphQLObjectType({
+  name: 'MeQuery',
+  fields: {
+    lesson,
+    lessons,
+    session,
+    sessions,
+    trainingData,
+    users,
+  },
+});
+
+export const me = {
+  type: Me,
+  resolve: (_: any, args: any, context: { user: User }) => {
+    if (!context.user) {
+      throw new Error('Only authenticated users');
+    }
+    return {
+      user: context.user,
+    };
+  },
+};
+
+export default me;

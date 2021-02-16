@@ -4,24 +4,34 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import mongoose from 'mongoose';
-import requireEnv from './require-env';
-mongoose.set('useCreateIndex', true);
+import passport from 'passport';
+import { graphqlHTTP } from 'express-graphql';
+import schema from './schema';
+import { Request, Response } from 'express';
+import { User } from 'models/User';
 
-/**
- * Connect mongoose using env variables:
- * MONGO_URI
- */
-export default async function mongooseConnect(uri: string): Promise<void> {
-  const mongoUri = uri || requireEnv('MONGO_URI');
-  await mongoose.connect(mongoUri, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  });
-  mongoose.set('useCreateIndex', true);
-  if (process.env['NODE_ENV'] !== 'test') {
-    console.log(
-      'mongoose: connection successful ' + mongoUri.replace(/^.*@/g, '')
-    );
-  }
+function isApiReq(req: Request): boolean {
+  return Boolean(req.headers['opentutor-api-req']);
 }
+
+export default graphqlHTTP((req: Request, res: Response) => {
+  return new Promise((resolve) => {
+    const next = (user: User) => {
+      resolve({
+        schema,
+        graphiql: true,
+        context: {
+          user: user || null,
+        },
+      });
+    };
+    /**
+     * Try to authenticate using passport,
+     * but never block the call from here.
+     */
+    const authType = isApiReq(req) ? 'bearer' : 'jwt';
+    passport.authenticate(authType, { session: false }, (err, user) => {
+      next(user);
+    })(req, res, next);
+  });
+});

@@ -6,40 +6,59 @@ The full terms of this copyright and license should always be found in the root 
 */
 import { GraphQLString, GraphQLObjectType } from 'graphql';
 import LessonType from 'gql/types/lesson';
-import DateType from 'gql/types/date';
-import { Lesson as LessonModel } from 'models';
+import { Lesson as LessonModel, Session as SessionModel } from 'models';
 import { Lesson } from 'models/Lesson';
+import { User } from 'models/User';
 
-export const updateLastTrainedAt = {
+export const deleteLesson = {
   type: LessonType,
   args: {
     lessonId: { type: GraphQLString },
-    date: { type: DateType },
   },
   resolve: async (
     _root: GraphQLObjectType,
-    args: { lessonId: string; date: Date }
+    args: { lessonId: string },
+    context: { user: User }
   ): Promise<Lesson> => {
     if (!args.lessonId) {
       throw new Error('missing required param lessonId');
     }
-    if (!args.date) {
-      args.date = new Date();
+    const lesson = await LessonModel.findOne({ lessonId: args.lessonId });
+    if (lesson.deleted || lesson.lessonId.startsWith('_deleted_')) {
+      throw new Error('lesson was already deleted');
+    }
+    if (!LessonModel.userCanEdit(context.user, lesson)) {
+      throw new Error('user does not have permission to edit this lesson');
     }
 
+    const date = new Date();
+    const deletedId = `_deleted_${args.lessonId}_${date.getTime()}`;
+    await SessionModel.updateMany(
+      {
+        lessonId: args.lessonId,
+      },
+      {
+        $set: {
+          deleted: true,
+          lessonId: deletedId,
+        },
+      }
+    );
     return await LessonModel.findOneAndUpdate(
       {
         lessonId: args.lessonId,
       },
       {
-        lastTrainedAt: args.date,
+        $set: {
+          deleted: true,
+          lessonId: deletedId,
+        },
       },
       {
         new: true, // return the updated doc rather than pre update
-        upsert: true,
       }
     );
   },
 };
 
-export default updateLastTrainedAt;
+export default deleteLesson;

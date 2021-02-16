@@ -10,7 +10,7 @@ import { Express } from 'express';
 import mongoUnit from 'mongo-unit';
 import request from 'supertest';
 
-describe('updateLastTrainedAt', () => {
+describe('login with google', () => {
   let app: Express;
 
   beforeEach(async () => {
@@ -24,49 +24,23 @@ describe('updateLastTrainedAt', () => {
     await mongoUnit.drop();
   });
 
-  it(`returns an error if no lessonId`, async () => {
+  it(`returns an error if no accessToken`, async () => {
     const response = await request(app).post('/graphql').send({
       query: `mutation { 
-          updateLastTrainedAt(lessonId: "") { 
-            lastTrainedAt
+          loginGoogle(accessToken: "") {
+            user {
+              name
+              email  
+            }
+            accessToken
+            expirationDate
           } 
         }`,
     });
     expect(response.status).to.equal(200);
     expect(response.body).to.have.deep.nested.property(
       'errors[0].message',
-      'missing required param lessonId'
-    );
-  });
-
-  it(`update with given date`, async () => {
-    const date = new Date();
-    const response = await request(app)
-      .post('/graphql')
-      .send({
-        query: `mutation { 
-          updateLastTrainedAt(lessonId: "lesson1", date: "${date}") { 
-            lastTrainedAt
-          } 
-        }`,
-      });
-    expect(response.status).to.equal(200);
-    expect(response.body.data.updateLastTrainedAt).to.eql({
-      lastTrainedAt: date.toLocaleString(),
-    });
-  });
-
-  it(`update with current date`, async () => {
-    const response = await request(app).post('/graphql').send({
-      query: `mutation { 
-          updateLastTrainedAt(lessonId: "lesson1") { 
-            lastTrainedAt
-          } 
-        }`,
-    });
-    expect(response.status).to.equal(200);
-    expect(response.body.data.updateLastTrainedAt.lastTrainedAt).to.not.eql(
-      null
+      'missing required param accessToken'
     );
   });
 });

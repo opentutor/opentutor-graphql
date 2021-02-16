@@ -4,24 +4,23 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import mongoose from 'mongoose';
-import requireEnv from './require-env';
-mongoose.set('useCreateIndex', true);
+import { GraphQLString, GraphQLObjectType } from 'graphql';
+import { DateType } from './date';
 
-/**
- * Connect mongoose using env variables:
- * MONGO_URI
- */
-export default async function mongooseConnect(uri: string): Promise<void> {
-  const mongoUri = uri || requireEnv('MONGO_URI');
-  await mongoose.connect(mongoUri, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  });
-  mongoose.set('useCreateIndex', true);
-  if (process.env['NODE_ENV'] !== 'test') {
-    console.log(
-      'mongoose: connection successful ' + mongoUri.replace(/^.*@/g, '')
-    );
-  }
-}
+export const UserType = new GraphQLObjectType({
+  name: 'User',
+  fields: {
+    id: {
+      type: GraphQLString,
+      resolve: async function (user) {
+        return user._id;
+      },
+    },
+    name: { type: GraphQLString },
+    email: { type: GraphQLString },
+    userRole: { type: GraphQLString },
+    lastLoginAt: { type: DateType },
+  },
+});
+
+export default UserType;
