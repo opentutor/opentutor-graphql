@@ -30,9 +30,10 @@ export default async function createApp(): Promise<Express> {
   if (process.env['APP_DISABLE_AUTO_START'] !== 'true') {
     await appStart();
   }
+  const API_SECRET = requireEnv('API_SECRET');
   passport.use(
     new BearerStrategy(function (token, done) {
-      if (token !== requireEnv('API_SECRET')) {
+      if (token !== API_SECRET) {
         return done('invalid api key');
       } else {
         const api_user = {
@@ -45,11 +46,11 @@ export default async function createApp(): Promise<Express> {
       }
     })
   );
-
+  const JWT_SECRET = requireEnv('JWT_SECRET');
   passport.use(
     new JwtStrategy(
       {
-        secretOrKey: requireEnv('JWT_SECRET'),
+        secretOrKey: JWT_SECRET,
         jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       },
       async (token, done) => {
