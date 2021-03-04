@@ -110,6 +110,8 @@ export interface SessionModel extends Model<Session> {
 
   getTrainingData(lessonId: string): any;
 
+  getAllTrainingData():any;
+
   updateLesson(lessonId: string, updatedLesson: Lesson): void;
 
   setGrade(
@@ -131,6 +133,37 @@ function _toCsv(data: string[][]): Promise<string> {
       }
     });
   });
+}
+
+SessionSchema.statics.getAllTrainingData = async function() {
+  const sessions: Session[] = await this.find({});
+  const gradingStats = {Good: 0, Bad : 0, Neutral:0, total:0};
+
+  const trainingData = [['exp_num', 'text', 'label']];
+  sessions.forEach((session: Session) => {
+    session.userResponses.forEach((response: Response) => {
+      for (let expIx = 0; expIx < response.expectationScores.length; expIx++) {
+        const grade = response.expectationScores[expIx].graderGrade;
+        if (grade) {
+          gradingStats.total += 1;
+          gradingStats[grade] += 1;
+          // Classifier cannot use Neutral data
+          if (grade !== 'Neutral') {
+            trainingData.push([`${expIx}`, response.text, grade]);
+          }
+        }
+      }
+    });
+  });
+  return {
+    data: gradingStats,
+    csv: await _toCsv(trainingData),
+    // Does the lesson have enough data for training, based on these requirements:
+    //   * At least 10 graded answers per expectation
+    //   * At least 2 Good and 2 Bad answers per expectation
+    isTrainable:  gradingStats.total >= 10 && gradingStats.Bad >= 2 && gradingStats.Good >= 2,
+  };
+
 }
 
 SessionSchema.statics.getTrainingData = async function (lessonId: string) {

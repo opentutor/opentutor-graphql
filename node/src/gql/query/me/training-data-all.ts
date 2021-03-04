@@ -4,39 +4,34 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { GraphQLObjectType } from 'graphql';
+import { GraphQLString, GraphQLObjectType } from 'graphql';
+import { Lesson as LessonModel, Session } from 'models';
 import { User } from 'models/User';
-import lesson from './lesson';
-import lessons from './lessons';
-import session from './session';
-import sessions from './sessions';
-import trainingData from './training-data';
-import allTrainingData from './training-data-all';
-import users from './users';
+import {TrainingData, TrainingDataType} from 'gql/types/training-data';
+import * as YAML from 'yaml';
+import { Lesson } from 'models/Lesson';
 
-export const Me: GraphQLObjectType = new GraphQLObjectType({
-  name: 'MeQuery',
-  fields: {
-    lesson,
-    lessons,
-    session,
-    sessions,
-    trainingData,
-    allTrainingData,
-    users,
+export const allTrainingData = {
+  type: TrainingDataType,
+  args: {
   },
-});
+  resolve: async (
+    _root: GraphQLObjectType,
+    args: { },
+    context: { user: User }
+  ): Promise<TrainingData> => {
+    
+    const trainingData = await Session.getAllTrainingData();
+    const config = {
+      question: "",
+    };
 
-export const me = {
-  type: Me,
-  resolve: (_: any, args: any, context: { user: User }) => {
-    if (!context.user) {
-      throw new Error('Only authenticated users');
-    }
     return {
-      user: context.user,
+      config: YAML.stringify(config),
+      training: trainingData.csv,
+      isTrainable: trainingData.isTrainable,
     };
   },
 };
 
-export default me;
+export default allTrainingData;

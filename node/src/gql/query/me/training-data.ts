@@ -7,14 +7,8 @@ The full terms of this copyright and license should always be found in the root 
 import { GraphQLString, GraphQLObjectType } from 'graphql';
 import { Lesson as LessonModel, Session } from 'models';
 import { User } from 'models/User';
-import TrainingDataType from 'gql/types/training-data';
+import {TrainingData, TrainingDataType} from 'gql/types/training-data';
 import * as YAML from 'yaml';
-
-export interface TrainingData {
-  config: string;
-  training: string;
-  isTrainable: boolean;
-}
 
 export const trainingData = {
   type: TrainingDataType,
