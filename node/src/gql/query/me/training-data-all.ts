@@ -4,19 +4,18 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { GraphQLString, GraphQLObjectType } from 'graphql';
-import { Lesson as LessonModel, Session } from 'models';
+import { GraphQLObjectType } from 'graphql';
+import { Session } from 'models';
 import { User, UserRole } from 'models/User';
 import { TrainingData, TrainingDataType } from 'gql/types/training-data';
 import * as YAML from 'yaml';
-import { Lesson } from 'models/Lesson';
 
 export const allTrainingData = {
   type: TrainingDataType,
   args: {},
   resolve: async (
     _root: GraphQLObjectType,
-    args: {},
+    args: any,
     context: { user: User }
   ): Promise<TrainingData> => {
     if (context.user.userRole !== UserRole.ADMIN) {
