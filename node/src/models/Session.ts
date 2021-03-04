@@ -110,7 +110,7 @@ export interface SessionModel extends Model<Session> {
 
   getTrainingData(lessonId: string): any;
 
-  getAllTrainingData():any;
+  getAllTrainingData(): any;
 
   updateLesson(lessonId: string, updatedLesson: Lesson): void;
 
@@ -135,9 +135,9 @@ function _toCsv(data: string[][]): Promise<string> {
   });
 }
 
-SessionSchema.statics.getAllTrainingData = async function() {
+SessionSchema.statics.getAllTrainingData = async function () {
   const sessions: Session[] = await this.find({});
-  const gradingStats = {Good: 0, Bad : 0, Neutral:0, total:0};
+  const gradingStats = { Good: 0, Bad: 0, Neutral: 0, total: 0 };
 
   const trainingData = [['exp_num', 'text', 'label']];
   sessions.forEach((session: Session) => {
@@ -161,10 +161,12 @@ SessionSchema.statics.getAllTrainingData = async function() {
     // Does the lesson have enough data for training, based on these requirements:
     //   * At least 10 graded answers per expectation
     //   * At least 2 Good and 2 Bad answers per expectation
-    isTrainable:  gradingStats.total >= 10 && gradingStats.Bad >= 2 && gradingStats.Good >= 2,
+    isTrainable:
+      gradingStats.total >= 10 &&
+      gradingStats.Bad >= 2 &&
+      gradingStats.Good >= 2,
   };
-
-}
+};
 
 SessionSchema.statics.getTrainingData = async function (lessonId: string) {
   const lesson: Lesson = await LessonModel.findOne({ lessonId });

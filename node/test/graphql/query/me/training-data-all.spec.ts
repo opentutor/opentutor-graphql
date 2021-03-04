@@ -62,8 +62,6 @@ describe('training data all', () => {
         }
       }`,
       });
-
-    console.log(response.body);
     expect(response.status).to.equal(200);
     expect(response.body).to.have.deep.nested.property(
       'errors[0].message',
@@ -85,7 +83,6 @@ describe('training data all', () => {
           }
         }`,
       });
-    console.log(JSON.stringify(response.body));
     expect(response.status).to.equal(200);
     expect(response.body.data.me.allTrainingData.isTrainable).to.eql(true);
   });
@@ -108,42 +105,6 @@ describe('training data all', () => {
     expect(response.body.data.me.allTrainingData.isTrainable).to.eql(true);
   });
 
-  it('succeeds for content manager', async () => {
-    const token = getToken('5f0cfea3395d762ca65405d2');
-    const response = await request(app)
-      .post('/graphql')
-      .set('Authorization', `bearer ${token}`)
-      .send({
-        query: `query {
-          me {
-            trainingData(lessonId: "lesson1") {
-              isTrainable
-            }  
-          }
-        }`,
-      });
-    expect(response.status).to.equal(200);
-    expect(response.body.data.me.trainingData.isTrainable).to.eql(false);
-  });
-
-  it('succeeds for lesson creator', async () => {
-    const token = getToken('5f0cfea3395d762ca65405d2');
-    const response = await request(app)
-      .post('/graphql')
-      .set('Authorization', `bearer ${token}`)
-      .send({
-        query: `query {
-          me {
-            trainingData(lessonId: "lesson2") {
-              isTrainable
-            }  
-          }
-        }`,
-      });
-    expect(response.status).to.equal(200);
-    expect(response.body.data.me.trainingData.isTrainable).to.eql(false);
-  });
-
   it(`returns all training data for lesson`, async () => {
     const token = getToken('5f0cfea3395d762ca65405d1');
     const response = await request(app)
@@ -152,7 +113,7 @@ describe('training data all', () => {
       .send({
         query: `query {
           me {
-            trainingData(lessonId: "lesson1") {
+            allTrainingData {
               isTrainable
               training
               config
@@ -161,79 +122,40 @@ describe('training data all', () => {
         }`,
       });
     expect(response.status).to.equal(200);
-    expect(response.body.data.me.trainingData.training).to.eql(
-      'exp_num,text,label\n0,a bad answer,Bad\n'
+    expect(response.body.data.me.allTrainingData.training).to.eql(
+      'exp_num,text,label\n0,a good answer,Good\n0,a bad answer,Bad' +
+        '\n0,good,Good' +
+        '\n0,good,Good' +
+        '\n0,bad,Bad' +
+        '\n0,bad,Bad' +
+        '\n0,bad,Bad' +
+        '\n0,bad,Bad' +
+        '\n0,bad,Bad' +
+        '\n0,bad,Bad' +
+        '\n0,bad,Bad' +
+        '\n0,bad,Bad' +
+        '\n0,bad,Bad' +
+        '\n0,bad,Bad' +
+        '\n0,bad,Bad' +
+        '\n0,bad,Bad' +
+        '\n0,good,Good' +
+        '\n0,good,Good' +
+        '\n0,good,Good' +
+        '\n0,good,Good' +
+        '\n0,good,Good' +
+        '\n0,good,Good' +
+        '\n0,good,Good' +
+        '\n0,good,Good' +
+        '\n0,good,Good' +
+        '\n0,good,Good' +
+        '\n0,"""good, not bad""",Good' +
+        '\n0,"good, not bad",Good' +
+        '\n0,"""bad"", not ""good""",Bad' +
+        '\n0,bad,Bad\n'
     );
-    expect(YAML.parse(response.body.data.me.trainingData.config)).to.eql({
-      question: 'question?',
-      expectations: [
-        {
-          ideal: 'expected text 1',
-          features: null,
-        },
-        {
-          ideal: 'expected text 2',
-          features: null,
-        },
-      ],
+    expect(YAML.parse(response.body.data.me.allTrainingData.config)).to.eql({
+      question: '',
     });
-    expect(response.body.data.me.trainingData.isTrainable).to.eql(false);
-  });
-
-  it(`training config includes additional properties `, async () => {
-    const token = getToken('5f0cfea3395d762ca65405d1');
-    const response = await request(app)
-      .post('/graphql')
-      .set('Authorization', `bearer ${token}`)
-      .send({
-        query: `query {
-        me {
-          trainingData(lessonId: "lesson8") {
-            config
-          }  
-        }
-      }`,
-      });
-    expect(response.status).to.equal(200);
-    expect(YAML.parse(response.body.data.me.trainingData.config)).to.eql({
-      question: 'question',
-      expectations: [
-        {
-          ideal: 'answer1',
-          features: {
-            ideal: 'new ideal answer',
-            good: ['good regex 1'],
-            bad: ['bad regex 1'],
-          },
-        },
-        {
-          ideal: 'answer2',
-          features: {
-            good: ['good regex 2'],
-            bad: ['bad regex 2'],
-          },
-        },
-      ],
-    });
-  });
-
-  it(`training csv escapes commas and quotes`, async () => {
-    const token = getToken('5f0cfea3395d762ca65405d1');
-    const response = await request(app)
-      .post('/graphql')
-      .set('Authorization', `bearer ${token}`)
-      .send({
-        query: `query {
-        me {
-          trainingData(lessonId: "lesson6") {
-            training
-          }  
-        }
-      }`,
-      });
-    expect(response.status).to.equal(200);
-    expect(response.body.data.me.trainingData.training).to.eql(
-      `exp_num,text,label\n0,"""good, not bad""",Good\n0,"good, not bad",Good\n0,"""bad"", not ""good""",Bad\n0,bad,Bad\n`
-    );
+    expect(response.body.data.me.allTrainingData.isTrainable).to.eql(true);
   });
 });
