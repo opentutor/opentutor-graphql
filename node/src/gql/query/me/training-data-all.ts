@@ -6,7 +6,7 @@ The full terms of this copyright and license should always be found in the root 
 */
 import { GraphQLString, GraphQLObjectType } from 'graphql';
 import { Lesson as LessonModel, Session } from 'models';
-import { User } from 'models/User';
+import { User, UserRole } from 'models/User';
 import { TrainingData, TrainingDataType } from 'gql/types/training-data';
 import * as YAML from 'yaml';
 import { Lesson } from 'models/Lesson';
@@ -19,6 +19,9 @@ export const allTrainingData = {
     args: {},
     context: { user: User }
   ): Promise<TrainingData> => {
+    if (context.user.userRole !== UserRole.ADMIN) {
+      throw new Error('only admins can train the default model');
+    }
     const trainingData = await Session.getAllTrainingData();
     const config = {
       question: '',

@@ -65,7 +65,7 @@ describe('training data all', () => {
     expect(response.status).to.equal(200);
     expect(response.body).to.have.deep.nested.property(
       'errors[0].message',
-      'user does not have permission to get training data for this lesson'
+      'only admins can train the default model'
     );
   });
 
