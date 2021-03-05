@@ -123,35 +123,37 @@ describe('training data all', () => {
       });
     expect(response.status).to.equal(200);
     expect(response.body.data.me.allTrainingData.training).to.eql(
-      'exp_num,text,label\n0,a good answer,Good\n0,a bad answer,Bad' +
-        '\n0,good,Good' +
-        '\n0,good,Good' +
-        '\n0,bad,Bad' +
-        '\n0,bad,Bad' +
-        '\n0,bad,Bad' +
-        '\n0,bad,Bad' +
-        '\n0,bad,Bad' +
-        '\n0,bad,Bad' +
-        '\n0,bad,Bad' +
-        '\n0,bad,Bad' +
-        '\n0,bad,Bad' +
-        '\n0,bad,Bad' +
-        '\n0,bad,Bad' +
-        '\n0,bad,Bad' +
-        '\n0,good,Good' +
-        '\n0,good,Good' +
-        '\n0,good,Good' +
-        '\n0,good,Good' +
-        '\n0,good,Good' +
-        '\n0,good,Good' +
-        '\n0,good,Good' +
-        '\n0,good,Good' +
-        '\n0,good,Good' +
-        '\n0,good,Good' +
-        '\n0,"""good, not bad""",Good' +
-        '\n0,"good, not bad",Good' +
-        '\n0,"""bad"", not ""good""",Bad' +
-        '\n0,bad,Bad\n'
+      'exp_num,text,label,exp_data\n' +
+        '0,a good answer,Good,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,a bad answer,Bad,"{""question"":""question?"",""ideal"":""expected text 1""}"\n' +
+        '0,good,Good,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,good,Good,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,bad,Bad,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,bad,Bad,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,bad,Bad,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,bad,Bad,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,bad,Bad,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,bad,Bad,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,bad,Bad,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,bad,Bad,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,bad,Bad,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,bad,Bad,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,bad,Bad,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,bad,Bad,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,good,Good,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,good,Good,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,good,Good,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,good,Good,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,good,Good,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,good,Good,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,good,Good,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,good,Good,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,good,Good,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,good,Good,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,"""good, not bad""",Good,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,"good, not bad",Good,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,"""bad"", not ""good""",Bad,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,bad,Bad,"{""question"":""question"",""ideal"":""answer1""}"\n'
     );
     expect(YAML.parse(response.body.data.me.allTrainingData.config)).to.eql({
       question: '',

@@ -138,9 +138,12 @@ function _toCsv(data: string[][]): Promise<string> {
 SessionSchema.statics.getAllTrainingData = async function () {
   const sessions: Session[] = await this.find({});
   const gradingStats = { Good: 0, Bad: 0, Neutral: 0, total: 0 };
-
-  const trainingData = [['exp_num', 'text', 'label']];
+  const lessons: Lesson[] = await LessonModel.find({});
+  const trainingData = [['exp_num', 'text', 'label', 'exp_data']];
   sessions.forEach((session: Session) => {
+    const lesson: Lesson = lessons.find((current: Lesson) => {
+      return current.lessonId === session.lessonId;
+    });
     session.userResponses.forEach((response: Response) => {
       for (let expIx = 0; expIx < response.expectationScores.length; expIx++) {
         const grade = response.expectationScores[expIx].graderGrade;
@@ -149,7 +152,11 @@ SessionSchema.statics.getAllTrainingData = async function () {
           gradingStats[grade] += 1;
           // Classifier cannot use Neutral data
           if (grade !== 'Neutral') {
-            trainingData.push([`${expIx}`, response.text, grade]);
+            const expData = JSON.stringify({
+              question: lesson.question,
+              ideal: lesson.expectations[expIx].expectation,
+            });
+            trainingData.push([`${expIx}`, response.text, grade, expData]);
           }
         }
       }
