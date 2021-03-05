@@ -6,6 +6,12 @@ The full terms of this copyright and license should always be found in the root 
 */
 import { GraphQLString, GraphQLObjectType, GraphQLBoolean } from 'graphql';
 
+export interface TrainingData {
+  config: string;
+  training: string;
+  isTrainable: boolean;
+}
+
 export const TrainingDataType = new GraphQLObjectType({
   name: 'TrainingData',
   fields: {
