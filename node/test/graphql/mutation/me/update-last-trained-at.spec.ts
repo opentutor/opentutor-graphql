@@ -9,6 +9,7 @@ import { expect } from 'chai';
 import { Express } from 'express';
 import mongoUnit from 'mongo-unit';
 import request from 'supertest';
+import timekeeper from 'timekeeper';
 import { getToken } from '../../../helpers';
 
 describe('updateLastTrainedAt', () => {
@@ -21,6 +22,7 @@ describe('updateLastTrainedAt', () => {
   });
 
   afterEach(async () => {
+    timekeeper.reset();
     await appStop();
     await mongoUnit.drop();
   });
@@ -151,6 +153,7 @@ describe('updateLastTrainedAt', () => {
   it('succeeds for lesson creator', async () => {
     const token = getToken('5f0cfea3395d762ca65405d3');
     const date = new Date();
+    timekeeper.freeze(date);
     const response = await request(app)
       .post('/graphql')
       .set('Authorization', `bearer ${token}`)
