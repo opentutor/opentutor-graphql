@@ -169,7 +169,7 @@ describe('lesson', () => {
       ],
       conclusion: ['conclusion text'],
       features: null,
-      image: null,
+      image: 'some/image.png',
       createdBy: '5f0cfea3395d762ca65405d1',
       createdByName: 'Admin',
       lastTrainedAt: null,
