@@ -14,11 +14,10 @@ import {
 export const LessonInfoType = new GraphQLObjectType({
   name: 'LessonInfo',
   fields: {
-    deleted: { type: GraphQLBoolean },
     id: { type: GraphQLID },
+    image: { type: GraphQLString },
     lessonId: { type: GraphQLString },
     name: { type: GraphQLString },
-    image: { type: GraphQLString },
   },
 });
 

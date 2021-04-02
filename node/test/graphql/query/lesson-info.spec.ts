@@ -55,24 +55,29 @@ describe('lessonInfo', () => {
     );
   });
 
-  it('gets image and name for lesson', async () => {
+  it('returns data for a lesson', async () => {
     const response = await request(app).post('/graphql').send({
       query: `query {
         lessonInfo(lessonId: "lesson1") {
-            lessonId
+            id
             image
+            lessonId
             name
           }
       }`,
     });
     expect(response.status).to.equal(200);
     expect(response.body).to.have.deep.nested.property(
-      'data.lessonInfo.lessonId',
-      'lesson1'
+      'data.lessonInfo.id',
+      '5f0cfea3395d762ca65405c1'
     );
     expect(response.body).to.have.deep.nested.property(
       'data.lessonInfo.image',
       'some/image.png'
+    );
+    expect(response.body).to.have.deep.nested.property(
+      'data.lessonInfo.lessonId',
+      'lesson1'
     );
     expect(response.body).to.have.deep.nested.property(
       'data.lessonInfo.name',
