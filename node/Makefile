@@ -55,6 +55,9 @@ lint-fix: node_modules/eslint
 node_modules/eslint:
 	npm ci
 
+node_modules/license-check-and-add:
+	npm ci
+
 node_modules/mocha:
 	npm ci
 
@@ -78,11 +81,19 @@ test: node_modules/mocha
 	&& npm test
 
 .PHONY: test-all
-test-all: test-format test-lint test-types test
+test-all: test-audit test-format test-lint test-types test-license test
+
+.PHONY: test-audit
+test-audit:
+	npm run test:audit
 
 .PHONY: test-format
 test-format: node_modules/prettier
 	npm run test:format
+	
+.PHONY: test-license
+test-license: node_modules/license-check-and-add
+	npm run test:license
 
 .PHONY: test-lint
 test-lint: node_modules/eslint
