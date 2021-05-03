@@ -45,6 +45,7 @@ export const LessonType = new GraphQLObjectType({
     conclusion: { type: GraphQLList(GraphQLString) },
     lastTrainedAt: { type: DateType },
     features: { type: GraphQLJSON },
+    config: { type: GraphQLJSON },
     createdAt: { type: DateType },
     updatedAt: { type: DateType },
     trainingConfig: { type: GraphQLString },

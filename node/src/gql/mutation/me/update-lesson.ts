@@ -4,7 +4,16 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { GraphQLString, GraphQLObjectType } from 'graphql';
+import {
+  GraphQLString,
+  GraphQLObjectType,
+  GraphQLInputObjectType,
+  GraphQLNonNull,
+  GraphQLList,
+  GraphQLBoolean,
+  GraphQLID,
+} from 'graphql';
+import GraphQLJSON from 'graphql-type-json';
 import LessonType from 'gql/types/lesson';
 import {
   Lesson as LessonModel,
@@ -14,15 +23,72 @@ import {
 import { Lesson } from 'models/Lesson';
 import { User } from 'models/User';
 
+export interface UpdateHint {
+  text: string;
+}
+
+export interface UpdateLessonExpectation {
+  expectation: string;
+  features: any;
+  hints: UpdateHint[];
+}
+
+export interface UpdateLesson {
+  lessonId: string;
+  name: string;
+  intro: string;
+  question: string;
+  image: string;
+  expectations: UpdateLessonExpectation[];
+  conclusion: string[];
+  lastTrainedAt: Date;
+  features: any;
+  createdBy: string;
+  deleted: boolean;
+}
+
+export const UpdateHintInputType = new GraphQLInputObjectType({
+  name: 'UpdateHintInputType',
+  fields: () => ({
+    text: { type: GraphQLString },
+  }),
+});
+
+export const UpdateLessonExpectationInputType = new GraphQLInputObjectType({
+  name: 'UpdateLessonExpectationInputType',
+  fields: () => ({
+    expectation: { type: GraphQLString },
+    features: { type: GraphQLJSON },
+    hints: { type: GraphQLList(UpdateHintInputType) },
+  }),
+});
+
+export const UpdateLessonInputType = new GraphQLInputObjectType({
+  name: 'UpdateLessonInputType',
+  fields: () => ({
+    lessonId: { type: GraphQLString },
+    name: { type: GraphQLString },
+    intro: { type: GraphQLString },
+    question: { type: GraphQLString },
+    image: { type: GraphQLString },
+    expectations: { type: GraphQLList(UpdateLessonExpectationInputType) },
+    conclusion: { type: GraphQLList(GraphQLString) },
+    lastTrainedAt: { type: GraphQLString },
+    features: { type: GraphQLJSON },
+    createdBy: { type: GraphQLID },
+    deleted: { type: GraphQLBoolean },
+  }),
+});
+
 export const updateLesson = {
   type: LessonType,
   args: {
     lessonId: { type: GraphQLString },
-    lesson: { type: GraphQLString },
+    lesson: { type: GraphQLNonNull(UpdateLessonInputType) },
   },
   resolve: async (
     _root: GraphQLObjectType,
-    args: { lessonId: string; lesson: string },
+    args: { lessonId: string; lesson: UpdateLesson },
     context: { user: User }
   ): Promise<Lesson> => {
     if (!args.lessonId) {
@@ -31,7 +97,7 @@ export const updateLesson = {
     if (!args.lesson) {
       throw new Error('missing required param lesson');
     }
-    const lesson: Lesson = JSON.parse(decodeURI(args.lesson));
+    const lesson = args.lesson;
     if (lesson.deleted) {
       throw new Error('lesson was deleted');
     }

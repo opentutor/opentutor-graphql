@@ -112,7 +112,10 @@ export interface SessionModel extends Model<Session> {
 
   getAllTrainingData(): any;
 
-  updateLesson(lessonId: string, updatedLesson: Lesson): void;
+  updateLesson(
+    lessonId: string,
+    updatedLesson: { lessonId: string; createdBy: string; name: string }
+  ): void;
 
   setGrade(
     sessionId: string,
@@ -211,7 +214,7 @@ SessionSchema.statics.getTrainingData = async function (lessonId: string) {
 
 SessionSchema.statics.updateLesson = async function (
   lessonId: string,
-  updatedLesson: Lesson
+  updatedLesson: { lessonId: string; createdBy: string; name: string }
 ) {
   const createdBy = await UserModel.findOne({ _id: updatedLesson.createdBy });
   await this.updateMany(
