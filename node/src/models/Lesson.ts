@@ -41,7 +41,6 @@ export interface Lesson extends Document {
   conclusion: [string];
   lastTrainedAt: Date;
   features: any;
-  config: any;
   createdBy: mongoose.Types.ObjectId;
   createdByName: string;
   deleted: boolean;
@@ -58,7 +57,6 @@ export const LessonSchema = new Schema(
     conclusion: { type: [String] },
     lastTrainedAt: { type: Date },
     features: { type: Object },
-    config: { type: Object },
     createdBy: { type: Schema.Types.ObjectId, ref: 'User' },
     createdByName: { type: String },
     deleted: { type: Boolean },

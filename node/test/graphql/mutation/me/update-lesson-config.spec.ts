@@ -11,7 +11,7 @@ import mongoUnit from 'mongo-unit';
 import request from 'supertest';
 import { getToken } from '../../../helpers';
 
-describe('updateLessonConfig', () => {
+describe('updateLessonFeatures', () => {
   let app: Express;
 
   beforeEach(async () => {
@@ -29,7 +29,7 @@ describe('updateLessonConfig', () => {
     const response = await request(app).post('/graphql').send({
       query: `mutation {
           me {
-            updateLessonConfig(lesson: {}) { 
+            updateLessonFeatures(lesson: {}) { 
               lessonId
             }   
           }
@@ -45,7 +45,7 @@ describe('updateLessonConfig', () => {
   it(`throws an error if no edit permission`, async () => {
     const token = getToken('5f0cfea3395d762ca65405d3');
     const lesson = JSON.stringify({
-      config: { test: 'test' },
+      features: { test: 'test' },
     }).replace(/"([^"]+)":/g, '$1:');
     const response = await request(app)
       .post('/graphql')
@@ -53,7 +53,7 @@ describe('updateLessonConfig', () => {
       .send({
         query: `mutation {
           me {
-            updateLessonConfig(lessonId: "lesson1", lesson: ${lesson}) {
+            updateLessonFeatures(lessonId: "lesson1", lesson: ${lesson}) {
               lessonId
             }
           }
@@ -74,7 +74,7 @@ describe('updateLessonConfig', () => {
       .send({
         query: `mutation {
           me {
-            updateLessonConfig(lesson: {}) { 
+            updateLessonFeatures(lesson: {}) { 
               lessonId
             }   
           }
@@ -95,7 +95,7 @@ describe('updateLessonConfig', () => {
       .send({
         query: `mutation {
           me {
-            updateLessonConfig(lessonId: "lesson1") { 
+            updateLessonFeatures(lessonId: "lesson1") { 
               lessonId
             }   
           }
@@ -106,7 +106,7 @@ describe('updateLessonConfig', () => {
 
   it('updates for api key', async () => {
     const lesson = JSON.stringify({
-      config: { test: 'test' },
+      features: { test: 'test' },
     }).replace(/"([^"]+)":/g, '$1:');
     const response = await request(app)
       .post('/graphql')
@@ -115,14 +115,14 @@ describe('updateLessonConfig', () => {
       .send({
         query: `mutation {
           me {
-            updateLessonConfig(lessonId: "lesson1", lesson: ${lesson}) {
+            updateLessonFeatures(lessonId: "lesson1", lesson: ${lesson}) {
               lessonId
             }   
           }
         }`,
       });
     expect(response.status).to.equal(200);
-    expect(response.body.data.me.updateLessonConfig).to.eql({
+    expect(response.body.data.me.updateLessonFeatures).to.eql({
       lessonId: 'lesson1',
     });
   });
@@ -130,7 +130,7 @@ describe('updateLessonConfig', () => {
   it('updates for admin', async () => {
     const token = getToken('5f0cfea3395d762ca65405d1');
     const lesson = JSON.stringify({
-      config: { test: 'test' },
+      features: { test: 'test' },
     }).replace(/"([^"]+)":/g, '$1:');
     const response = await request(app)
       .post('/graphql')
@@ -138,14 +138,14 @@ describe('updateLessonConfig', () => {
       .send({
         query: `mutation {
           me {
-            updateLessonConfig(lessonId: "lesson1", lesson: ${lesson}) {
+            updateLessonFeatures(lessonId: "lesson1", lesson: ${lesson}) {
               lessonId
             }   
           }
         }`,
       });
     expect(response.status).to.equal(200);
-    expect(response.body.data.me.updateLessonConfig).to.eql({
+    expect(response.body.data.me.updateLessonFeatures).to.eql({
       lessonId: 'lesson1',
     });
   });
@@ -153,7 +153,7 @@ describe('updateLessonConfig', () => {
   it('updates for content manager', async () => {
     const token = getToken('5f0cfea3395d762ca65405d2');
     const lesson = JSON.stringify({
-      config: { test: 'test' },
+      features: { test: 'test' },
     }).replace(/"([^"]+)":/g, '$1:');
     const response = await request(app)
       .post('/graphql')
@@ -161,14 +161,14 @@ describe('updateLessonConfig', () => {
       .send({
         query: `mutation {
           me {
-            updateLessonConfig(lessonId: "lesson1", lesson: ${lesson}) {
+            updateLessonFeatures(lessonId: "lesson1", lesson: ${lesson}) {
               lessonId
             }   
           }
         }`,
       });
     expect(response.status).to.equal(200);
-    expect(response.body.data.me.updateLessonConfig).to.eql({
+    expect(response.body.data.me.updateLessonFeatures).to.eql({
       lessonId: 'lesson1',
     });
   });
@@ -176,7 +176,7 @@ describe('updateLessonConfig', () => {
   it('updates for lesson creator', async () => {
     const token = getToken('5f0cfea3395d762ca65405d3');
     const lesson = JSON.stringify({
-      config: { test: 'test' },
+      features: { test: 'test' },
     }).replace(/"([^"]+)":/g, '$1:');
     const response = await request(app)
       .post('/graphql')
@@ -184,14 +184,14 @@ describe('updateLessonConfig', () => {
       .send({
         query: `mutation {
           me {
-            updateLessonConfig(lessonId: "lesson2", lesson: ${lesson}) {
+            updateLessonFeatures(lessonId: "lesson2", lesson: ${lesson}) {
               lessonId
             }   
           }
         }`,
       });
     expect(response.status).to.equal(200);
-    expect(response.body.data.me.updateLessonConfig).to.eql({
+    expect(response.body.data.me.updateLessonFeatures).to.eql({
       lessonId: 'lesson2',
     });
   });
@@ -199,7 +199,7 @@ describe('updateLessonConfig', () => {
   it(`fails if lesson does not exist`, async () => {
     const token = getToken('5f0cfea3395d762ca65405d1');
     const lesson = JSON.stringify({
-      config: { test: 'test' },
+      features: { test: 'test' },
     }).replace(/"([^"]+)":/g, '$1:');
     const response = await request(app)
       .post('/graphql')
@@ -207,7 +207,7 @@ describe('updateLessonConfig', () => {
       .send({
         query: `mutation {
           me {
-            updateLessonConfig(lessonId: "newlesson", lesson: ${lesson}) {
+            updateLessonFeatures(lessonId: "newlesson", lesson: ${lesson}) {
               lessonId
             }   
           }
@@ -223,7 +223,7 @@ describe('updateLessonConfig', () => {
   it(`fails if invalid params are passed`, async () => {
     const token = getToken('5f0cfea3395d762ca65405d1');
     const lesson = JSON.stringify({
-      config: { test: 'test' },
+      features: { test: 'test' },
       lessonId: 'this should fail',
     }).replace(/"([^"]+)":/g, '$1:');
     const response = await request(app)
@@ -232,7 +232,7 @@ describe('updateLessonConfig', () => {
       .send({
         query: `mutation {
           me {
-            updateLessonConfig(lessonId: "newlesson", lesson: ${lesson}) {
+            updateLessonFeatures(lessonId: "newlesson", lesson: ${lesson}) {
               lessonId
             }   
           }
@@ -244,7 +244,7 @@ describe('updateLessonConfig', () => {
   it(`returns updated lesson`, async () => {
     const token = getToken('5f0cfea3395d762ca65405d3');
     const lesson = JSON.stringify({
-      config: { test: 'test' },
+      features: { test: 'test' },
     }).replace(/"([^"]+)":/g, '$1:');
     const response = await request(app)
       .post('/graphql')
@@ -252,15 +252,15 @@ describe('updateLessonConfig', () => {
       .send({
         query: `mutation {
           me {
-            updateLessonConfig(lessonId: "lesson2", lesson: ${lesson}) {
-              config
+            updateLessonFeatures(lessonId: "lesson2", lesson: ${lesson}) {
+              features
             }
           }
         }`,
       });
     expect(response.status).to.equal(200);
-    expect(response.body.data.me.updateLessonConfig).to.eql({
-      config: {
+    expect(response.body.data.me.updateLessonFeatures).to.eql({
+      features: {
         test: 'test',
       },
     });
@@ -269,7 +269,7 @@ describe('updateLessonConfig', () => {
   it(`updates lesson in database`, async () => {
     const token = getToken('5f0cfea3395d762ca65405d1');
     const lesson = JSON.stringify({
-      config: { test: 'test' },
+      features: { test: 'test' },
     }).replace(/"([^"]+)":/g, '$1:');
     await request(app)
       .post('/graphql')
@@ -277,7 +277,7 @@ describe('updateLessonConfig', () => {
       .send({
         query: `mutation {
           me {
-            updateLessonConfig(lessonId: "lesson1", lesson: ${lesson}) {
+            updateLessonFeatures(lessonId: "lesson1", lesson: ${lesson}) {
               lessonId
             }   
           }
@@ -290,14 +290,14 @@ describe('updateLessonConfig', () => {
         query: `query {
         me {
           lesson(lessonId: "lesson1") {
-            config
+            features
           }  
         }
       }`,
       });
     expect(newLesson.status).to.equal(200);
     expect(newLesson.body.data.me.lesson).to.eql({
-      config: { test: 'test' },
+      features: { test: 'test' },
     });
   });
 });

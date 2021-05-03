@@ -16,26 +16,26 @@ import { Lesson as LessonModel } from 'models';
 import { Lesson } from 'models/Lesson';
 import { User } from 'models/User';
 
-export interface UpdateLessonConfig {
-  config: any;
+export interface UpdateLessonFeatures {
+  features: any;
 }
 
-export const UpdateLessonConfigInputType = new GraphQLInputObjectType({
-  name: 'UpdateLessonConfigInputType',
+export const UpdateLessonFeaturesInputType = new GraphQLInputObjectType({
+  name: 'UpdateLessonFeaturesInputType',
   fields: () => ({
-    config: { type: GraphQLJSON },
+    features: { type: GraphQLJSON },
   }),
 });
 
-export const updateLessonConfig = {
+export const updateLessonFeatures = {
   type: LessonType,
   args: {
     lessonId: { type: GraphQLString },
-    lesson: { type: GraphQLNonNull(UpdateLessonConfigInputType) },
+    lesson: { type: GraphQLNonNull(UpdateLessonFeaturesInputType) },
   },
   resolve: async (
     _root: GraphQLObjectType,
-    args: { lessonId: string; lesson: UpdateLessonConfig },
+    args: { lessonId: string; lesson: UpdateLessonFeatures },
     context: { user: User }
   ): Promise<Lesson> => {
     if (!args.lessonId) {
@@ -66,4 +66,4 @@ export const updateLessonConfig = {
   },
 };
 
-export default updateLessonConfig;
+export default updateLessonFeatures;
