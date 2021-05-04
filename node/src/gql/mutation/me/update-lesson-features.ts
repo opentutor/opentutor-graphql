@@ -9,6 +9,8 @@ import {
   GraphQLObjectType,
   GraphQLInputObjectType,
   GraphQLNonNull,
+  GraphQLInt,
+  GraphQLList,
 } from 'graphql';
 import GraphQLJSON from 'graphql-type-json';
 import LessonType from 'gql/types/lesson';
@@ -20,6 +22,11 @@ export interface UpdateLessonFeatures {
   features: any;
 }
 
+export interface UpdateExpectationFeatures {
+  expectationIdx: number;
+  features: any;
+}
+
 export const UpdateLessonFeaturesInputType = new GraphQLInputObjectType({
   name: 'UpdateLessonFeaturesInputType',
   fields: () => ({
@@ -27,24 +34,32 @@ export const UpdateLessonFeaturesInputType = new GraphQLInputObjectType({
   }),
 });
 
+export const UpdateExpectationFeaturesInputType = new GraphQLInputObjectType({
+  name: 'UpdateExpectationFeaturesInputType',
+  fields: () => ({
+    expectationIdx: { type: GraphQLInt },
+    features: { type: GraphQLJSON },
+  }),
+});
+
 export const updateLessonFeatures = {
   type: LessonType,
   args: {
-    lessonId: { type: GraphQLString },
-    lesson: { type: GraphQLNonNull(UpdateLessonFeaturesInputType) },
+    lessonId: { type: GraphQLNonNull(GraphQLString) },
+    lessonUpdate: { type: UpdateLessonFeaturesInputType },
+    expectationUpdate: {
+      type: GraphQLList(UpdateExpectationFeaturesInputType),
+    },
   },
   resolve: async (
     _root: GraphQLObjectType,
-    args: { lessonId: string; lesson: UpdateLessonFeatures },
+    args: {
+      lessonId: string;
+      lessonUpdate: UpdateLessonFeatures;
+      expectationUpdate: UpdateExpectationFeatures[];
+    },
     context: { user: User }
   ): Promise<Lesson> => {
-    if (!args.lessonId) {
-      throw new Error('missing required param lessonId');
-    }
-    if (!args.lesson) {
-      throw new Error('missing required param lesson');
-    }
-    const lessonUpdate = args.lesson;
     const lesson = await LessonModel.findOne({ lessonId: args.lessonId });
     if (!lesson) {
       throw new Error('invalid lesson id');
@@ -52,12 +67,19 @@ export const updateLessonFeatures = {
     if (!LessonModel.userCanEdit(context.user, lesson)) {
       throw new Error('user does not have permission to edit this lesson');
     }
+
+    const setChanges: any = args.lessonUpdate || {};
+    for (const expUpdate of args.expectationUpdate || []) {
+      setChanges[`expectations.${expUpdate.expectationIdx}.features`] =
+        expUpdate.features;
+    }
+
     return await LessonModel.findOneAndUpdate(
       {
         lessonId: args.lessonId,
       },
       {
-        $set: lessonUpdate,
+        $set: setChanges,
       },
       {
         new: true,

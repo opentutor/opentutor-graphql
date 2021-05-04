@@ -29,7 +29,7 @@ describe('updateLessonFeatures', () => {
     const response = await request(app).post('/graphql').send({
       query: `mutation {
           me {
-            updateLessonFeatures(lesson: {}) { 
+            updateLessonFeatures(lessonId: "lesson1") { 
               lessonId
             }   
           }
@@ -53,7 +53,7 @@ describe('updateLessonFeatures', () => {
       .send({
         query: `mutation {
           me {
-            updateLessonFeatures(lessonId: "lesson1", lesson: ${lesson}) {
+            updateLessonFeatures(lessonId: "lesson1", lessonUpdate: ${lesson}) {
               lessonId
             }
           }
@@ -74,7 +74,27 @@ describe('updateLessonFeatures', () => {
       .send({
         query: `mutation {
           me {
-            updateLessonFeatures(lesson: {}) { 
+            updateLessonFeatures(lessonUpdate: {}) { 
+              lessonId
+            }   
+          }
+        }`,
+      });
+    expect(response.status).to.equal(400);
+  });
+
+  it(`throws an error if lesson does not exist`, async () => {
+    const token = getToken('5f0cfea3395d762ca65405d1');
+    const lesson = JSON.stringify({
+      features: { test: 'test' },
+    }).replace(/"([^"]+)":/g, '$1:');
+    const response = await request(app)
+      .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
+      .send({
+        query: `mutation {
+          me {
+            updateLessonFeatures(lessonId: "newlesson", lessonUpdate: ${lesson}) {
               lessonId
             }   
           }
@@ -83,25 +103,213 @@ describe('updateLessonFeatures', () => {
     expect(response.status).to.equal(200);
     expect(response.body).to.have.deep.nested.property(
       'errors[0].message',
-      'missing required param lessonId'
+      'invalid lesson id'
     );
   });
 
-  it(`throws an error if no lesson`, async () => {
+  it(`throws an error if invalid params are passed`, async () => {
     const token = getToken('5f0cfea3395d762ca65405d1');
+    const lesson = JSON.stringify({
+      features: { test: 'test' },
+      lessonId: 'this should fail',
+    }).replace(/"([^"]+)":/g, '$1:');
     const response = await request(app)
       .post('/graphql')
       .set('Authorization', `bearer ${token}`)
       .send({
         query: `mutation {
           me {
-            updateLessonFeatures(lessonId: "lesson1") { 
+            updateLessonFeatures(lessonId: "newlesson", lessonUpdate: ${lesson}) {
               lessonId
             }   
           }
         }`,
       });
     expect(response.status).to.equal(400);
+  });
+
+  it(`doesn't update anything if no lessonUpdate or expecationUpdate`, async () => {
+    const response = await request(app)
+      .post('/graphql')
+      .set('opentutor-api-req', 'true')
+      .set('Authorization', `bearer ${process.env.API_SECRET}`)
+      .send({
+        query: `mutation {
+          me {
+            updateLessonFeatures(lessonId: "lesson8") {
+              lessonId
+              features
+              expectations {
+                expectation
+                features
+              }
+            }   
+          }
+        }`,
+      });
+    expect(response.status).to.equal(200);
+    expect(response.body.data.me.updateLessonFeatures).to.eql({
+      lessonId: 'lesson8',
+      features: {
+        test: 'test',
+        question: 'fake question',
+      },
+      expectations: [
+        {
+          expectation: 'answer1',
+          features: {
+            ideal: 'new ideal answer',
+            good: ['good regex 1'],
+            bad: ['bad regex 1'],
+          },
+        },
+        {
+          expectation: 'answer2',
+          features: {
+            good: ['good regex 2'],
+            bad: ['bad regex 2'],
+          },
+        },
+      ],
+    });
+  });
+
+  it('updates lesson features and not expectation features', async () => {
+    const lesson = JSON.stringify({
+      features: { test: 'test' },
+    }).replace(/"([^"]+)":/g, '$1:');
+    const response = await request(app)
+      .post('/graphql')
+      .set('opentutor-api-req', 'true')
+      .set('Authorization', `bearer ${process.env.API_SECRET}`)
+      .send({
+        query: `mutation {
+          me {
+            updateLessonFeatures(lessonId: "lesson8", lessonUpdate: ${lesson}) {
+              lessonId
+              features
+              expectations {
+                expectation
+                features
+              }
+            }   
+          }
+        }`,
+      });
+    expect(response.status).to.equal(200);
+    expect(response.body.data.me.updateLessonFeatures).to.eql({
+      lessonId: 'lesson8',
+      features: {
+        test: 'test',
+      },
+      expectations: [
+        {
+          expectation: 'answer1',
+          features: {
+            ideal: 'new ideal answer',
+            good: ['good regex 1'],
+            bad: ['bad regex 1'],
+          },
+        },
+        {
+          expectation: 'answer2',
+          features: {
+            good: ['good regex 2'],
+            bad: ['bad regex 2'],
+          },
+        },
+      ],
+    });
+  });
+
+  it('updates expectation features and not lesson features', async () => {
+    const response = await request(app)
+      .post('/graphql')
+      .set('opentutor-api-req', 'true')
+      .set('Authorization', `bearer ${process.env.API_SECRET}`)
+      .send({
+        query: `mutation {
+          me {
+            updateLessonFeatures(lessonId: "lesson8", expectationUpdate: [{expectationIdx: 1, features: {test: "test"}}]) {
+              lessonId
+              features
+              expectations {
+                expectation
+                features
+              }
+            }   
+          }
+        }`,
+      });
+    expect(response.status).to.equal(200);
+    expect(response.body.data.me.updateLessonFeatures).to.eql({
+      lessonId: 'lesson8',
+      features: {
+        test: 'test',
+        question: 'fake question',
+      },
+      expectations: [
+        {
+          expectation: 'answer1',
+          features: {
+            ideal: 'new ideal answer',
+            good: ['good regex 1'],
+            bad: ['bad regex 1'],
+          },
+        },
+        {
+          expectation: 'answer2',
+          features: {
+            test: 'test',
+          },
+        },
+      ],
+    });
+  });
+
+  it('updates lesson and expectation features', async () => {
+    const lesson = JSON.stringify({
+      features: { test: 'test' },
+    }).replace(/"([^"]+)":/g, '$1:');
+    const response = await request(app)
+      .post('/graphql')
+      .set('opentutor-api-req', 'true')
+      .set('Authorization', `bearer ${process.env.API_SECRET}`)
+      .send({
+        query: `mutation {
+          me {
+            updateLessonFeatures(lessonId: "lesson8", lessonUpdate: ${lesson}, expectationUpdate: [{expectationIdx: 0, features: {test: "test1"}}, {expectationIdx: 1, features: {test: "test2"}}]) {
+              lessonId
+              features
+              expectations {
+                expectation
+                features
+              }
+            }   
+          }
+        }`,
+      });
+    expect(response.status).to.equal(200);
+    expect(response.body.data.me.updateLessonFeatures).to.eql({
+      lessonId: 'lesson8',
+      features: {
+        test: 'test',
+      },
+      expectations: [
+        {
+          expectation: 'answer1',
+          features: {
+            test: 'test1',
+          },
+        },
+        {
+          expectation: 'answer2',
+          features: {
+            test: 'test2',
+          },
+        },
+      ],
+    });
   });
 
   it('updates for api key', async () => {
@@ -115,8 +323,9 @@ describe('updateLessonFeatures', () => {
       .send({
         query: `mutation {
           me {
-            updateLessonFeatures(lessonId: "lesson1", lesson: ${lesson}) {
+            updateLessonFeatures(lessonId: "lesson1", lessonUpdate: ${lesson}) {
               lessonId
+              features
             }   
           }
         }`,
@@ -124,6 +333,9 @@ describe('updateLessonFeatures', () => {
     expect(response.status).to.equal(200);
     expect(response.body.data.me.updateLessonFeatures).to.eql({
       lessonId: 'lesson1',
+      features: {
+        test: 'test',
+      },
     });
   });
 
@@ -138,8 +350,9 @@ describe('updateLessonFeatures', () => {
       .send({
         query: `mutation {
           me {
-            updateLessonFeatures(lessonId: "lesson1", lesson: ${lesson}) {
+            updateLessonFeatures(lessonId: "lesson1", lessonUpdate: ${lesson}) {
               lessonId
+              features
             }   
           }
         }`,
@@ -147,6 +360,7 @@ describe('updateLessonFeatures', () => {
     expect(response.status).to.equal(200);
     expect(response.body.data.me.updateLessonFeatures).to.eql({
       lessonId: 'lesson1',
+      features: { test: 'test' },
     });
   });
 
@@ -161,8 +375,9 @@ describe('updateLessonFeatures', () => {
       .send({
         query: `mutation {
           me {
-            updateLessonFeatures(lessonId: "lesson1", lesson: ${lesson}) {
+            updateLessonFeatures(lessonId: "lesson1", lessonUpdate: ${lesson}) {
               lessonId
+              features
             }   
           }
         }`,
@@ -170,6 +385,7 @@ describe('updateLessonFeatures', () => {
     expect(response.status).to.equal(200);
     expect(response.body.data.me.updateLessonFeatures).to.eql({
       lessonId: 'lesson1',
+      features: { test: 'test' },
     });
   });
 
@@ -184,8 +400,9 @@ describe('updateLessonFeatures', () => {
       .send({
         query: `mutation {
           me {
-            updateLessonFeatures(lessonId: "lesson2", lesson: ${lesson}) {
+            updateLessonFeatures(lessonId: "lesson2", lessonUpdate: ${lesson}) {
               lessonId
+              features
             }   
           }
         }`,
@@ -193,52 +410,8 @@ describe('updateLessonFeatures', () => {
     expect(response.status).to.equal(200);
     expect(response.body.data.me.updateLessonFeatures).to.eql({
       lessonId: 'lesson2',
+      features: { test: 'test' },
     });
-  });
-
-  it(`fails if lesson does not exist`, async () => {
-    const token = getToken('5f0cfea3395d762ca65405d1');
-    const lesson = JSON.stringify({
-      features: { test: 'test' },
-    }).replace(/"([^"]+)":/g, '$1:');
-    const response = await request(app)
-      .post('/graphql')
-      .set('Authorization', `bearer ${token}`)
-      .send({
-        query: `mutation {
-          me {
-            updateLessonFeatures(lessonId: "newlesson", lesson: ${lesson}) {
-              lessonId
-            }   
-          }
-        }`,
-      });
-    expect(response.status).to.equal(200);
-    expect(response.body).to.have.deep.nested.property(
-      'errors[0].message',
-      'invalid lesson id'
-    );
-  });
-
-  it(`fails if invalid params are passed`, async () => {
-    const token = getToken('5f0cfea3395d762ca65405d1');
-    const lesson = JSON.stringify({
-      features: { test: 'test' },
-      lessonId: 'this should fail',
-    }).replace(/"([^"]+)":/g, '$1:');
-    const response = await request(app)
-      .post('/graphql')
-      .set('Authorization', `bearer ${token}`)
-      .send({
-        query: `mutation {
-          me {
-            updateLessonFeatures(lessonId: "newlesson", lesson: ${lesson}) {
-              lessonId
-            }   
-          }
-        }`,
-      });
-    expect(response.status).to.equal(400);
   });
 
   it(`returns updated lesson`, async () => {
@@ -252,7 +425,7 @@ describe('updateLessonFeatures', () => {
       .send({
         query: `mutation {
           me {
-            updateLessonFeatures(lessonId: "lesson2", lesson: ${lesson}) {
+            updateLessonFeatures(lessonId: "lesson2", lessonUpdate: ${lesson}) {
               features
             }
           }
@@ -277,7 +450,7 @@ describe('updateLessonFeatures', () => {
       .send({
         query: `mutation {
           me {
-            updateLessonFeatures(lessonId: "lesson1", lesson: ${lesson}) {
+            updateLessonFeatures(lessonId: "lesson1", lessonUpdate: ${lesson}) {
               lessonId
             }   
           }
