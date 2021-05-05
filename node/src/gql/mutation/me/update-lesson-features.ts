@@ -46,8 +46,8 @@ export const updateLessonFeatures = {
   type: LessonType,
   args: {
     lessonId: { type: GraphQLNonNull(GraphQLString) },
-    lessonUpdate: { type: UpdateLessonFeaturesInputType },
-    expectationUpdate: {
+    features: { type: UpdateLessonFeaturesInputType },
+    expectations: {
       type: GraphQLList(UpdateExpectationFeaturesInputType),
     },
   },
@@ -55,8 +55,8 @@ export const updateLessonFeatures = {
     _root: GraphQLObjectType,
     args: {
       lessonId: string;
-      lessonUpdate: UpdateLessonFeatures;
-      expectationUpdate: UpdateExpectationFeatures[];
+      features: UpdateLessonFeatures;
+      expectations: UpdateExpectationFeatures[];
     },
     context: { user: User }
   ): Promise<Lesson> => {
@@ -68,8 +68,8 @@ export const updateLessonFeatures = {
       throw new Error('user does not have permission to edit this lesson');
     }
 
-    const setChanges: any = args.lessonUpdate || {};
-    for (const expUpdate of args.expectationUpdate || []) {
+    const setChanges: any = args.features || {};
+    for (const expUpdate of args.expectations || []) {
       setChanges[`expectations.${expUpdate.expectationIdx}.features`] =
         expUpdate.features;
     }

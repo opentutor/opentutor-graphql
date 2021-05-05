@@ -11,6 +11,21 @@ import mongoUnit from 'mongo-unit';
 import request from 'supertest';
 import { getToken } from '../../../helpers';
 
+interface Request {
+  lessonId: string;
+  features?: LessonUpdate;
+  expectations?: ExpectationsUpdate[];
+}
+
+interface LessonUpdate {
+  features: any;
+}
+
+interface ExpectationsUpdate {
+  expectationIdx: number;
+  features: any;
+}
+
 describe('updateLessonFeatures', () => {
   let app: Express;
 
@@ -26,15 +41,25 @@ describe('updateLessonFeatures', () => {
   });
 
   it(`throws an error if not logged in`, async () => {
-    const response = await request(app).post('/graphql').send({
-      query: `mutation {
+    const req: Request = {
+      lessonId: 'lesson1',
+    };
+    const response = await request(app)
+      .post('/graphql')
+      .send({
+        query: `mutation UpdateLessonFeatures($lessonId: String!, $features: UpdateLessonFeaturesInputType, $expectations: [UpdateExpectationFeaturesInputType]) {
           me {
-            updateLessonFeatures(lessonId: "lesson1") { 
+            updateLessonFeatures(lessonId: $lessonId, features: $features, expectations: $expectations) { 
               lessonId
             }   
           }
         }`,
-    });
+        variables: {
+          lessonId: req.lessonId,
+          features: req.features,
+          expectations: req.expectations,
+        },
+      });
     expect(response.status).to.equal(200);
     expect(response.body).to.have.deep.nested.property(
       'errors[0].message',
@@ -44,20 +69,26 @@ describe('updateLessonFeatures', () => {
 
   it(`throws an error if no edit permission`, async () => {
     const token = getToken('5f0cfea3395d762ca65405d3');
-    const lesson = JSON.stringify({
-      features: { test: 'test' },
-    }).replace(/"([^"]+)":/g, '$1:');
+    const req: Request = {
+      lessonId: 'lesson1',
+      features: { features: { test: 'test' } },
+    };
     const response = await request(app)
       .post('/graphql')
       .set('Authorization', `bearer ${token}`)
       .send({
-        query: `mutation {
+        query: `mutation UpdateLessonFeatures($lessonId: String!, $features: UpdateLessonFeaturesInputType, $expectations: [UpdateExpectationFeaturesInputType]) {
           me {
-            updateLessonFeatures(lessonId: "lesson1", lessonUpdate: ${lesson}) {
+            updateLessonFeatures(lessonId: $lessonId, features: $features, expectations: $expectations) { 
               lessonId
-            }
+            }   
           }
         }`,
+        variables: {
+          lessonId: req.lessonId,
+          features: req.features,
+          expectations: req.expectations,
+        },
       });
     expect(response.status).to.equal(200);
     expect(response.body).to.have.deep.nested.property(
@@ -74,31 +105,40 @@ describe('updateLessonFeatures', () => {
       .send({
         query: `mutation {
           me {
-            updateLessonFeatures(lessonUpdate: {}) { 
+            updateLessonFeatures(features: {}) { 
               lessonId
             }   
           }
         }`,
       });
     expect(response.status).to.equal(400);
+    expect(response.body.errors[0].message).to.equal(
+      `Field "updateLessonFeatures" argument "lessonId" of type "String!" is required, but it was not provided.`
+    );
   });
 
   it(`throws an error if lesson does not exist`, async () => {
     const token = getToken('5f0cfea3395d762ca65405d1');
-    const lesson = JSON.stringify({
-      features: { test: 'test' },
-    }).replace(/"([^"]+)":/g, '$1:');
+    const req: Request = {
+      lessonId: 'newlesson',
+      features: { features: { test: 'test' } },
+    };
     const response = await request(app)
       .post('/graphql')
       .set('Authorization', `bearer ${token}`)
       .send({
-        query: `mutation {
+        query: `mutation UpdateLessonFeatures($lessonId: String!, $features: UpdateLessonFeaturesInputType, $expectations: [UpdateExpectationFeaturesInputType]) {
           me {
-            updateLessonFeatures(lessonId: "newlesson", lessonUpdate: ${lesson}) {
+            updateLessonFeatures(lessonId: $lessonId, features: $features, expectations: $expectations) { 
               lessonId
             }   
           }
         }`,
+        variables: {
+          lessonId: req.lessonId,
+          features: req.features,
+          expectations: req.expectations,
+        },
       });
     expect(response.status).to.equal(200);
     expect(response.body).to.have.deep.nested.property(
@@ -119,7 +159,7 @@ describe('updateLessonFeatures', () => {
       .send({
         query: `mutation {
           me {
-            updateLessonFeatures(lessonId: "newlesson", lessonUpdate: ${lesson}) {
+            updateLessonFeatures(lessonId: "lesson1", features: ${lesson}) {
               lessonId
             }   
           }
@@ -128,24 +168,30 @@ describe('updateLessonFeatures', () => {
     expect(response.status).to.equal(400);
   });
 
-  it(`doesn't update anything if no lessonUpdate or expecationUpdate`, async () => {
+  it(`doesn't update anything if no features or expecationUpdate`, async () => {
+    const req: Request = {
+      lessonId: 'lesson8',
+    };
     const response = await request(app)
       .post('/graphql')
       .set('opentutor-api-req', 'true')
       .set('Authorization', `bearer ${process.env.API_SECRET}`)
       .send({
-        query: `mutation {
+        query: `mutation UpdateLessonFeatures($lessonId: String!) {
           me {
-            updateLessonFeatures(lessonId: "lesson8") {
+            updateLessonFeatures(lessonId: $lessonId) { 
               lessonId
               features
               expectations {
                 expectation
                 features
               }
-            }   
+            }
           }
         }`,
+        variables: {
+          lessonId: req.lessonId,
+        },
       });
     expect(response.status).to.equal(200);
     expect(response.body.data.me.updateLessonFeatures).to.eql({
@@ -175,26 +221,31 @@ describe('updateLessonFeatures', () => {
   });
 
   it('updates lesson features and not expectation features', async () => {
-    const lesson = JSON.stringify({
-      features: { test: 'test' },
-    }).replace(/"([^"]+)":/g, '$1:');
+    const req: Request = {
+      lessonId: 'lesson8',
+      features: { features: { test: 'test' } },
+    };
     const response = await request(app)
       .post('/graphql')
       .set('opentutor-api-req', 'true')
       .set('Authorization', `bearer ${process.env.API_SECRET}`)
       .send({
-        query: `mutation {
+        query: `mutation UpdateLessonFeatures($lessonId: String!, $features: UpdateLessonFeaturesInputType) {
           me {
-            updateLessonFeatures(lessonId: "lesson8", lessonUpdate: ${lesson}) {
+            updateLessonFeatures(lessonId: $lessonId, features: $features) {
               lessonId
               features
               expectations {
                 expectation
                 features
               }
-            }   
+            }
           }
         }`,
+        variables: {
+          lessonId: req.lessonId,
+          features: req.features,
+        },
       });
     expect(response.status).to.equal(200);
     expect(response.body.data.me.updateLessonFeatures).to.eql({
@@ -223,23 +274,32 @@ describe('updateLessonFeatures', () => {
   });
 
   it('updates expectation features and not lesson features', async () => {
+    const req: Request = {
+      lessonId: 'lesson8',
+      expectations: [{ expectationIdx: 1, features: { test: 'test' } }],
+    };
     const response = await request(app)
       .post('/graphql')
       .set('opentutor-api-req', 'true')
       .set('Authorization', `bearer ${process.env.API_SECRET}`)
       .send({
-        query: `mutation {
+        query: `mutation UpdateLessonFeatures($lessonId: String!, $features: UpdateLessonFeaturesInputType, $expectations: [UpdateExpectationFeaturesInputType]) {
           me {
-            updateLessonFeatures(lessonId: "lesson8", expectationUpdate: [{expectationIdx: 1, features: {test: "test"}}]) {
+            updateLessonFeatures(lessonId: $lessonId, features: $features, expectations: $expectations) { 
               lessonId
               features
               expectations {
                 expectation
                 features
               }
-            }   
+            }
           }
         }`,
+        variables: {
+          lessonId: req.lessonId,
+          features: req.features,
+          expectations: req.expectations,
+        },
       });
     expect(response.status).to.equal(200);
     expect(response.body.data.me.updateLessonFeatures).to.eql({
@@ -268,26 +328,36 @@ describe('updateLessonFeatures', () => {
   });
 
   it('updates lesson and expectation features', async () => {
-    const lesson = JSON.stringify({
-      features: { test: 'test' },
-    }).replace(/"([^"]+)":/g, '$1:');
+    const req: Request = {
+      lessonId: 'lesson8',
+      features: { features: { test: 'test' } },
+      expectations: [
+        { expectationIdx: 0, features: { test: 'test1' } },
+        { expectationIdx: 1, features: { test: 'test2' } },
+      ],
+    };
     const response = await request(app)
       .post('/graphql')
       .set('opentutor-api-req', 'true')
       .set('Authorization', `bearer ${process.env.API_SECRET}`)
       .send({
-        query: `mutation {
+        query: `mutation UpdateLessonFeatures($lessonId: String!, $features: UpdateLessonFeaturesInputType, $expectations: [UpdateExpectationFeaturesInputType]) {
           me {
-            updateLessonFeatures(lessonId: "lesson8", lessonUpdate: ${lesson}, expectationUpdate: [{expectationIdx: 0, features: {test: "test1"}}, {expectationIdx: 1, features: {test: "test2"}}]) {
+            updateLessonFeatures(lessonId: $lessonId, features: $features, expectations: $expectations) { 
               lessonId
               features
               expectations {
                 expectation
                 features
               }
-            }   
+            }
           }
         }`,
+        variables: {
+          lessonId: req.lessonId,
+          features: req.features,
+          expectations: req.expectations,
+        },
       });
     expect(response.status).to.equal(200);
     expect(response.body.data.me.updateLessonFeatures).to.eql({
@@ -313,22 +383,28 @@ describe('updateLessonFeatures', () => {
   });
 
   it('updates for api key', async () => {
-    const lesson = JSON.stringify({
-      features: { test: 'test' },
-    }).replace(/"([^"]+)":/g, '$1:');
+    const req: Request = {
+      lessonId: 'lesson1',
+      features: { features: { test: 'test' } },
+    };
     const response = await request(app)
       .post('/graphql')
       .set('opentutor-api-req', 'true')
       .set('Authorization', `bearer ${process.env.API_SECRET}`)
       .send({
-        query: `mutation {
+        query: `mutation UpdateLessonFeatures($lessonId: String!, $features: UpdateLessonFeaturesInputType, $expectations: [UpdateExpectationFeaturesInputType]) {
           me {
-            updateLessonFeatures(lessonId: "lesson1", lessonUpdate: ${lesson}) {
+            updateLessonFeatures(lessonId: $lessonId, features: $features, expectations: $expectations) { 
               lessonId
               features
-            }   
+            }
           }
         }`,
+        variables: {
+          lessonId: req.lessonId,
+          features: req.features,
+          expectations: req.expectations,
+        },
       });
     expect(response.status).to.equal(200);
     expect(response.body.data.me.updateLessonFeatures).to.eql({
@@ -341,21 +417,27 @@ describe('updateLessonFeatures', () => {
 
   it('updates for admin', async () => {
     const token = getToken('5f0cfea3395d762ca65405d1');
-    const lesson = JSON.stringify({
-      features: { test: 'test' },
-    }).replace(/"([^"]+)":/g, '$1:');
+    const req: Request = {
+      lessonId: 'lesson1',
+      features: { features: { test: 'test' } },
+    };
     const response = await request(app)
       .post('/graphql')
       .set('Authorization', `bearer ${token}`)
       .send({
-        query: `mutation {
+        query: `mutation UpdateLessonFeatures($lessonId: String!, $features: UpdateLessonFeaturesInputType, $expectations: [UpdateExpectationFeaturesInputType]) {
           me {
-            updateLessonFeatures(lessonId: "lesson1", lessonUpdate: ${lesson}) {
+            updateLessonFeatures(lessonId: $lessonId, features: $features, expectations: $expectations) { 
               lessonId
               features
-            }   
+            }
           }
         }`,
+        variables: {
+          lessonId: req.lessonId,
+          features: req.features,
+          expectations: req.expectations,
+        },
       });
     expect(response.status).to.equal(200);
     expect(response.body.data.me.updateLessonFeatures).to.eql({
@@ -366,21 +448,27 @@ describe('updateLessonFeatures', () => {
 
   it('updates for content manager', async () => {
     const token = getToken('5f0cfea3395d762ca65405d2');
-    const lesson = JSON.stringify({
-      features: { test: 'test' },
-    }).replace(/"([^"]+)":/g, '$1:');
+    const req: Request = {
+      lessonId: 'lesson1',
+      features: { features: { test: 'test' } },
+    };
     const response = await request(app)
       .post('/graphql')
       .set('Authorization', `bearer ${token}`)
       .send({
-        query: `mutation {
+        query: `mutation UpdateLessonFeatures($lessonId: String!, $features: UpdateLessonFeaturesInputType, $expectations: [UpdateExpectationFeaturesInputType]) {
           me {
-            updateLessonFeatures(lessonId: "lesson1", lessonUpdate: ${lesson}) {
+            updateLessonFeatures(lessonId: $lessonId, features: $features, expectations: $expectations) { 
               lessonId
               features
-            }   
+            }
           }
         }`,
+        variables: {
+          lessonId: req.lessonId,
+          features: req.features,
+          expectations: req.expectations,
+        },
       });
     expect(response.status).to.equal(200);
     expect(response.body.data.me.updateLessonFeatures).to.eql({
@@ -391,21 +479,27 @@ describe('updateLessonFeatures', () => {
 
   it('updates for lesson creator', async () => {
     const token = getToken('5f0cfea3395d762ca65405d3');
-    const lesson = JSON.stringify({
-      features: { test: 'test' },
-    }).replace(/"([^"]+)":/g, '$1:');
+    const req: Request = {
+      lessonId: 'lesson2',
+      features: { features: { test: 'test' } },
+    };
     const response = await request(app)
       .post('/graphql')
       .set('Authorization', `bearer ${token}`)
       .send({
-        query: `mutation {
+        query: `mutation UpdateLessonFeatures($lessonId: String!, $features: UpdateLessonFeaturesInputType, $expectations: [UpdateExpectationFeaturesInputType]) {
           me {
-            updateLessonFeatures(lessonId: "lesson2", lessonUpdate: ${lesson}) {
+            updateLessonFeatures(lessonId: $lessonId, features: $features, expectations: $expectations) { 
               lessonId
               features
-            }   
+            }
           }
         }`,
+        variables: {
+          lessonId: req.lessonId,
+          features: req.features,
+          expectations: req.expectations,
+        },
       });
     expect(response.status).to.equal(200);
     expect(response.body.data.me.updateLessonFeatures).to.eql({
@@ -416,20 +510,26 @@ describe('updateLessonFeatures', () => {
 
   it(`returns updated lesson`, async () => {
     const token = getToken('5f0cfea3395d762ca65405d3');
-    const lesson = JSON.stringify({
-      features: { test: 'test' },
-    }).replace(/"([^"]+)":/g, '$1:');
+    const req: Request = {
+      lessonId: 'lesson2',
+      features: { features: { test: 'test' } },
+    };
     const response = await request(app)
       .post('/graphql')
       .set('Authorization', `bearer ${token}`)
       .send({
-        query: `mutation {
+        query: `mutation UpdateLessonFeatures($lessonId: String!, $features: UpdateLessonFeaturesInputType, $expectations: [UpdateExpectationFeaturesInputType]) {
           me {
-            updateLessonFeatures(lessonId: "lesson2", lessonUpdate: ${lesson}) {
+            updateLessonFeatures(lessonId: $lessonId, features: $features, expectations: $expectations) { 
               features
             }
           }
         }`,
+        variables: {
+          lessonId: req.lessonId,
+          features: req.features,
+          expectations: req.expectations,
+        },
       });
     expect(response.status).to.equal(200);
     expect(response.body.data.me.updateLessonFeatures).to.eql({
@@ -441,20 +541,26 @@ describe('updateLessonFeatures', () => {
 
   it(`updates lesson in database`, async () => {
     const token = getToken('5f0cfea3395d762ca65405d1');
-    const lesson = JSON.stringify({
-      features: { test: 'test' },
-    }).replace(/"([^"]+)":/g, '$1:');
+    const req: Request = {
+      lessonId: 'lesson1',
+      features: { features: { test: 'test' } },
+    };
     await request(app)
       .post('/graphql')
       .set('Authorization', `bearer ${token}`)
       .send({
-        query: `mutation {
+        query: `mutation UpdateLessonFeatures($lessonId: String!, $features: UpdateLessonFeaturesInputType, $expectations: [UpdateExpectationFeaturesInputType]) {
           me {
-            updateLessonFeatures(lessonId: "lesson1", lessonUpdate: ${lesson}) {
-              lessonId
-            }   
+            updateLessonFeatures(lessonId: $lessonId, features: $features, expectations: $expectations) { 
+              features
+            }
           }
         }`,
+        variables: {
+          lessonId: req.lessonId,
+          features: req.features,
+          expectations: req.expectations,
+        },
       });
     const newLesson = await request(app)
       .post('/graphql')
