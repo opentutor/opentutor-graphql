@@ -23,7 +23,7 @@ export interface UpdateLessonFeatures {
 }
 
 export interface UpdateExpectationFeatures {
-  expectationIdx: number;
+  expectation: number;
   features: any;
 }
 
@@ -37,7 +37,7 @@ export const UpdateLessonFeaturesInputType = new GraphQLInputObjectType({
 export const UpdateExpectationFeaturesInputType = new GraphQLInputObjectType({
   name: 'UpdateExpectationFeaturesInputType',
   fields: () => ({
-    expectationIdx: { type: GraphQLInt },
+    expectation: { type: GraphQLInt },
     features: { type: GraphQLJSON },
   }),
 });
@@ -70,7 +70,7 @@ export const updateLessonFeatures = {
 
     const setChanges: any = args.features || {};
     for (const expUpdate of args.expectations || []) {
-      setChanges[`expectations.${expUpdate.expectationIdx}.features`] =
+      setChanges[`expectations.${expUpdate.expectation}.features`] =
         expUpdate.features;
     }
 

@@ -22,7 +22,7 @@ interface LessonUpdate {
 }
 
 interface ExpectationsUpdate {
-  expectationIdx: number;
+  expectation: number;
   features: any;
 }
 
@@ -276,7 +276,7 @@ describe('updateLessonFeatures', () => {
   it('updates expectation features and not lesson features', async () => {
     const req: Request = {
       lessonId: 'lesson8',
-      expectations: [{ expectationIdx: 1, features: { test: 'test' } }],
+      expectations: [{ expectation: 1, features: { test: 'test' } }],
     };
     const response = await request(app)
       .post('/graphql')
@@ -332,8 +332,8 @@ describe('updateLessonFeatures', () => {
       lessonId: 'lesson8',
       features: { features: { test: 'test' } },
       expectations: [
-        { expectationIdx: 0, features: { test: 'test1' } },
-        { expectationIdx: 1, features: { test: 'test2' } },
+        { expectation: 0, features: { test: 'test1' } },
+        { expectation: 1, features: { test: 'test2' } },
       ],
     };
     const response = await request(app)
