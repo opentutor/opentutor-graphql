@@ -71,10 +71,16 @@ export interface LessonModel extends Model<Lesson> {
     callback?: any
   ): Promise<PaginatedResolveResult<Lesson>>;
 
-  userCanEdit(user: User, lesson: Lesson): boolean;
+  userCanEdit(
+    user: User,
+    lesson: { createdBy: string | mongoose.Types.ObjectId }
+  ): boolean;
 }
 
-LessonSchema.statics.userCanEdit = function (user: User, lesson: Lesson) {
+LessonSchema.statics.userCanEdit = function (
+  user: User,
+  lesson: { createdBy: string }
+) {
   return (
     user.userRole === UserRole.ADMIN ||
     user.userRole === UserRole.CONTENT_MANAGER ||

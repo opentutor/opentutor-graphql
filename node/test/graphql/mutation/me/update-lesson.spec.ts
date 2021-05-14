@@ -29,7 +29,7 @@ describe('updateLesson', () => {
     const response = await request(app).post('/graphql').send({
       query: `mutation {
           me {
-            updateLesson(lesson: "") { 
+            updateLesson(lesson: {}) { 
               lessonId
             }   
           }
@@ -44,33 +44,31 @@ describe('updateLesson', () => {
 
   it(`throws an error if no edit permission`, async () => {
     const token = getToken('5f0cfea3395d762ca65405d3');
-    const lesson = encodeURI(
-      JSON.stringify({
-        lessonId: 'newlesson',
-        name: 'new name',
-        intro: 'new intro',
-        question: 'new question',
-        conclusion: ['new conclusion'],
-        createdBy: '5f0cfea3395d762ca65405d1',
-        expectations: [
-          {
-            expectation: 'new expectation',
-            hints: [
-              {
-                text: 'new hint',
-              },
-            ],
-          },
-        ],
-      })
-    );
+    const lesson = JSON.stringify({
+      lessonId: 'newlesson',
+      name: 'new name',
+      intro: 'new intro',
+      question: 'new question',
+      conclusion: ['new conclusion'],
+      createdBy: '5f0cfea3395d762ca65405d1',
+      expectations: [
+        {
+          expectation: 'new expectation',
+          hints: [
+            {
+              text: 'new hint',
+            },
+          ],
+        },
+      ],
+    }).replace(/"([^"]+)":/g, '$1:');
     const response = await request(app)
       .post('/graphql')
       .set('Authorization', `bearer ${token}`)
       .send({
         query: `mutation {
           me {
-            updateLesson(lessonId: "newlesson", lesson: "${lesson}") {
+            updateLesson(lessonId: "newlesson", lesson: ${lesson}) {
               lessonId
             }   
           }
@@ -91,7 +89,7 @@ describe('updateLesson', () => {
       .send({
         query: `mutation {
           me {
-            updateLesson(lesson: "") { 
+            updateLesson(lesson: {}) { 
               lessonId
             }   
           }
@@ -118,28 +116,22 @@ describe('updateLesson', () => {
           }
         }`,
       });
-    expect(response.status).to.equal(200);
-    expect(response.body).to.have.deep.nested.property(
-      'errors[0].message',
-      'missing required param lesson'
-    );
+    expect(response.status).to.equal(400);
   });
 
   it(`throws an error if lesson was deleted`, async () => {
     const token = getToken('5f0cfea3395d762ca65405d1');
-    const lesson = encodeURI(
-      JSON.stringify({
-        lessonId: '_deleted_lesson',
-        deleted: true,
-      })
-    );
+    const lesson = JSON.stringify({
+      lessonId: '_deleted_lesson',
+      deleted: true,
+    }).replace(/"([^"]+)":/g, '$1:');
     const response = await request(app)
       .post('/graphql')
       .set('Authorization', `bearer ${token}`)
       .send({
         query: `mutation {
           me {
-            updateLesson(lessonId: "_deleted_lesson", lesson: "${lesson}") {
+            updateLesson(lessonId: "_deleted_lesson", lesson: ${lesson}) {
               lessonId
             }   
           }
@@ -154,18 +146,16 @@ describe('updateLesson', () => {
 
   it(`args.lessonId must be lowercase`, async () => {
     const token = getToken('5f0cfea3395d762ca65405d1');
-    const lesson = encodeURI(
-      JSON.stringify({
-        lessonId: 'a',
-      })
-    );
+    const lesson = JSON.stringify({
+      lessonId: 'a',
+    }).replace(/"([^"]+)":/g, '$1:');
     const response = await request(app)
       .post('/graphql')
       .set('Authorization', `bearer ${token}`)
       .send({
         query: `mutation {
           me {
-            updateLesson(lessonId: "A", lesson: "${lesson}") {
+            updateLesson(lessonId: "A", lesson: ${lesson}) {
               lessonId
             }   
           }
@@ -180,18 +170,16 @@ describe('updateLesson', () => {
 
   it(`lesson.lessonId must be lowercase`, async () => {
     const token = getToken('5f0cfea3395d762ca65405d1');
-    const lesson = encodeURI(
-      JSON.stringify({
-        lessonId: 'A',
-      })
-    );
+    const lesson = JSON.stringify({
+      lessonId: 'A',
+    }).replace(/"([^"]+)":/g, '$1:');
     const response = await request(app)
       .post('/graphql')
       .set('Authorization', `bearer ${token}`)
       .send({
         query: `mutation {
           me {
-            updateLesson(lessonId: "a", lesson: "${lesson}") {
+            updateLesson(lessonId: "a", lesson: ${lesson}) {
               lessonId
             }   
           }
@@ -206,18 +194,16 @@ describe('updateLesson', () => {
 
   it(`args.lessonId cannot contain special chars`, async () => {
     const token = getToken('5f0cfea3395d762ca65405d1');
-    const lesson = encodeURI(
-      JSON.stringify({
-        lessonId: 'a',
-      })
-    );
+    const lesson = JSON.stringify({
+      lessonId: 'a',
+    }).replace(/"([^"]+)":/g, '$1:');
     const response = await request(app)
       .post('/graphql')
       .set('Authorization', `bearer ${token}`)
       .send({
         query: `mutation {
           me {
-            updateLesson(lessonId: "!", lesson: "${lesson}") {
+            updateLesson(lessonId: "!", lesson: ${lesson}) {
               lessonId
             }   
           }
@@ -232,18 +218,16 @@ describe('updateLesson', () => {
 
   it(`lesson.lessonId cannot contain special chars`, async () => {
     const token = getToken('5f0cfea3395d762ca65405d1');
-    const lesson = encodeURI(
-      JSON.stringify({
-        lessonId: '!',
-      })
-    );
+    const lesson = JSON.stringify({
+      lessonId: '!',
+    }).replace(/"([^"]+)":/g, '$1:');
     const response = await request(app)
       .post('/graphql')
       .set('Authorization', `bearer ${token}`)
       .send({
         query: `mutation {
           me {
-            updateLesson(lessonId: "a", lesson: "${lesson}") {
+            updateLesson(lessonId: "a", lesson: ${lesson}) {
               lessonId
             }   
           }
@@ -257,11 +241,9 @@ describe('updateLesson', () => {
   });
 
   it('updates for api key', async () => {
-    const lesson = encodeURI(
-      JSON.stringify({
-        lessonId: 'lesson1',
-      })
-    );
+    const lesson = JSON.stringify({
+      lessonId: 'lesson1',
+    }).replace(/"([^"]+)":/g, '$1:');
     const response = await request(app)
       .post('/graphql')
       .set('opentutor-api-req', 'true')
@@ -269,7 +251,7 @@ describe('updateLesson', () => {
       .send({
         query: `mutation {
           me {
-            updateLesson(lessonId: "lesson1", lesson: "${lesson}") {
+            updateLesson(lessonId: "lesson1", lesson: ${lesson}) {
               lessonId
             }   
           }
@@ -283,18 +265,16 @@ describe('updateLesson', () => {
 
   it('updates for admin', async () => {
     const token = getToken('5f0cfea3395d762ca65405d1');
-    const lesson = encodeURI(
-      JSON.stringify({
-        lessonId: 'lesson1',
-      })
-    );
+    const lesson = JSON.stringify({
+      lessonId: 'lesson1',
+    }).replace(/"([^"]+)":/g, '$1:');
     const response = await request(app)
       .post('/graphql')
       .set('Authorization', `bearer ${token}`)
       .send({
         query: `mutation {
           me {
-            updateLesson(lessonId: "lesson1", lesson: "${lesson}") {
+            updateLesson(lessonId: "lesson1", lesson: ${lesson}) {
               lessonId
             }   
           }
@@ -308,18 +288,16 @@ describe('updateLesson', () => {
 
   it('updates for content manager', async () => {
     const token = getToken('5f0cfea3395d762ca65405d2');
-    const lesson = encodeURI(
-      JSON.stringify({
-        lessonId: 'lesson1',
-      })
-    );
+    const lesson = JSON.stringify({
+      lessonId: 'lesson1',
+    }).replace(/"([^"]+)":/g, '$1:');
     const response = await request(app)
       .post('/graphql')
       .set('Authorization', `bearer ${token}`)
       .send({
         query: `mutation {
           me {
-            updateLesson(lessonId: "lesson1", lesson: "${lesson}") {
+            updateLesson(lessonId: "lesson1", lesson: ${lesson}) {
               lessonId
             }   
           }
@@ -333,19 +311,17 @@ describe('updateLesson', () => {
 
   it('updates for lesson creator', async () => {
     const token = getToken('5f0cfea3395d762ca65405d3');
-    const lesson = encodeURI(
-      JSON.stringify({
-        lessonId: 'lesson2',
-        createdBy: '5f0cfea3395d762ca65405d3',
-      })
-    );
+    const lesson = JSON.stringify({
+      lessonId: 'lesson2',
+      createdBy: '5f0cfea3395d762ca65405d3',
+    }).replace(/"([^"]+)":/g, '$1:');
     const response = await request(app)
       .post('/graphql')
       .set('Authorization', `bearer ${token}`)
       .send({
         query: `mutation {
           me {
-            updateLesson(lessonId: "lesson2", lesson: "${lesson}") {
+            updateLesson(lessonId: "lesson2", lesson: ${lesson}) {
               lessonId
             }   
           }
@@ -359,33 +335,31 @@ describe('updateLesson', () => {
 
   it(`creates a new lesson`, async () => {
     const token = getToken('5f0cfea3395d762ca65405d1');
-    const lesson = encodeURI(
-      JSON.stringify({
-        lessonId: 'newlesson',
-        name: 'new name',
-        intro: 'new intro',
-        question: 'new question',
-        conclusion: ['new conclusion'],
-        createdBy: '5f0cfea3395d762ca65405d1',
-        expectations: [
-          {
-            expectation: 'new expectation',
-            hints: [
-              {
-                text: 'new hint',
-              },
-            ],
-          },
-        ],
-      })
-    );
+    const lesson = JSON.stringify({
+      lessonId: 'newlesson',
+      name: 'new name',
+      intro: 'new intro',
+      question: 'new question',
+      conclusion: ['new conclusion'],
+      createdBy: '5f0cfea3395d762ca65405d1',
+      expectations: [
+        {
+          expectation: 'new expectation',
+          hints: [
+            {
+              text: 'new hint',
+            },
+          ],
+        },
+      ],
+    }).replace(/"([^"]+)":/g, '$1:');
     const response = await request(app)
       .post('/graphql')
       .set('Authorization', `bearer ${token}`)
       .send({
         query: `mutation {
           me {
-            updateLesson(lessonId: "newlesson", lesson: "${lesson}") {
+            updateLesson(lessonId: "newlesson", lesson: ${lesson}) {
               lessonId
               name
               intro
@@ -425,33 +399,31 @@ describe('updateLesson', () => {
 
   it(`adds new lesson to database`, async () => {
     const token = getToken('5f0cfea3395d762ca65405d1');
-    const lesson = encodeURI(
-      JSON.stringify({
-        lessonId: 'newlesson',
-        createdBy: '5f0cfea3395d762ca65405d1',
-        name: 'new name',
-        intro: 'new intro',
-        question: 'new question',
-        conclusion: ['new conclusion'],
-        expectations: [
-          {
-            expectation: 'new expectation',
-            hints: [
-              {
-                text: 'new hint',
-              },
-            ],
-          },
-        ],
-      })
-    );
+    const lesson = JSON.stringify({
+      lessonId: 'newlesson',
+      createdBy: '5f0cfea3395d762ca65405d1',
+      name: 'new name',
+      intro: 'new intro',
+      question: 'new question',
+      conclusion: ['new conclusion'],
+      expectations: [
+        {
+          expectation: 'new expectation',
+          hints: [
+            {
+              text: 'new hint',
+            },
+          ],
+        },
+      ],
+    }).replace(/"([^"]+)":/g, '$1:');
     await request(app)
       .post('/graphql')
       .set('Authorization', `bearer ${token}`)
       .send({
         query: `mutation {
           me {
-            updateLesson(lessonId: "newlesson", lesson: "${lesson}") {
+            updateLesson(lessonId: "newlesson", lesson: ${lesson}) {
               lessonId
             }   
           }
@@ -502,33 +474,31 @@ describe('updateLesson', () => {
 
   it(`returns updated lesson`, async () => {
     const token = getToken('5f0cfea3395d762ca65405d3');
-    const lesson = encodeURI(
-      JSON.stringify({
-        lessonId: 'lesson1',
-        name: 'updated name',
-        intro: 'updated intro',
-        question: 'updated question',
-        conclusion: ['updated conclusion'],
-        expectations: [
-          {
-            expectation: 'updated expectation',
-            hints: [
-              {
-                text: 'updated hint',
-              },
-            ],
-          },
-        ],
-        createdBy: '5f0cfea3395d762ca65405d3',
-      })
-    );
+    const lesson = JSON.stringify({
+      lessonId: 'lesson1',
+      name: 'updated name',
+      intro: 'updated intro',
+      question: 'updated question',
+      conclusion: ['updated conclusion'],
+      expectations: [
+        {
+          expectation: 'updated expectation',
+          hints: [
+            {
+              text: 'updated hint',
+            },
+          ],
+        },
+      ],
+      createdBy: '5f0cfea3395d762ca65405d3',
+    }).replace(/"([^"]+)":/g, '$1:');
     const response = await request(app)
       .post('/graphql')
       .set('Authorization', `bearer ${token}`)
       .send({
         query: `mutation {
           me {
-            updateLesson(lessonId: "lesson1", lesson: "${lesson}") {
+            updateLesson(lessonId: "lesson1", lesson: ${lesson}) {
               lessonId
               name
               intro
@@ -568,33 +538,31 @@ describe('updateLesson', () => {
 
   it(`updates lesson in database`, async () => {
     const token = getToken('5f0cfea3395d762ca65405d1');
-    const lesson = encodeURI(
-      JSON.stringify({
-        createdBy: '5f0cfea3395d762ca65405d1',
-        lessonId: 'lesson1',
-        name: 'updated name',
-        intro: 'updated intro',
-        question: 'updated question',
-        conclusion: ['updated conclusion'],
-        expectations: [
-          {
-            expectation: 'updated expectation',
-            hints: [
-              {
-                text: 'updated hint',
-              },
-            ],
-          },
-        ],
-      })
-    );
+    const lesson = JSON.stringify({
+      createdBy: '5f0cfea3395d762ca65405d1',
+      lessonId: 'lesson1',
+      name: 'updated name',
+      intro: 'updated intro',
+      question: 'updated question',
+      conclusion: ['updated conclusion'],
+      expectations: [
+        {
+          expectation: 'updated expectation',
+          hints: [
+            {
+              text: 'updated hint',
+            },
+          ],
+        },
+      ],
+    }).replace(/"([^"]+)":/g, '$1:');
     await request(app)
       .post('/graphql')
       .set('Authorization', `bearer ${token}`)
       .send({
         query: `mutation {
           me {
-            updateLesson(lessonId: "lesson1", lesson: "${lesson}") {
+            updateLesson(lessonId: "lesson1", lesson: ${lesson}) {
               lessonId
             }   
           }
@@ -644,20 +612,18 @@ describe('updateLesson', () => {
 
   it(`updates lessonId`, async () => {
     const token = getToken('5f0cfea3395d762ca65405d1');
-    const lesson = encodeURI(
-      JSON.stringify({
-        createdBy: '5f0cfea3395d762ca65405d1',
-        lessonId: 'newlessonid',
-        name: 'lesson name',
-      })
-    );
+    const lesson = JSON.stringify({
+      createdBy: '5f0cfea3395d762ca65405d1',
+      lessonId: 'newlessonid',
+      name: 'lesson name',
+    }).replace(/"([^"]+)":/g, '$1:');
     await request(app)
       .post('/graphql')
       .set('Authorization', `bearer ${token}`)
       .send({
         query: `mutation {
           me {
-            updateLesson(lessonId: "lesson1", lesson: "${lesson}") {
+            updateLesson(lessonId: "lesson1", lesson: ${lesson}) {
               lessonId
               name
             }   
@@ -702,20 +668,18 @@ describe('updateLesson', () => {
 
   it(`updates session lesson`, async () => {
     const token = getToken('5f0cfea3395d762ca65405d1');
-    const lesson = encodeURI(
-      JSON.stringify({
-        lessonId: 'newlessonid',
-        name: 'new lesson name',
-        createdBy: '5f0cfea3395d762ca65405d1',
-      })
-    );
+    const lesson = JSON.stringify({
+      lessonId: 'newlessonid',
+      name: 'new lesson name',
+      createdBy: '5f0cfea3395d762ca65405d1',
+    }).replace(/"([^"]+)":/g, '$1:');
     await request(app)
       .post('/graphql')
       .set('Authorization', `bearer ${token}`)
       .send({
         query: `mutation {
           me {
-            updateLesson(lessonId: "lesson1", lesson: "${lesson}") {
+            updateLesson(lessonId: "lesson1", lesson: ${lesson}) {
               lessonId
             }   
           }
