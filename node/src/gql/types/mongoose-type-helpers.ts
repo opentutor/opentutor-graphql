@@ -23,6 +23,5 @@ export interface HasPaginate<T extends PaginatedResolveResult> {
 }
 
 export type MongooseModel<T> = HasFindOne<T> & HasFindById<T>;
-export type PaginatableMongooseModel<
-  T extends PaginatedResolveResult
-> = HasFindOne<T> & HasFindById<T> & HasPaginate<T>;
+export type PaginatableMongooseModel<T extends PaginatedResolveResult> =
+  HasFindOne<T> & HasFindById<T> & HasPaginate<T>;
