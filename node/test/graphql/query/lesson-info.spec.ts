@@ -26,13 +26,15 @@ describe('lessonInfo', () => {
   });
 
   it(`returns an error if invalid id`, async () => {
-    const response = await request(app).post('/graphql').send({
-      query: `query {
+    const response = await request(app)
+      .post('/graphql')
+      .send({
+        query: `query {
         lessonInfo(lessonId: "111111111111111111111111") {
           lessonId
         }
       }`,
-    });
+      });
     expect(response.status).to.equal(200);
     expect(response.body).to.have.deep.nested.property(
       'errors[0].message',
@@ -41,13 +43,15 @@ describe('lessonInfo', () => {
   });
 
   it(`cannot find a deleted lesson`, async () => {
-    const response = await request(app).post('/graphql').send({
-      query: `query {
+    const response = await request(app)
+      .post('/graphql')
+      .send({
+        query: `query {
           lessonInfo(lessonId: "_deleted_lesson") {
             lessonId
           }
       }`,
-    });
+      });
     expect(response.status).to.equal(200);
     expect(response.body).to.have.deep.nested.property(
       'errors[0].message',
@@ -56,8 +60,10 @@ describe('lessonInfo', () => {
   });
 
   it('returns data for a lesson', async () => {
-    const response = await request(app).post('/graphql').send({
-      query: `query {
+    const response = await request(app)
+      .post('/graphql')
+      .send({
+        query: `query {
         lessonInfo(lessonId: "lesson1") {
             id
             image
@@ -65,7 +71,7 @@ describe('lessonInfo', () => {
             name
           }
       }`,
-    });
+      });
     expect(response.status).to.equal(200);
     expect(response.body).to.have.deep.nested.property(
       'data.lessonInfo.id',

@@ -95,15 +95,17 @@ describe('updateUserPermissions', () => {
   });
 
   it(`returns an error if not logged in`, async () => {
-    const response = await request(app).post('/graphql').send({
-      query: `mutation {
+    const response = await request(app)
+      .post('/graphql')
+      .send({
+        query: `mutation {
           me {
             updateUserPermissions(userId: "5f0cfea3395d762ca65405d3", permissionLevel: "author") {
               name
             }  
           }
         }`,
-    });
+      });
     expect(response.status).to.equal(200);
     expect(response.body).to.have.deep.nested.property(
       'errors[0].message',

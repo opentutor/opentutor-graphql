@@ -27,15 +27,17 @@ describe('lesson', () => {
   });
 
   it(`returns an error if not logged in`, async () => {
-    const response = await request(app).post('/graphql').send({
-      query: `query {
+    const response = await request(app)
+      .post('/graphql')
+      .send({
+        query: `query {
         me {
           lesson(lessonId: "111111111111111111111111") {
             lessonId
           }
         }
       }`,
-    });
+      });
     expect(response.status).to.equal(200);
     expect(response.body).to.have.deep.nested.property(
       'errors[0].message',

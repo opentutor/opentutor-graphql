@@ -15,6 +15,7 @@ export const allTrainingData = {
   args: {},
   resolve: async (
     _root: GraphQLObjectType,
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     args: any,
     context: { user: User }
   ): Promise<TrainingData> => {

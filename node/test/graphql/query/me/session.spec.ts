@@ -26,15 +26,17 @@ describe('session', () => {
   });
 
   it(`returns an error if not logged in`, async () => {
-    const response = await request(app).post('/graphql').send({
-      query: `query { 
+    const response = await request(app)
+      .post('/graphql')
+      .send({
+        query: `query { 
         me {
           session(sessionId: "111111111111111111111111") { 
             username
           }   
         }
       }`,
-    });
+      });
     expect(response.status).to.equal(200);
     expect(response.body).to.have.deep.nested.property(
       'errors[0].message',

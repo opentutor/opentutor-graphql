@@ -27,9 +27,18 @@ export const Me: GraphQLObjectType = new GraphQLObjectType({
   },
 });
 
+interface ResolvedUser {
+  user: User;
+}
+
 export const me = {
   type: Me,
-  resolve: (_: any, args: any, context: { user: User }) => {
+  resolve: (
+    _: GraphQLObjectType,
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+    args: any,
+    context: { user: User }
+  ): ResolvedUser => {
     if (!context.user) {
       throw new Error('Only authenticated users');
     }

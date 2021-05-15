@@ -28,15 +28,17 @@ describe('updateLastTrainedAt', () => {
   });
 
   it(`throws an error if not logged in`, async () => {
-    const response = await request(app).post('/graphql').send({
-      query: `mutation {
+    const response = await request(app)
+      .post('/graphql')
+      .send({
+        query: `mutation {
           me {
             updateLastTrainedAt(lessonId: "") { 
               lastTrainedAt
             }   
           }
         }`,
-    });
+      });
     expect(response.status).to.equal(200);
     expect(response.body).to.have.deep.nested.property(
       'errors[0].message',
