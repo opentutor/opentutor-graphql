@@ -147,6 +147,9 @@ SessionSchema.statics.getAllTrainingData = async function () {
     const lesson: Lesson = lessons.find((current: Lesson) => {
       return current.lessonId === session.lessonId;
     });
+    if (!lesson && Array.isArray(lesson.expectations)) {
+      return;
+    }
     session.userResponses.forEach((response: Response) => {
       for (let expIx = 0; expIx < response.expectationScores.length; expIx++) {
         const grade = response.expectationScores[expIx].graderGrade;
@@ -154,13 +157,17 @@ SessionSchema.statics.getAllTrainingData = async function () {
           gradingStats.total += 1;
           gradingStats[grade] += 1;
           // Classifier cannot use Neutral data
-          if (grade !== 'Neutral') {
-            const expData = JSON.stringify({
-              question: lesson.question,
-              ideal: lesson.expectations[expIx].expectation,
-            });
-            trainingData.push([`${expIx}`, response.text, grade, expData]);
+          if (grade === 'Neutral') {
+            continue;
           }
+          if (expIx >= lesson.expectations.length) {
+            continue;
+          }
+          const expData = JSON.stringify({
+            question: lesson.question,
+            ideal: lesson.expectations[expIx].expectation,
+          });
+          trainingData.push([`${expIx}`, response.text, grade, expData]);
         }
       }
     });
