@@ -22,16 +22,21 @@ export const allTrainingData = {
     if (context.user.userRole !== UserRole.ADMIN) {
       throw new Error('only admins can train the default model');
     }
-    const trainingData = await Session.getAllTrainingData();
-    const config = {
-      question: '',
-    };
+    try {
+      const trainingData = await Session.getAllTrainingData();
+      const config = {
+        question: '',
+      };
 
-    return {
-      config: YAML.stringify(config),
-      training: trainingData.csv,
-      isTrainable: trainingData.isTrainable,
-    };
+      return {
+        config: YAML.stringify(config),
+        training: trainingData.csv,
+        isTrainable: trainingData.isTrainable,
+      };
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
   },
 };
 
