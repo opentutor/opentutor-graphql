@@ -4,8 +4,11 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import path from 'path';
+import { expect } from 'chai';
+import { Express } from 'express';
 import jwt from 'jsonwebtoken';
+import path from 'path';
+import request from 'supertest';
 
 export function fixturePath(p: string): string {
   return path.join(__dirname, 'fixtures', p);
@@ -29,4 +32,29 @@ export function getToken(userId: string, expiresIn?: number): string {
     { expiresIn: expirationDate.getTime() - new Date().getTime() }
   );
   return accessToken;
+}
+
+export interface GqlBody {
+  query: string;
+  variables?: Record<string, any>;
+}
+
+export interface AuthGqlArgs {
+  app: Express;
+  body: GqlBody;
+  disableExpect200Response?: boolean;
+  userId?: string;
+}
+
+const USER_ID_DEFAULT = '5f0cfea3395d762ca65405d3';
+export async function authGql(args: AuthGqlArgs): Promise<request.Response> {
+  const token = getToken(args.userId || USER_ID_DEFAULT);
+  const response = await request(args.app)
+    .post('/graphql')
+    .set('Authorization', `bearer ${token}`)
+    .send(args.body);
+  if (!args.disableExpect200Response) {
+    expect(response.status).to.equal(200);
+  }
+  return response;
 }

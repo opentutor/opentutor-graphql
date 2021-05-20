@@ -4,11 +4,11 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { Session } from 'models/Session';
+import { Session, ExpectationScore } from 'models/Session';
 
 const calculateScore = (
   session: Session,
-  gradeField = 'graderGrade'
+  gradeField: keyof ExpectationScore = 'graderGrade'
 ): number => {
   const expGrades = [];
   let score = 0;
@@ -17,7 +17,7 @@ const calculateScore = (
     const userResponse = session.userResponses[i];
     let isGraded = false;
     for (let j = 0; j < userResponse.expectationScores.length; j++) {
-      const expectationScore = userResponse.expectationScores[j] as any;
+      const expectationScore = userResponse.expectationScores[j];
       if (expectationScore[gradeField]) {
         isGraded = true;
         if (!expGrades[j]) {

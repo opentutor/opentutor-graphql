@@ -4,7 +4,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { GraphQLString, GraphQLObjectType } from 'graphql';
+import { GraphQLObjectType, GraphQLString } from 'graphql';
 import { Lesson as LessonModel, Session } from 'models';
 import { User } from 'models/User';
 import { TrainingData, TrainingDataType } from 'gql/types/training-data';
@@ -23,25 +23,35 @@ export const trainingData = {
     if (!args.lessonId) {
       throw new Error('missing required param lessonId');
     }
-    const lesson = await LessonModel.findOne({ lessonId: args.lessonId });
+    const lesson = await LessonModel.findOne({
+      lessonId: args.lessonId,
+    });
+    if (!lesson) {
+      throw new Error(`lesson not found for lessonId '${args.lessonId}'`);
+    }
     if (!LessonModel.userCanEdit(context.user, lesson)) {
       throw new Error(
         'user does not have permission to get training data for this lesson'
       );
     }
-    const trainingData = await Session.getTrainingData(args.lessonId);
-    const config = {
-      expectations: lesson.expectations.map((exp) => {
-        return { ideal: exp.expectation, features: exp.features };
-      }),
-      question: lesson.question,
-    };
+    try {
+      const trainingData = await Session.getTrainingData(args.lessonId);
+      const config = {
+        expectations: lesson.expectations.map((exp) => {
+          return { ideal: exp.expectation, features: exp.features };
+        }),
+        question: lesson.question,
+      };
 
-    return {
-      config: YAML.stringify(config),
-      training: trainingData.csv,
-      isTrainable: trainingData.isTrainable,
-    };
+      return {
+        config: YAML.stringify(config),
+        training: trainingData.csv,
+        isTrainable: trainingData.isTrainable,
+      };
+    } catch (err) {
+      console.exception(err);
+      throw err;
+    }
   },
 };
 

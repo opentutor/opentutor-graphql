@@ -38,6 +38,7 @@ export function generateAccessToken(user: User): UserAccessToken {
   };
 }
 
+// eslint-disable-next-line  @typescript-eslint/no-explicit-any
 export function decodeAccessToken(token: string): any {
   try {
     return jwt.verify(token, process.env.JWT_SECRET);

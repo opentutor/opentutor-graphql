@@ -5,11 +5,8 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import mongoose, { Schema, Document, Model } from 'mongoose';
-import { PaginatedResolveResult } from './PaginatedResolveResult';
+import { HasPaginate, pluginPagination } from './Paginatation';
 import { User, UserRole } from './User';
-
-const mongoPaging = require('mongo-cursor-pagination');
-mongoPaging.config.COLLATION = { locale: 'en', strength: 2 };
 
 interface Hint extends Document {
   text: string;
@@ -21,7 +18,7 @@ const HintSchema = new Schema({
 
 export interface LessonExpectation extends Document {
   expectation: string;
-  features: any;
+  features: Features;
   hints: [Hint];
 }
 
@@ -30,6 +27,8 @@ const LessonExpectationSchema = new Schema({
   features: { type: Object },
   hints: { type: [HintSchema] },
 });
+
+export type Features = Record<string, unknown>;
 
 export interface Lesson extends Document {
   lessonId: string;
@@ -40,7 +39,7 @@ export interface Lesson extends Document {
   expectations: [LessonExpectation];
   conclusion: [string];
   lastTrainedAt: Date;
-  features: any;
+  features: Features;
   createdBy: mongoose.Types.ObjectId;
   createdByName: string;
   deleted: boolean;
@@ -64,13 +63,7 @@ export const LessonSchema = new Schema(
   { timestamps: true, collation: { locale: 'en', strength: 2 } }
 );
 
-export interface LessonModel extends Model<Lesson> {
-  paginate(
-    query?: any,
-    options?: any,
-    callback?: any
-  ): Promise<PaginatedResolveResult<Lesson>>;
-
+export interface LessonModel extends Model<Lesson>, HasPaginate<Lesson> {
   userCanEdit(
     user: User,
     lesson: { createdBy: string | mongoose.Types.ObjectId }
@@ -91,6 +84,6 @@ LessonSchema.statics.userCanEdit = function (
 LessonSchema.index({ name: -1, _id: -1 });
 LessonSchema.index({ createdByName: -1, _id: -1 });
 LessonSchema.index({ createdAt: -1, _id: -1 });
-LessonSchema.plugin(mongoPaging.mongoosePlugin);
+pluginPagination(LessonSchema);
 
 export default mongoose.model<Lesson, LessonModel>('Lesson', LessonSchema);

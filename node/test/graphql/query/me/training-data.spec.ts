@@ -11,7 +11,27 @@ import { describe } from 'mocha';
 import mongoUnit from 'mongo-unit';
 import request from 'supertest';
 import * as YAML from 'yaml';
-import { getToken } from '../../../helpers';
+import { authGql, getToken } from '../../../helpers';
+
+const GQL_QUERY_TRAINING_DATA = `query TrainingData($lessonId: String!) {
+  me {
+    trainingData(lessonId: $lessonId) {
+      isTrainable
+      training
+      config
+    }  
+  }
+}
+`;
+
+function gqlQueryTrainingData(lessonId: string = 'lesson1') {
+  return {
+    query: GQL_QUERY_TRAINING_DATA,
+    variables: {
+      lessonId,
+    },
+  };
+}
 
 describe('training data', () => {
   let app: Express;
@@ -30,17 +50,7 @@ describe('training data', () => {
   it(`throws an error if not logged in`, async () => {
     const response = await request(app)
       .post('/graphql')
-      .send({
-        query: `query {
-        me {
-          trainingData(lessonId: "lesson1") {
-            isTrainable
-            training
-            config
-          }  
-        }
-      }`,
-      });
+      .send(gqlQueryTrainingData());
     expect(response.status).to.equal(200);
     expect(response.body).to.have.deep.nested.property(
       'errors[0].message',
@@ -49,25 +59,21 @@ describe('training data', () => {
   });
 
   it(`throws an error if user does not have permissions`, async () => {
-    const token = getToken('5f0cfea3395d762ca65405d3');
-    const response = await request(app)
-      .post('/graphql')
-      .set('Authorization', `bearer ${token}`)
-      .send({
-        query: `query {
-        me {
-          trainingData(lessonId: "lesson1") {
-            isTrainable
-            training
-            config
-          }  
-        }
-      }`,
-      });
-    expect(response.status).to.equal(200);
+    const response = await authGql({ app, body: gqlQueryTrainingData() });
     expect(response.body).to.have.deep.nested.property(
       'errors[0].message',
       'user does not have permission to get training data for this lesson'
+    );
+  });
+
+  it(`throws an error if lesson does not exist`, async () => {
+    const response = await authGql({
+      app,
+      body: gqlQueryTrainingData('noSuchLesson'),
+    });
+    expect(response.body).to.have.deep.nested.property(
+      'errors[0].message',
+      "lesson not found for lessonId 'noSuchLesson'"
     );
   });
 
@@ -76,34 +82,17 @@ describe('training data', () => {
       .post('/graphql')
       .set('opentutor-api-req', 'true')
       .set('Authorization', `bearer ${process.env.API_SECRET}`)
-      .send({
-        query: `query {
-          me {
-            trainingData(lessonId: "lesson1") {
-              isTrainable
-            }  
-          }
-        }`,
-      });
+      .send(gqlQueryTrainingData());
     expect(response.status).to.equal(200);
     expect(response.body.data.me.trainingData.isTrainable).to.eql(false);
   });
 
   it('succeeds for admin', async () => {
-    const token = getToken('5f0cfea3395d762ca65405d1');
-    const response = await request(app)
-      .post('/graphql')
-      .set('Authorization', `bearer ${token}`)
-      .send({
-        query: `query {
-          me {
-            trainingData(lessonId: "lesson1") {
-              isTrainable
-            }  
-          }
-        }`,
-      });
-    expect(response.status).to.equal(200);
+    const response = await authGql({
+      app,
+      body: gqlQueryTrainingData(),
+      userId: '5f0cfea3395d762ca65405d1',
+    });
     expect(response.body.data.me.trainingData.isTrainable).to.eql(false);
   });
 
@@ -112,54 +101,26 @@ describe('training data', () => {
     const response = await request(app)
       .post('/graphql')
       .set('Authorization', `bearer ${token}`)
-      .send({
-        query: `query {
-          me {
-            trainingData(lessonId: "lesson1") {
-              isTrainable
-            }  
-          }
-        }`,
-      });
+      .send(gqlQueryTrainingData());
     expect(response.status).to.equal(200);
     expect(response.body.data.me.trainingData.isTrainable).to.eql(false);
   });
 
   it('succeeds for lesson creator', async () => {
-    const token = getToken('5f0cfea3395d762ca65405d2');
-    const response = await request(app)
-      .post('/graphql')
-      .set('Authorization', `bearer ${token}`)
-      .send({
-        query: `query {
-          me {
-            trainingData(lessonId: "lesson2") {
-              isTrainable
-            }  
-          }
-        }`,
-      });
-    expect(response.status).to.equal(200);
+    const response = await authGql({
+      app,
+      body: gqlQueryTrainingData(),
+      userId: '5f0cfea3395d762ca65405d2',
+    });
     expect(response.body.data.me.trainingData.isTrainable).to.eql(false);
   });
 
   it(`returns all training data for lesson`, async () => {
-    const token = getToken('5f0cfea3395d762ca65405d1');
-    const response = await request(app)
-      .post('/graphql')
-      .set('Authorization', `bearer ${token}`)
-      .send({
-        query: `query {
-          me {
-            trainingData(lessonId: "lesson1") {
-              isTrainable
-              training
-              config
-            }  
-          }
-        }`,
-      });
-    expect(response.status).to.equal(200);
+    const response = await authGql({
+      app,
+      body: gqlQueryTrainingData(),
+      userId: '5f0cfea3395d762ca65405d1',
+    });
     expect(response.body.data.me.trainingData.training).to.eql(
       'exp_num,text,label\n0,a bad answer,Bad\n'
     );
@@ -180,20 +141,11 @@ describe('training data', () => {
   });
 
   it(`training config includes additional properties `, async () => {
-    const token = getToken('5f0cfea3395d762ca65405d1');
-    const response = await request(app)
-      .post('/graphql')
-      .set('Authorization', `bearer ${token}`)
-      .send({
-        query: `query {
-        me {
-          trainingData(lessonId: "lesson8") {
-            config
-          }  
-        }
-      }`,
-      });
-    expect(response.status).to.equal(200);
+    const response = await authGql({
+      app,
+      body: gqlQueryTrainingData('lesson8'),
+      userId: '5f0cfea3395d762ca65405d1',
+    });
     expect(YAML.parse(response.body.data.me.trainingData.config)).to.eql({
       question: 'question',
       expectations: [
@@ -217,19 +169,11 @@ describe('training data', () => {
   });
 
   it(`training csv escapes commas and quotes`, async () => {
-    const token = getToken('5f0cfea3395d762ca65405d1');
-    const response = await request(app)
-      .post('/graphql')
-      .set('Authorization', `bearer ${token}`)
-      .send({
-        query: `query {
-        me {
-          trainingData(lessonId: "lesson6") {
-            training
-          }  
-        }
-      }`,
-      });
+    const response = await authGql({
+      app,
+      body: gqlQueryTrainingData('lesson6'),
+      userId: '5f0cfea3395d762ca65405d1',
+    });
     expect(response.status).to.equal(200);
     expect(response.body.data.me.trainingData.training).to.eql(
       `exp_num,text,label\n0,"""good, not bad""",Good\n0,"good, not bad",Good\n0,"""bad"", not ""good""",Bad\n0,bad,Bad\n`

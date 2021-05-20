@@ -5,14 +5,11 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import csvStringify from 'csv-stringify';
-import mongoose, { Schema, Document, Model } from 'mongoose';
+import mongoose, { Schema, Document, Model, Error } from 'mongoose';
 import calculateScore from 'models/utils/calculate-score';
-import { PaginatedResolveResult } from './PaginatedResolveResult';
+import { HasPaginate, pluginPagination } from './Paginatation';
 import LessonModel, { Lesson } from './Lesson';
 import UserModel, { User } from './User';
-
-const mongoPaging = require('mongo-cursor-pagination');
-mongoPaging.config.COLLATION = { locale: 'en', strength: 2 };
 
 interface Expectation extends Document {
   text: string;
@@ -38,7 +35,7 @@ const QuestionSchema = new Schema({
   expectations: [ExpectationSchema],
 });
 
-interface ExpectationScore extends Document {
+export interface ExpectationScore extends Document {
   classifierGrade: Grade;
   graderGrade?: Grade;
 }
@@ -101,16 +98,23 @@ export const SessionSchema = new Schema<Session>(
   { timestamps: true, collation: { locale: 'en', strength: 2 } }
 );
 
-export interface SessionModel extends Model<Session> {
-  paginate(
-    query?: any,
-    options?: any,
-    callback?: any
-  ): Promise<PaginatedResolveResult<Session>>;
+export interface GradingStats {
+  Bad: number;
+  Good: number;
+  Neutral: number;
+  total: number;
+}
 
-  getTrainingData(lessonId: string): any;
+export interface TrainingData {
+  data: GradingStats[];
+  csv: string;
+  isTrainable: boolean;
+}
 
-  getAllTrainingData(): any;
+export interface SessionModel extends Model<Session>, HasPaginate<Session> {
+  getTrainingData(lessonId: string): Promise<TrainingData>;
+
+  getAllTrainingData(): Promise<TrainingData>;
 
   updateLesson(
     lessonId: string,
@@ -128,7 +132,7 @@ export interface SessionModel extends Model<Session> {
 
 function _toCsv(data: string[][]): Promise<string> {
   return new Promise((resolve, reject) => {
-    csvStringify(data, (err: any, csv: string | PromiseLike<string>) => {
+    csvStringify(data, (err: Error, csv: string | PromiseLike<string>) => {
       if (err) {
         return reject(err);
       } else {
@@ -138,55 +142,65 @@ function _toCsv(data: string[][]): Promise<string> {
   });
 }
 
-SessionSchema.statics.getAllTrainingData = async function () {
-  const sessions: Session[] = await this.find({});
-  const gradingStats = { Good: 0, Bad: 0, Neutral: 0, total: 0 };
-  const lessons: Lesson[] = await LessonModel.find({});
-  const trainingData = [['exp_num', 'text', 'label', 'exp_data']];
-  sessions.forEach((session: Session) => {
-    const lesson: Lesson = lessons.find((current: Lesson) => {
-      return current.lessonId === session.lessonId;
-    });
-    if (!lesson && Array.isArray(lesson.expectations)) {
-      return;
-    }
-    session.userResponses.forEach((response: Response) => {
-      for (let expIx = 0; expIx < response.expectationScores.length; expIx++) {
-        const grade = response.expectationScores[expIx].graderGrade;
-        if (grade) {
-          gradingStats.total += 1;
-          gradingStats[grade] += 1;
-          // Classifier cannot use Neutral data
-          if (grade === 'Neutral') {
-            continue;
-          }
-          if (expIx >= lesson.expectations.length) {
-            continue;
-          }
-          const expData = JSON.stringify({
-            question: lesson.question,
-            ideal: lesson.expectations[expIx].expectation,
-          });
-          trainingData.push([`${expIx}`, response.text, grade, expData]);
-        }
+SessionSchema.statics.getAllTrainingData =
+  async function (): Promise<TrainingData> {
+    const sessions: Session[] = await this.find({});
+    const gradingStats = { Good: 0, Bad: 0, Neutral: 0, total: 0 };
+    const lessons: Lesson[] = await LessonModel.find({});
+    const trainingData = [['exp_num', 'text', 'label', 'exp_data']];
+    sessions.forEach((session: Session) => {
+      const lesson: Lesson = lessons.find((current: Lesson) => {
+        return current.lessonId === session.lessonId;
+      });
+      if (!lesson && Array.isArray(lesson.expectations)) {
+        return;
       }
+      session.userResponses.forEach((response: Response) => {
+        for (
+          let expIx = 0;
+          expIx < response.expectationScores.length;
+          expIx++
+        ) {
+          const grade = response.expectationScores[expIx].graderGrade;
+          if (grade) {
+            gradingStats.total += 1;
+            gradingStats[grade] += 1;
+            // Classifier cannot use Neutral data
+            if (grade === 'Neutral') {
+              continue;
+            }
+            if (expIx >= lesson.expectations.length) {
+              continue;
+            }
+            const expData = JSON.stringify({
+              question: lesson.question,
+              ideal: lesson.expectations[expIx].expectation,
+            });
+            trainingData.push([`${expIx}`, response.text, grade, expData]);
+          }
+        }
+      });
     });
-  });
-  return {
-    data: gradingStats,
-    csv: await _toCsv(trainingData),
-    // Does the lesson have enough data for training, based on these requirements:
-    //   * At least 10 graded answers per expectation
-    //   * At least 2 Good and 2 Bad answers per expectation
-    isTrainable:
-      gradingStats.total >= 10 &&
-      gradingStats.Bad >= 2 &&
-      gradingStats.Good >= 2,
+    return {
+      data: [gradingStats],
+      csv: await _toCsv(trainingData),
+      // Does the lesson have enough data for training, based on these requirements:
+      //   * At least 10 graded answers per expectation
+      //   * At least 2 Good and 2 Bad answers per expectation
+      isTrainable:
+        gradingStats.total >= 10 &&
+        gradingStats.Bad >= 2 &&
+        gradingStats.Good >= 2,
+    };
   };
-};
 
-SessionSchema.statics.getTrainingData = async function (lessonId: string) {
+SessionSchema.statics.getTrainingData = async function (
+  lessonId: string
+): Promise<TrainingData> {
   const lesson: Lesson = await LessonModel.findOne({ lessonId });
+  if (!lesson) {
+    throw new Error(`no lesson found for id '${lessonId}'`);
+  }
   const sessions: Session[] = await this.find({ lessonId });
   const expectationGradingStats = lesson.expectations.map(() => {
     return { Good: 0, Bad: 0, Neutral: 0, total: 0 };
@@ -254,6 +268,7 @@ SessionSchema.statics.setGrade = async function (
   ].graderGrade = grade;
   const score = calculateScore(session);
   session.score = score;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const changesAsSet: any = {};
   changesAsSet[
     `userResponses.${userAnswerIndex}.expectationScores.${userExpectationIndex}.graderGrade`
@@ -282,6 +297,6 @@ SessionSchema.index({ classifierGrade: -1, _id: -1 });
 SessionSchema.index({ graderGrade: -1, _id: -1 });
 SessionSchema.index({ lastGradedByName: -1, _id: -1 });
 SessionSchema.index({ lastGradedAt: -1, _id: -1 });
-SessionSchema.plugin(mongoPaging.mongoosePlugin);
+pluginPagination(SessionSchema);
 
 export default mongoose.model<Session, SessionModel>('Session', SessionSchema);

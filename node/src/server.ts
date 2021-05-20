@@ -8,13 +8,12 @@ The full terms of this copyright and license should always be found in the root 
  * Module dependencies.
  */
 import createApp from 'app';
-const debug = require('debug')('opentutor-grading:server');
-const http = require('http');
+import http from 'http';
 
 /**
  * Normalize a port into a number, string, or false.
  */
-function normalizePort(val: any) {
+function normalizePort(val: string): string | boolean | number {
   const port = parseInt(val, 10);
   if (isNaN(port)) {
     // named pipe
@@ -31,8 +30,9 @@ async function serverStart() {
   const app = await createApp();
   const port = normalizePort(process.env.PORT || '3001');
   app.set('port', port);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const server = http.createServer(app);
-  server.on('error', (error: any) => {
+  server.on('error', (error: { syscall: string; code: string }) => {
     if (error.syscall !== 'listen') {
       throw error;
     }
@@ -53,7 +53,7 @@ async function serverStart() {
     const addr = server.address();
     const bind =
       typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port;
-    debug('Listening on ' + bind);
+    console.log('Listening on ' + bind);
   });
   server.listen(port);
   console.log('node version ' + process.version);
