@@ -5,13 +5,13 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import { GraphQLObjectType, GraphQLString } from 'graphql';
-import { Lesson as LessonModel, Session } from 'models';
+import { Lesson as LessonModel } from 'models';
 import { User } from 'models/User';
-import { TrainingData, TrainingDataType } from 'gql/types/training-data';
+import { Config, ConfigType } from 'gql/types/config';
 import * as YAML from 'yaml';
 
-export const trainingData = {
-  type: TrainingDataType,
+export const config = {
+  type: ConfigType,
   args: {
     lessonId: { type: GraphQLString },
   },
@@ -19,7 +19,7 @@ export const trainingData = {
     _root: GraphQLObjectType,
     args: { lessonId: string },
     context: { user: User }
-  ): Promise<TrainingData> => {
+  ): Promise<Config> => {
     if (!args.lessonId) {
       throw new Error('missing required param lessonId');
     }
@@ -35,18 +35,14 @@ export const trainingData = {
       );
     }
     try {
-      const trainingData = await Session.getTrainingData(args.lessonId);
       const config = {
         expectations: lesson.expectations.map((exp) => {
           return { ideal: exp.expectation, features: exp.features };
         }),
         question: lesson.question,
       };
-
       return {
-        config: YAML.stringify(config),
-        training: trainingData.csv,
-        isTrainable: trainingData.isTrainable,
+        stringified: YAML.stringify(config),
       };
     } catch (err) {
       console.error(err);
@@ -55,4 +51,4 @@ export const trainingData = {
   },
 };
 
-export default trainingData;
+export default config;

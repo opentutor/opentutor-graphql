@@ -5,10 +5,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import mongoose, { Schema, Document, Model } from 'mongoose';
-import { PaginatedResolveResult } from './PaginatedResolveResult';
-
-const mongoPaging = require('mongo-cursor-pagination');
-mongoPaging.config.COLLATION = { locale: 'en', strength: 2 };
+import { HasPaginate, pluginPagination } from './Paginatation';
 
 export const UserRole = {
   AUTHOR: 'author',
@@ -41,17 +38,11 @@ export const UserSchema = new Schema(
   { timestamps: true, collation: { locale: 'en', strength: 2 } }
 );
 
-export interface UserModel extends Model<User> {
-  paginate(
-    query?: any,
-    options?: any,
-    callback?: any
-  ): Promise<PaginatedResolveResult<User>>;
-}
+export interface UserModel extends Model<User>, HasPaginate<User> {}
 
 UserSchema.index({ name: -1, _id: -1 });
 UserSchema.index({ email: -1, _id: -1 });
 UserSchema.index({ userRole: -1, _id: -1 });
-UserSchema.plugin(mongoPaging.mongoosePlugin);
+pluginPagination(UserSchema);
 
 export default mongoose.model<User, UserModel>('User', UserSchema);

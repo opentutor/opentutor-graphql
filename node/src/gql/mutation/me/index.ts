@@ -32,7 +32,7 @@ interface Me {
 }
 export const me = {
   type: Me,
-  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types, @typescript-eslint/no-explicit-any
   resolve: (_: GraphQLObjectType, args: any, context: { user: User }): Me => {
     if (!context.user) {
       throw new Error('Only authenticated users');

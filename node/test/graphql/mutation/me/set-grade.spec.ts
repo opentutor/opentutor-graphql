@@ -7,9 +7,10 @@ The full terms of this copyright and license should always be found in the root 
 import createApp, { appStart, appStop } from 'app';
 import { expect } from 'chai';
 import { Express } from 'express';
+import { describe } from 'mocha';
 import mongoUnit from 'mongo-unit';
 import request from 'supertest';
-import { getToken } from '../../../helpers';
+import { authGql, getToken } from '../../../helpers';
 
 describe('setGrade', () => {
   let app: Express;
@@ -45,11 +46,10 @@ describe('setGrade', () => {
   });
 
   it(`throws an error if user does not have permissions`, async () => {
-    const token = getToken('5f0cfea3395d762ca65405d3');
-    const response = await request(app)
-      .post('/graphql')
-      .set('Authorization', `bearer ${token}`)
-      .send({
+    const response = await authGql({
+      userId: '5f0cfea3395d762ca65405d3',
+      app,
+      body: {
         query: `mutation {
             me {
               setGrade(sessionId: "session 1", userAnswerIndex: 0, userExpectationIndex: 0, grade: "Bad") { 
@@ -57,8 +57,8 @@ describe('setGrade', () => {
               } 
             }
           }`,
-      });
-    expect(response.status).to.equal(200);
+      },
+    });
     expect(response.body).to.have.deep.nested.property(
       'errors[0].message',
       'user does not have permission to grade this lesson'
@@ -66,11 +66,10 @@ describe('setGrade', () => {
   });
 
   it(`throws an error if no sessionId`, async () => {
-    const token = getToken('5f0cfea3395d762ca65405d1');
-    const response = await request(app)
-      .post('/graphql')
-      .set('Authorization', `bearer ${token}`)
-      .send({
+    const response = await authGql({
+      userId: '5f0cfea3395d762ca65405d1',
+      app,
+      body: {
         query: `mutation {
           me {
             setGrade(userAnswerIndex: 0, userExpectationIndex: 0, grade: "Bad") { 
@@ -78,8 +77,8 @@ describe('setGrade', () => {
             }
           }
         }`,
-      });
-    expect(response.status).to.equal(200);
+      },
+    });
     expect(response.body).to.have.deep.nested.property(
       'errors[0].message',
       'missing required param sessionId'
@@ -87,11 +86,10 @@ describe('setGrade', () => {
   });
 
   it(`throws an error if no userAnswerIndex`, async () => {
-    const token = getToken('5f0cfea3395d762ca65405d1');
-    const response = await request(app)
-      .post('/graphql')
-      .set('Authorization', `bearer ${token}`)
-      .send({
+    const response = await authGql({
+      userId: '5f0cfea3395d762ca65405d1',
+      app,
+      body: {
         query: `mutation {
           me {
             setGrade(sessionId: "session 1", userExpectationIndex: 0, grade: "Bad") { 
@@ -99,8 +97,8 @@ describe('setGrade', () => {
             }
           }
         }`,
-      });
-    expect(response.status).to.equal(200);
+      },
+    });
     expect(response.body).to.have.deep.nested.property(
       'errors[0].message',
       'missing required param userAnswerIndex'
@@ -108,11 +106,10 @@ describe('setGrade', () => {
   });
 
   it(`throws an error if no userExpectationIndex`, async () => {
-    const token = getToken('5f0cfea3395d762ca65405d1');
-    const response = await request(app)
-      .post('/graphql')
-      .set('Authorization', `bearer ${token}`)
-      .send({
+    const response = await authGql({
+      userId: '5f0cfea3395d762ca65405d1',
+      app,
+      body: {
         query: `mutation {
           me {
             setGrade(sessionId: "session 1", userAnswerIndex: 0, grade: "Bad") { 
@@ -120,8 +117,8 @@ describe('setGrade', () => {
             }
           }
         }`,
-      });
-    expect(response.status).to.equal(200);
+      },
+    });
     expect(response.body).to.have.deep.nested.property(
       'errors[0].message',
       'missing required param userExpectationIndex'
@@ -129,11 +126,10 @@ describe('setGrade', () => {
   });
 
   it(`throws an error if no grade`, async () => {
-    const token = getToken('5f0cfea3395d762ca65405d1');
-    const response = await request(app)
-      .post('/graphql')
-      .set('Authorization', `bearer ${token}`)
-      .send({
+    const response = await authGql({
+      userId: '5f0cfea3395d762ca65405d1',
+      app,
+      body: {
         query: `mutation {
           me {
             setGrade(sessionId: "session 1", userAnswerIndex: 0, userExpectationIndex: 0) { 
@@ -141,8 +137,8 @@ describe('setGrade', () => {
             } 
           }
         }`,
-      });
-    expect(response.status).to.equal(200);
+      },
+    });
     expect(response.body).to.have.deep.nested.property(
       'errors[0].message',
       'missing required param grade'
@@ -150,11 +146,10 @@ describe('setGrade', () => {
   });
 
   it(`throws an error if invalid sessionId`, async () => {
-    const token = getToken('5f0cfea3395d762ca65405d1');
-    const response = await request(app)
-      .post('/graphql')
-      .set('Authorization', `bearer ${token}`)
-      .send({
+    const response = await authGql({
+      userId: '5f0cfea3395d762ca65405d1',
+      app,
+      body: {
         query: `mutation {
           me {
             setGrade(sessionId: "111111111111111111111111", userAnswerIndex: 0, userExpectationIndex: 0, grade: "Bad") { 
@@ -162,8 +157,8 @@ describe('setGrade', () => {
             }
           }
         }`,
-      });
-    expect(response.status).to.equal(200);
+      },
+    });
     expect(response.body).to.have.deep.nested.property(
       'errors[0].message',
       'failed to find session with sessionId 111111111111111111111111'
@@ -171,11 +166,10 @@ describe('setGrade', () => {
   });
 
   it('succeeds for admin', async () => {
-    const token = getToken('5f0cfea3395d762ca65405d1');
-    const setGrade = await request(app)
-      .post('/graphql')
-      .set('Authorization', `bearer ${token}`)
-      .send({
+    const response = await authGql({
+      userId: '5f0cfea3395d762ca65405d1',
+      app,
+      body: {
         query: `mutation {
           me {
             setGrade(sessionId: "session 1", userAnswerIndex: 0, userExpectationIndex: 0, grade: "Bad") { 
@@ -183,19 +177,18 @@ describe('setGrade', () => {
             } 
           }
         }`,
-      });
-    expect(setGrade.status).to.equal(200);
-    expect(setGrade.body.data.me.setGrade).to.eql({
+      },
+    });
+    expect(response.body.data.me.setGrade).to.eql({
       graderGrade: null,
     });
   });
 
   it('succeeds for content manager', async () => {
-    const token = getToken('5f0cfea3395d762ca65405d2');
-    const setGrade = await request(app)
-      .post('/graphql')
-      .set('Authorization', `bearer ${token}`)
-      .send({
+    const response = await authGql({
+      userId: '5f0cfea3395d762ca65405d2',
+      app,
+      body: {
         query: `mutation {
           me {
             setGrade(sessionId: "session 1", userAnswerIndex: 0, userExpectationIndex: 0, grade: "Bad") { 
@@ -203,19 +196,18 @@ describe('setGrade', () => {
             } 
           }
         }`,
-      });
-    expect(setGrade.status).to.equal(200);
-    expect(setGrade.body.data.me.setGrade).to.eql({
+      },
+    });
+    expect(response.body.data.me.setGrade).to.eql({
       graderGrade: null,
     });
   });
 
   it('succeeds for lesson creator', async () => {
-    const token = getToken('5f0cfea3395d762ca65405d3');
-    const setGrade = await request(app)
-      .post('/graphql')
-      .set('Authorization', `bearer ${token}`)
-      .send({
+    const response = await authGql({
+      userId: '5f0cfea3395d762ca65405d3',
+      app,
+      body: {
         query: `mutation {
           me {
             setGrade(sessionId: "session 3", userAnswerIndex: 0, userExpectationIndex: 0, grade: "Bad") { 
@@ -223,19 +215,18 @@ describe('setGrade', () => {
             } 
           }
         }`,
-      });
-    expect(setGrade.status).to.equal(200);
-    expect(setGrade.body.data.me.setGrade).to.eql({
+      },
+    });
+    expect(response.body.data.me.setGrade).to.eql({
       graderGrade: 0,
     });
   });
 
   it('returns updated session', async () => {
-    const token = getToken('5f0cfea3395d762ca65405d1');
-    const setGrade = await request(app)
-      .post('/graphql')
-      .set('Authorization', `bearer ${token}`)
-      .send({
+    const response = await authGql({
+      userId: '5f0cfea3395d762ca65405d1',
+      app,
+      body: {
         query: `mutation {
           me {
             setGrade(sessionId: "session 1", userAnswerIndex: 0, userExpectationIndex: 0, grade: "Bad") { 
@@ -258,9 +249,9 @@ describe('setGrade', () => {
             } 
           }
         }`,
-      });
-    expect(setGrade.status).to.equal(200);
-    expect(setGrade.body.data.me.setGrade).to.eql({
+      },
+    });
+    expect(response.body.data.me.setGrade).to.eql({
       username: 'username1',
       graderGrade: null,
       classifierGrade: null,
@@ -295,23 +286,23 @@ describe('setGrade', () => {
   });
 
   it('updates session in database', async () => {
-    const token = getToken('5f0cfea3395d762ca65405d1');
-    await request(app)
-      .post('/graphql')
-      .set('Authorization', `bearer ${token}`)
-      .send({
+    await authGql({
+      userId: '5f0cfea3395d762ca65405d1',
+      app,
+      body: {
         query: `mutation {
-          me {
-            setGrade(sessionId: "session 1", userAnswerIndex: 0, userExpectationIndex: 0, grade: "Bad") { 
-              username
-            }  
-          }
-        }`,
-      });
-    const session = await request(app)
-      .post('/graphql')
-      .set('Authorization', `bearer ${token}`)
-      .send({
+            me {
+              setGrade(sessionId: "session 1", userAnswerIndex: 0, userExpectationIndex: 0, grade: "Bad") { 
+                username
+              }  
+            }
+          }`,
+      },
+    });
+    const response = await authGql({
+      userId: '5f0cfea3395d762ca65405d1',
+      app,
+      body: {
         query: `query {
           me {
             session(sessionId: "session 1") { 
@@ -334,9 +325,9 @@ describe('setGrade', () => {
             }
           }
         }`,
-      });
-    expect(session.status).to.equal(200);
-    expect(session.body.data.me.session).to.eql({
+      },
+    });
+    expect(response.body.data.me.session).to.eql({
       username: 'username1',
       graderGrade: null,
       classifierGrade: null,
@@ -371,11 +362,10 @@ describe('setGrade', () => {
   });
 
   it('sets lastGradedBy and lastGradedAt after user grades session', async () => {
-    const token = getToken('5f0cfea3395d762ca65405d1');
-    const session = await request(app)
-      .post('/graphql')
-      .set('Authorization', `bearer ${token}`)
-      .send({
+    const session = await authGql({
+      userId: '5f0cfea3395d762ca65405d1',
+      app,
+      body: {
         query: `query {
           me {
             session(sessionId: "session 1") { 
@@ -384,26 +374,27 @@ describe('setGrade', () => {
             }
           }
         }`,
-      });
-    expect(session.status).to.equal(200);
+      },
+    });
     expect(session.body.data.me.session).to.eql({
       lastGradedByName: null,
       lastGradedAt: null,
     });
     const date0 = new Date(Date.now() - 1000);
-    const setGrade = await request(app)
-      .post('/graphql')
-      .set('Authorization', `bearer ${token}`)
-      .send({
+    const setGrade = await authGql({
+      userId: '5f0cfea3395d762ca65405d1',
+      app,
+      body: {
         query: `mutation {
-          me {
-            setGrade(sessionId: "session 1", userAnswerIndex: 0, userExpectationIndex: 0, grade: "Bad") { 
-              lastGradedAt
-              lastGradedByName
-            } 
-          }
-        }`,
-      });
+            me {
+              setGrade(sessionId: "session 1", userAnswerIndex: 0, userExpectationIndex: 0, grade: "Bad") { 
+                lastGradedAt
+                lastGradedByName
+              } 
+            }
+          }`,
+      },
+    });
     const date1 = new Date(setGrade.body.data.me.setGrade.lastGradedAt);
     expect(setGrade.status).to.equal(200);
     expect(setGrade.body.data.me.setGrade.lastGradedByName).to.eql('Admin');
@@ -411,12 +402,11 @@ describe('setGrade', () => {
   });
 
   it('update lastGradedBy and lastGradedAt after a new user regrades same session', async () => {
-    const adminToken = getToken('5f0cfea3395d762ca65405d1');
     const date0 = new Date(Date.now() - 1000);
-    const setGrade = await request(app)
-      .post('/graphql')
-      .set('Authorization', `bearer ${adminToken}`)
-      .send({
+    const setGrade = await authGql({
+      userId: '5f0cfea3395d762ca65405d1',
+      app,
+      body: {
         query: `mutation {
           me {
             setGrade(sessionId: "session 1", userAnswerIndex: 0, userExpectationIndex: 0, grade: "Bad") { 
@@ -426,28 +416,29 @@ describe('setGrade', () => {
             } 
           }
         }`,
-      });
+      },
+    });
     const date1 = new Date(setGrade.body.data.me.setGrade.lastGradedAt);
     expect(setGrade.status).to.equal(200);
     expect(setGrade.body.data.me.setGrade.sessionId).to.eql('session 1');
     expect(setGrade.body.data.me.setGrade.lastGradedByName).to.eql('Admin');
     expect(date1).to.be.greaterThan(date0);
     setTimeout(async function () {
-      const managerToken = getToken('5f0cfea3395d762ca65405d2');
-      const updateGrade = await request(app)
-        .post('/graphql')
-        .set('Authorization', `bearer ${managerToken}`)
-        .send({
+      const updateGrade = await authGql({
+        userId: '5f0cfea3395d762ca65405d2',
+        app,
+        body: {
           query: `mutation {
-            me {
-              setGrade(sessionId: "session 1", userAnswerIndex: 0, userExpectationIndex: 0, grade: "Bad") { 
-                sessionId
-                lastGradedAt
-                lastGradedByName
-              } 
-            }
-          }`,
-        });
+              me {
+                setGrade(sessionId: "session 1", userAnswerIndex: 0, userExpectationIndex: 0, grade: "Bad") { 
+                  sessionId
+                  lastGradedAt
+                  lastGradedByName
+                } 
+              }
+            }`,
+        },
+      });
       const date2 = new Date(updateGrade.body.data.me.setGrade.lastGradedAt);
       expect(updateGrade.status).to.equal(200);
       expect(updateGrade.body.data.me.setGrade.lastGradedByName).to.eql(
@@ -460,22 +451,23 @@ describe('setGrade', () => {
 
   it('calculates and updates GOOD graderGrade', async () => {
     const token = getToken('5f0cfea3395d762ca65405d1');
-    await request(app)
-      .post('/graphql')
-      .set('Authorization', `bearer ${token}`)
-      .send({
+    await authGql({
+      userId: '5f0cfea3395d762ca65405d1',
+      app,
+      body: {
         query: `mutation {
-          me {
-            setGrade(sessionId: "session 2", userAnswerIndex: 0, userExpectationIndex: 0, grade: "Good") { 
-              username
-            }   
-          }
-        }`,
-      });
-    const session = await request(app)
-      .post('/graphql')
-      .set('Authorization', `bearer ${token}`)
-      .send({
+            me {
+              setGrade(sessionId: "session 2", userAnswerIndex: 0, userExpectationIndex: 0, grade: "Good") { 
+                username
+              }   
+            }
+          }`,
+      },
+    });
+    const session = await authGql({
+      userId: '5f0cfea3395d762ca65405d1',
+      app,
+      body: {
         query: `query {
           me {
             session(sessionId: "session 2") { 
@@ -483,19 +475,18 @@ describe('setGrade', () => {
             }   
           }
         }`,
-      });
-    expect(session.status).to.equal(200);
+      },
+    });
     expect(session.body.data.me.session).to.eql({
       graderGrade: 1,
     });
   });
 
   it('calculates and updates BAD graderGrade', async () => {
-    const token = getToken('5f0cfea3395d762ca65405d1');
-    await request(app)
-      .post('/graphql')
-      .set('Authorization', `bearer ${token}`)
-      .send({
+    await authGql({
+      userId: '5f0cfea3395d762ca65405d1',
+      app,
+      body: {
         query: `mutation {
           me {
             setGrade(sessionId: "session 2", userAnswerIndex: 0, userExpectationIndex: 0, grade: "Bad") { 
@@ -503,11 +494,12 @@ describe('setGrade', () => {
             }  
           }
         }`,
-      });
-    const session = await request(app)
-      .post('/graphql')
-      .set('Authorization', `bearer ${token}`)
-      .send({
+      },
+    });
+    const session = await authGql({
+      userId: '5f0cfea3395d762ca65405d1',
+      app,
+      body: {
         query: `query {
           me {
             session(sessionId: "session 2") { 
@@ -515,8 +507,8 @@ describe('setGrade', () => {
             }
           }
         }`,
-      });
-    expect(session.status).to.equal(200);
+      },
+    });
     expect(session.body.data.me.session).to.eql({
       graderGrade: 0,
     });
@@ -524,22 +516,23 @@ describe('setGrade', () => {
 
   it('calculates and updates NEUTRAL graderGrade', async () => {
     const token = getToken('5f0cfea3395d762ca65405d1');
-    await request(app)
-      .post('/graphql')
-      .set('Authorization', `bearer ${token}`)
-      .send({
+    await authGql({
+      userId: '5f0cfea3395d762ca65405d1',
+      app,
+      body: {
         query: `mutation {
-          me {
-            setGrade(sessionId: "session 2", userAnswerIndex: 0, userExpectationIndex: 0, grade: "Neutral") { 
-              username
-            }   
-          }
-        }`,
-      });
-    const session = await request(app)
-      .post('/graphql')
-      .set('Authorization', `bearer ${token}`)
-      .send({
+            me {
+              setGrade(sessionId: "session 2", userAnswerIndex: 0, userExpectationIndex: 0, grade: "Neutral") { 
+                username
+              }   
+            }
+          }`,
+      },
+    });
+    const session = await authGql({
+      userId: '5f0cfea3395d762ca65405d1',
+      app,
+      body: {
         query: `query {
           me {
             session(sessionId: "session 2") { 
@@ -547,31 +540,31 @@ describe('setGrade', () => {
             }   
           }
         }`,
-      });
-    expect(session.status).to.equal(200);
+      },
+    });
     expect(session.body.data.me.session).to.eql({
       graderGrade: 0.5,
     });
   });
 
   it('calculates and updates NO graderGrade', async () => {
-    const token = getToken('5f0cfea3395d762ca65405d1');
-    await request(app)
-      .post('/graphql')
-      .set('Authorization', `bearer ${token}`)
-      .send({
+    await authGql({
+      userId: '5f0cfea3395d762ca65405d1',
+      app,
+      body: {
         query: `mutation {
-          me {
-            setGrade(sessionId: "session 2", userAnswerIndex: 0, userExpectationIndex: 0, grade: "") { 
-              username
-            }   
-          }
-        }`,
-      });
-    const session = await request(app)
-      .post('/graphql')
-      .set('Authorization', `bearer ${token}`)
-      .send({
+            me {
+              setGrade(sessionId: "session 2", userAnswerIndex: 0, userExpectationIndex: 0, grade: "") { 
+                username
+              }   
+            }
+          }`,
+      },
+    });
+    const session = await authGql({
+      userId: '5f0cfea3395d762ca65405d1',
+      app,
+      body: {
         query: `query {
           me {
             session(sessionId: "session 2") { 
@@ -579,8 +572,8 @@ describe('setGrade', () => {
             }   
           }
         }`,
-      });
-    expect(session.status).to.equal(200);
+      },
+    });
     expect(session.body.data.me.session).to.eql({
       graderGrade: null,
     });

@@ -4,8 +4,17 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-module.exports = {
-  'mongoose-find-one-by-id-or-alias': require('./mongoose-find-one-by-id-or-alias'),
-  'mongoose-no-underscore-id': require('./mongoose-no-underscore-id'),
-  'mongoose-to-id': require('./mongoose-to-id'),
-};
+import { GraphQLString, GraphQLObjectType } from 'graphql';
+
+export interface Config {
+  stringified: string;
+}
+
+export const ConfigType = new GraphQLObjectType({
+  name: 'Config',
+  fields: {
+    stringified: { type: GraphQLString },
+  },
+});
+
+export default ConfigType;

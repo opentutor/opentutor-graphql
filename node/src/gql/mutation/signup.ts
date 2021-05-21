@@ -6,7 +6,7 @@ The full terms of this copyright and license should always be found in the root 
 */
 import bcrypt from 'bcrypt';
 import { GraphQLString, GraphQLObjectType } from 'graphql';
-import { User as UserSchema } from 'models';
+import { User as UserModel } from 'models';
 import {
   UserAccessTokenType,
   UserAccessToken,
@@ -35,7 +35,7 @@ export const signup = {
     if (!args.password) {
       throw new Error('missing required param password');
     }
-    const user = await UserSchema.findOne({ email: args.email });
+    const user = await UserModel.findOne({ email: args.email });
     if (user) {
       throw new Error('user already exists');
     }
@@ -43,7 +43,7 @@ export const signup = {
       bcrypt
         .hash(args.password, BCRYPT_SALT_ROUNDS)
         .then((hashedPassword: string) => {
-          UserSchema.findOneAndUpdate(
+          UserModel.findOneAndUpdate(
             {
               email: args.email,
             },

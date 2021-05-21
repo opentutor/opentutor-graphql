@@ -14,7 +14,7 @@ import path from 'path';
 import { logger } from 'utils/logging';
 import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt';
 import { Strategy as BearerStrategy } from 'passport-http-bearer';
-import { User as UserSchema } from 'models';
+import { User as UserModel } from 'models';
 import { UserRole } from 'models/User';
 import requireEnv from 'utils/require-env';
 
@@ -58,7 +58,7 @@ export default async function createApp(): Promise<Express> {
           if (token.expirationDate < new Date()) {
             return done('token expired', null);
           } else {
-            const user = await UserSchema.findOne({ _id: token.id });
+            const user = await UserModel.findOne({ _id: token.id });
             if (user) {
               return done(null, user);
             } else {
@@ -80,7 +80,7 @@ export default async function createApp(): Promise<Express> {
   app.use(bodyParser.json());
   app.use(express.static(path.join(__dirname, 'public')));
   app.use(function (
-    err: any,
+    err: { message?: string; status?: string | number },
     req: Request,
     res: Response,
     next: NextFunction // eslint-disable-line @typescript-eslint/no-unused-vars
@@ -92,7 +92,7 @@ export default async function createApp(): Promise<Express> {
     }
     if (err instanceof Object) {
       errorStatus =
-        (!isNaN(err.status) && Number(err.status) > 0) ||
+        (!isNaN(Number(err.status)) && Number(err.status) > 0) ||
         Number(err.status) < 600
           ? Number(err.status)
           : 500;
