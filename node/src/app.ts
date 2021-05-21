@@ -80,7 +80,7 @@ export default async function createApp(): Promise<Express> {
   app.use(bodyParser.json());
   app.use(express.static(path.join(__dirname, 'public')));
   app.use(function (
-    err: any,
+    err: { message?: string; status?: string | number },
     req: Request,
     res: Response,
     next: NextFunction // eslint-disable-line @typescript-eslint/no-unused-vars
@@ -92,7 +92,7 @@ export default async function createApp(): Promise<Express> {
     }
     if (err instanceof Object) {
       errorStatus =
-        (!isNaN(err.status) && Number(err.status) > 0) ||
+        (!isNaN(Number(err.status)) && Number(err.status) > 0) ||
         Number(err.status) < 600
           ? Number(err.status)
           : 500;
