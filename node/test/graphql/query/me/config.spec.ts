@@ -11,7 +11,7 @@ import { describe } from 'mocha';
 import mongoUnit from 'mongo-unit';
 import request from 'supertest';
 import * as YAML from 'yaml';
-import { authGql, getToken } from '../../../helpers';
+import { authGql } from '../../../helpers';
 
 const GQL_QUERY_CONFIG = `query Config($lessonId: String!) {
   me {
@@ -22,6 +22,30 @@ const GQL_QUERY_CONFIG = `query Config($lessonId: String!) {
 }
 `;
 
+interface Expectation {
+  ideal: string;
+  features?: Record<string, unknown> | null;
+}
+
+interface Config {
+  question: string;
+  expectations: Expectation[];
+}
+
+const LESSON_1_CONFIG: Config = {
+  question: 'question?',
+  expectations: [
+    {
+      ideal: 'expected text 1',
+      features: null,
+    },
+    {
+      ideal: 'expected text 2',
+      features: null,
+    },
+  ],
+};
+
 function gqlQueryConfig(lessonId: string = 'lesson1') {
   return {
     query: GQL_QUERY_CONFIG,
@@ -31,7 +55,27 @@ function gqlQueryConfig(lessonId: string = 'lesson1') {
   };
 }
 
-describe.only('config', () => {
+function parseConfig(stringified: string): Config {
+  return YAML.parse(stringified);
+}
+
+async function assertLoadsConfig(args: {
+  app: Express;
+  userId?: string;
+  lessonId?: string;
+  expectedConfig?: Config;
+}): Promise<void> {
+  const response = await authGql({
+    app: args.app,
+    body: gqlQueryConfig(args.lessonId),
+    userId: args.userId,
+  });
+  expect(parseConfig(response.body.data.me.config.stringified)).to.eql(
+    args.expectedConfig || LESSON_1_CONFIG
+  );
+}
+
+describe('config', () => {
   let app: Express;
 
   beforeEach(async () => {
@@ -73,70 +117,57 @@ describe.only('config', () => {
     );
   });
 
-  // it('succeeds for api key', async () => {
-  //   const response = await request(app)
-  //     .post('/graphql')
-  //     .set('opentutor-api-req', 'true')
-  //     .set('Authorization', `bearer ${process.env.API_SECRET}`)
-  //     .send(gqlQueryConfig());
-  //   expect(response.status).to.equal(200);
-  //   expect(response.body.data.me.config.stringified).to.eql(false);
-  // });
+  it('succeeds for api key', async () => {
+    const response = await request(app)
+      .post('/graphql')
+      .set('opentutor-api-req', 'true')
+      .set('Authorization', `bearer ${process.env.API_SECRET}`)
+      .send(gqlQueryConfig());
+    expect(response.status).to.equal(200);
+    expect(parseConfig(response.body.data.me.config.stringified)).to.eql(
+      LESSON_1_CONFIG
+    );
+  });
 
-  // it('succeeds for admin', async () => {
-  //   const response = await authGql({
-  //     app,
-  //     body: gqlQueryConfig(),
-  //     userId: '5f0cfea3395d762ca65405d1',
-  //   });
-  //   expect(response.body.data.me.config.stringified).to.eql(false);
-  // });
+  it('succeeds for admin', async () => {
+    await assertLoadsConfig({
+      app,
+      userId: '5f0cfea3395d762ca65405d1',
+    });
+  });
 
-  // it('succeeds for content manager', async () => {
-  //   const token = getToken('5f0cfea3395d762ca65405d2');
-  //   const response = await request(app)
-  //     .post('/graphql')
-  //     .set('Authorization', `bearer ${token}`)
-  //     .send(gqlQueryConfig());
-  //   expect(response.status).to.equal(200);
-  //   expect(response.body.data.me.config.stringified).to.eql(false);
-  // });
+  it('succeeds for content manager', async () => {
+    await assertLoadsConfig({
+      app,
+      userId: '5f0cfea3395d762ca65405d2',
+    });
+  });
 
-  // it('succeeds for lesson creator', async () => {
-  //   const response = await authGql({
-  //     app,
-  //     body: gqlQueryConfig(),
-  //     userId: '5f0cfea3395d762ca65405d2',
-  //   });
-  //   expect(response.body.data.me.config.stringified).to.eql(false);
-  // });
-
-  // it(`config includes additional properties `, async () => {
-  //   const response = await authGql({
-  //     app,
-  //     body: gqlQueryConfig('lesson8'),
-  //     userId: '5f0cfea3395d762ca65405d1',
-  //   });
-  //   expect(YAML.parse(response.body.data.me.trainingData.config)).to.eql({
-  //     question: 'question',
-  //     expectations: [
-  //       {
-  //         ideal: 'answer1',
-  //         features: {
-  //           ideal: 'new ideal answer',
-  //           good: ['good regex 1'],
-  //           bad: ['bad regex 1'],
-  //         },
-  //       },
-  //       {
-  //         ideal: 'answer2',
-  //         features: {
-  //           good: ['good regex 2'],
-  //           bad: ['bad regex 2'],
-  //         },
-  //       },
-  //     ],
-  //   });
-  // });
-
+  it('config includes additional properties', async () => {
+    await assertLoadsConfig({
+      app,
+      lessonId: 'lesson8',
+      userId: '5f0cfea3395d762ca65405d1',
+      expectedConfig: {
+        question: 'question',
+        expectations: [
+          {
+            ideal: 'answer1',
+            features: {
+              bad: ['bad regex 1'],
+              good: ['good regex 1'],
+              ideal: 'new ideal answer',
+            },
+          },
+          {
+            ideal: 'answer2',
+            features: {
+              bad: ['bad regex 2'],
+              good: ['good regex 2'],
+            },
+          },
+        ],
+      },
+    });
+  });
 });
