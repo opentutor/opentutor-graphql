@@ -53,7 +53,7 @@ mongo-restore-uri: check-mongo-uri check-mongo-restore-dump check-mongo-db
 			--drop \
 			$(MONGO_RESTORE_DUMP)
 
-# `MONGO_RESTORE_DUMP=./dump/xyz make mongo-restore-<DB>`
+# `MONGO_RESTORE_DUMP=./dump/mydb-20210101T000000/mydb make mongo-restore-<DB>`
 #  Runs mongorestore with MONGO_URI found in .env.<DB>
 mongo-restore-%:
 	@test -s "$(PWD)/.env.$*" || { echo "missing .env.$*"; exit 1; }
