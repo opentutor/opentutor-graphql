@@ -1,0 +1,17 @@
+{
+  "name": "mongodb",
+  "version": "1.0.0",
+  "description": "",
+  "main": "migrate-mongo-config.js",
+  "dependencies": {},
+  "devDependencies": {
+    "dotenv": "^8.2.0",
+    "migrate-mongo": "^8.2.2"
+  },
+  "scripts": {
+    "migrate:up": "migrate-mongo up",
+    "migrate:down": "migrate-mongo down"
+  },
+  "author": "Larry Kirschner <larrykirschner@gmail.com> (https://ict.usc.edu/)",
+  "license": "MIT"
+}
