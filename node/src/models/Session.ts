@@ -111,6 +111,12 @@ export interface TrainingData {
   isTrainable: boolean;
 }
 
+export interface TrainingDataAll {
+  data: GradingStats;
+  csv: string;
+  isTrainable: boolean;
+}
+
 export interface SessionModel extends Model<Session>, HasPaginate<Session> {
   getTrainingData(lessonId: string): Promise<TrainingData>;
 
@@ -143,7 +149,7 @@ function _toCsv(data: string[][]): Promise<string> {
 }
 
 SessionSchema.statics.getAllTrainingData =
-  async function (): Promise<TrainingData> {
+  async function (): Promise<TrainingDataAll> {
     const sessions: Session[] = await this.find({});
     const gradingStats = { Good: 0, Bad: 0, Neutral: 0, total: 0 };
     const lessons: Lesson[] = await LessonModel.find({});
@@ -182,7 +188,7 @@ SessionSchema.statics.getAllTrainingData =
       });
     });
     return {
-      data: [gradingStats],
+      data: gradingStats,
       csv: await _toCsv(trainingData),
       // Does the lesson have enough data for training, based on these requirements:
       //   * At least 10 graded answers per expectation
@@ -198,7 +204,7 @@ SessionSchema.statics.getTrainingData = async function (
   lessonId: string
 ): Promise<TrainingData> {
   const lesson: Lesson = await LessonModel.findOne({ lessonId });
-  if (!lesson) {
+  if (!lesson && Array.isArray(lesson.expectations)) {
     throw new Error(`no lesson found for id '${lessonId}'`);
   }
   const sessions: Session[] = await this.find({ lessonId });
@@ -209,6 +215,9 @@ SessionSchema.statics.getTrainingData = async function (
   sessions.forEach((session: Session) => {
     session.userResponses.forEach((response: Response) => {
       for (let expIx = 0; expIx < response.expectationScores.length; expIx++) {
+        if (expIx >= lesson.expectations.length) {
+          continue;
+        }
         const grade = response.expectationScores[expIx].graderGrade;
         if (grade) {
           expectationGradingStats[expIx].total += 1;

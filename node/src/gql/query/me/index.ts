@@ -6,6 +6,7 @@ The full terms of this copyright and license should always be found in the root 
 */
 import { GraphQLObjectType } from 'graphql';
 import { User } from 'models/User';
+import config from './config';
 import lesson from './lesson';
 import lessons from './lessons';
 import session from './session';
@@ -17,6 +18,7 @@ import users from './users';
 export const Me: GraphQLObjectType = new GraphQLObjectType({
   name: 'MeQuery',
   fields: {
+    config,
     lesson,
     lessons,
     session,
