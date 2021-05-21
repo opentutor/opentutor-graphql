@@ -25,9 +25,6 @@ Then to overwrite `opentutor-test` with the dump we just made do:
 MONGO_RESTORE_DUMP=./dump/dump-opentutor-prod-${TIMESTAMP}/opentutor-prod make mongo-restore-opentutor-test
 ```
 
-
-
-
 ## .env files for mongodb instances
 
 For any mongo db we will either dump from or load to, you need a file in this directory with a valid `MONGO_URI` property for that db. For example if you are dumping from a db called `opentutor-prod` then you will need an env file `.env.opentutor-prod` with contents like
