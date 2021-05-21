@@ -49,7 +49,7 @@ export const trainingData = {
         isTrainable: trainingData.isTrainable,
       };
     } catch (err) {
-      console.exception(err);
+      console.error(err);
       throw err;
     }
   },

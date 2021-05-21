@@ -12,7 +12,7 @@ import mongoUnit from 'mongo-unit';
 import request from 'supertest';
 import { authGql, getToken } from '../../../helpers';
 
-describe.only('setGrade', () => {
+describe('setGrade', () => {
   let app: Express;
 
   beforeEach(async () => {
