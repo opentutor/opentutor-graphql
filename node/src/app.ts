@@ -14,7 +14,7 @@ import path from 'path';
 import { logger } from 'utils/logging';
 import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt';
 import { Strategy as BearerStrategy } from 'passport-http-bearer';
-import { User as UserSchema } from 'models';
+import { User as UserModel } from 'models';
 import { UserRole } from 'models/User';
 import requireEnv from 'utils/require-env';
 
@@ -58,7 +58,7 @@ export default async function createApp(): Promise<Express> {
           if (token.expirationDate < new Date()) {
             return done('token expired', null);
           } else {
-            const user = await UserSchema.findOne({ _id: token.id });
+            const user = await UserModel.findOne({ _id: token.id });
             if (user) {
               return done(null, user);
             } else {
