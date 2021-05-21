@@ -42,7 +42,7 @@ mongo-dump-%:
 
 # Runs mongodump on env var MONGO_URI
 # Often more convient to store MONGO_URI in .env.<DB> 
-# and then call `MONGO_RESTORE_DUMP=./dump/xyz make mongo-restore-<DB>`
+# and then call `MONGO_RESTORE_DUMP=./dump/mydb-20210101T000000/mydb make mongo-restore-<DB>`
 mongo-restore-uri: check-mongo-uri check-mongo-restore-dump check-mongo-db
 	docker run \
 			--rm \
@@ -50,6 +50,7 @@ mongo-restore-uri: check-mongo-uri check-mongo-restore-dump check-mongo-db
 		$(MONGO_DOCKER_IMAGE) mongorestore \
 			--uri="$(MONGO_URI)" \
 			--db=$(MONGO_DB) \
+			--drop \
 			$(MONGO_RESTORE_DUMP)
 
 # `MONGO_RESTORE_DUMP=./dump/xyz make mongo-restore-<DB>`
@@ -59,3 +60,27 @@ mongo-restore-%:
 	@MONGO_URI=$(shell echo $$(grep -e ^MONGO_URI= '.env.$*' | cut -d '=' -f2-)) \
 	MONGO_DB=$* \
 	$(MAKE) mongo-restore-uri
+
+
+node_modules/migrate-mongo:
+	npm ci
+
+PHONY: migrate-down
+migrate-down: node_modules/migrate-mongo
+	ENV_FILE=.env.$(MONGO_DB) npm run migrate:down
+
+migrate-down-%:
+	@test -s "$(PWD)/.env.$*" || { echo "missing .env.$*"; exit 1; }
+	@MONGO_URI=$(shell echo $$(grep -e ^MONGO_URI= '.env.$*' | cut -d '=' -f2-)) \
+		MONGO_DB=$* \
+		$(MAKE) migrate-down
+
+PHONY: migrate-up
+migrate-up: node_modules/migrate-mongo
+	ENV_FILE=.env.$(MONGO_DB) npm run migrate:up
+
+migrate-up-%:
+	@test -s "$(PWD)/.env.$*" || { echo "missing .env.$*"; exit 1; }
+	@MONGO_URI=$(shell echo $$(grep -e ^MONGO_URI= '.env.$*' | cut -d '=' -f2-)) \
+		MONGO_DB=$* \
+		$(MAKE) migrate-up
