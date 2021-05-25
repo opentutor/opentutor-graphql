@@ -7,7 +7,7 @@ The full terms of this copyright and license should always be found in the root 
 
 import AppConfigType, { AppConfig } from 'gql/types/appConfig';
 
-export const config = {
+export const appConfig = {
   type: AppConfigType,
   resolve: async (): Promise<AppConfig> => {
     return {
@@ -16,4 +16,4 @@ export const config = {
   },
 };
 
-export default config;
+export default appConfig;
