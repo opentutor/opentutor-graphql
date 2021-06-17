@@ -12,7 +12,7 @@ export const health = {
   resolve: async (): Promise<Health> => {
     return {
       message: 'I am healthy!',
-      status: 'Working hard :)'
+      status: 'Working hard :)',
     };
   },
 };
