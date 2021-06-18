@@ -4,20 +4,17 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { GraphQLObjectType } from 'graphql';
-import appConfig from './app-config';
-import lessonInfo from './lesson-info';
-import lessons from './lessons';
-import me from './me';
-import health from './health';
 
-export default new GraphQLObjectType({
-  name: 'Query',
-  fields: {
-    appConfig,
-    lessonInfo,
-    lessons,
-    me,
-    health,
+import HealthType, { Health } from 'gql/types/health';
+
+export const health = {
+  type: HealthType,
+  resolve: async (): Promise<Health> => {
+    return {
+      message: 'I am healthy!',
+      status: 'Working hard :)',
+    };
   },
-});
+};
+
+export default health;
