@@ -188,7 +188,12 @@ SessionSchema.statics.getAllTrainingData =
               question: lesson.question,
               ideal: lesson.expectations[expIx].expectation,
             });
-            trainingData.push([`${expIx}`, response.text, grade, expData]);
+            trainingData.push([
+              response.expectationScores[expIx].expectationId,
+              response.text,
+              grade,
+              expData,
+            ]);
           }
         }
       });
@@ -230,7 +235,11 @@ SessionSchema.statics.getTrainingData = async function (
           expectationGradingStats[expIx][grade] += 1;
           // Classifier cannot use Neutral data
           if (grade !== 'Neutral') {
-            trainingData.push([response.expectationScores[expIx].expectationId, response.text, grade]);
+            trainingData.push([
+              response.expectationScores[expIx].expectationId,
+              response.text,
+              grade,
+            ]);
           }
         }
       }
