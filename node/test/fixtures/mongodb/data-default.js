@@ -18,6 +18,7 @@ module.exports = {
       question: 'question?',
       expectations: [
         {
+          expectationId: '0',
           expectation: 'expected text 1',
           hints: [
             {
@@ -29,6 +30,7 @@ module.exports = {
           ],
         },
         {
+          expectationId: '1',
           expectation: 'expected text 2',
           hints: [
             {
@@ -52,6 +54,7 @@ module.exports = {
       question: 'question',
       expectations: [
         {
+          expectationId: '0',
           expectation: 'answer1',
           hints: [
             {
@@ -72,6 +75,7 @@ module.exports = {
       question: 'question',
       expectations: [
         {
+          expectationId: '0',
           expectation: 'answer1',
           hints: [
             {
@@ -90,6 +94,7 @@ module.exports = {
       question: 'question',
       expectations: [
         {
+          expectationId: '0',
           expectation: 'answer1',
           hints: [
             {
@@ -108,6 +113,7 @@ module.exports = {
       question: 'question',
       expectations: [
         {
+          expectationId: '0',
           expectation: 'answer1',
           hints: [
             {
@@ -126,6 +132,7 @@ module.exports = {
       question: 'question',
       expectations: [
         {
+          expectationId: '0',
           expectation: 'answer1',
           hints: [
             {
@@ -149,6 +156,7 @@ module.exports = {
       question: 'question',
       expectations: [
         {
+          expectationId: '0',
           expectation: 'answer1',
           hints: [
             {
@@ -162,6 +170,7 @@ module.exports = {
           },
         },
         {
+          expectationId: '1',
           expectation: 'answer2',
           hints: [
             {
@@ -192,9 +201,11 @@ module.exports = {
         text: 'question?',
         expectations: [
           {
+            expectationId: '0',
             text: 'expected text 1',
           },
           {
+            expectationId: '1',
             text: 'expected text 2',
           },
         ],
@@ -204,6 +215,7 @@ module.exports = {
           text: 'answer1',
           expectationScores: [
             {
+              expectationId: '0',
               classifierGrade: 'Good',
               graderGrade: '',
             },
@@ -213,6 +225,7 @@ module.exports = {
           text: 'answer2',
           expectationScores: [
             {
+              expectationId: '0',
               classifierGrade: 'Bad',
               graderGrade: '',
             },
@@ -229,9 +242,11 @@ module.exports = {
         text: 'question',
         expectations: [
           {
+            expectationId: '0',
             text: 'expectation 1',
           },
           {
+            expectationId: '1',
             text: 'expectation 2',
           },
         ],
@@ -241,10 +256,12 @@ module.exports = {
           text: 'answer1',
           expectationScores: [
             {
+              expectationId: '0',
               classifierGrade: 'Good',
               graderGrade: '',
             },
             {
+              expectationId: '1',
               classifierGrade: 'Bad',
               graderGrade: '',
             },
@@ -261,6 +278,7 @@ module.exports = {
           text: 'a good answer',
           expectationScores: [
             {
+              expectationId: '0',
               classifierGrade: 'Good',
               graderGrade: 'Good',
             },
@@ -277,6 +295,7 @@ module.exports = {
           text: 'a bad answer',
           expectationScores: [
             {
+              expectationId: '0',
               classifierGrade: 'Bad',
               graderGrade: 'Bad',
             },
@@ -293,6 +312,7 @@ module.exports = {
           text: 'a neutral answer',
           expectationScores: [
             {
+              expectationId: '0',
               classifierGrade: 'Neutral',
               graderGrade: 'Neutral',
             },
@@ -309,6 +329,7 @@ module.exports = {
           text: 'good',
           expectationScores: [
             {
+              expectationId: '0',
               graderGrade: 'Good',
             },
           ],
@@ -317,6 +338,7 @@ module.exports = {
           text: 'good',
           expectationScores: [
             {
+              expectationId: '0',
               graderGrade: 'Good',
             },
           ],
@@ -325,6 +347,7 @@ module.exports = {
           text: 'bad',
           expectationScores: [
             {
+              expectationId: '0',
               graderGrade: 'Bad',
             },
           ],
@@ -333,6 +356,7 @@ module.exports = {
           text: 'bad',
           expectationScores: [
             {
+              expectationId: '0',
               graderGrade: 'Bad',
             },
           ],
@@ -348,6 +372,7 @@ module.exports = {
           text: 'bad',
           expectationScores: [
             {
+              expectationId: '0',
               graderGrade: 'Bad',
             },
           ],
@@ -356,6 +381,7 @@ module.exports = {
           text: 'bad',
           expectationScores: [
             {
+              expectationId: '0',
               graderGrade: 'Bad',
             },
           ],
@@ -364,6 +390,7 @@ module.exports = {
           text: 'bad',
           expectationScores: [
             {
+              expectationId: '0',
               graderGrade: 'Bad',
             },
           ],
@@ -372,6 +399,7 @@ module.exports = {
           text: 'bad',
           expectationScores: [
             {
+              expectationId: '0',
               graderGrade: 'Bad',
             },
           ],
@@ -380,6 +408,7 @@ module.exports = {
           text: 'bad',
           expectationScores: [
             {
+              expectationId: '0',
               graderGrade: 'Bad',
             },
           ],
@@ -388,6 +417,7 @@ module.exports = {
           text: 'bad',
           expectationScores: [
             {
+              expectationId: '0',
               graderGrade: 'Bad',
             },
           ],
@@ -396,6 +426,7 @@ module.exports = {
           text: 'bad',
           expectationScores: [
             {
+              expectationId: '0',
               graderGrade: 'Bad',
             },
           ],
@@ -404,6 +435,7 @@ module.exports = {
           text: 'bad',
           expectationScores: [
             {
+              expectationId: '0',
               graderGrade: 'Bad',
             },
           ],
@@ -412,6 +444,7 @@ module.exports = {
           text: 'bad',
           expectationScores: [
             {
+              expectationId: '0',
               graderGrade: 'Bad',
             },
           ],
@@ -420,6 +453,7 @@ module.exports = {
           text: 'bad',
           expectationScores: [
             {
+              expectationId: '0',
               graderGrade: 'Bad',
             },
           ],
@@ -435,6 +469,7 @@ module.exports = {
           text: 'good',
           expectationScores: [
             {
+              expectationId: '0',
               graderGrade: 'Good',
             },
           ],
@@ -443,6 +478,7 @@ module.exports = {
           text: 'good',
           expectationScores: [
             {
+              expectationId: '0',
               graderGrade: 'Good',
             },
           ],
@@ -451,6 +487,7 @@ module.exports = {
           text: 'good',
           expectationScores: [
             {
+              expectationId: '0',
               graderGrade: 'Good',
             },
           ],
@@ -459,6 +496,7 @@ module.exports = {
           text: 'good',
           expectationScores: [
             {
+              expectationId: '0',
               graderGrade: 'Good',
             },
           ],
@@ -467,6 +505,7 @@ module.exports = {
           text: 'good',
           expectationScores: [
             {
+              expectationId: '0',
               graderGrade: 'Good',
             },
           ],
@@ -475,6 +514,7 @@ module.exports = {
           text: 'good',
           expectationScores: [
             {
+              expectationId: '0',
               graderGrade: 'Good',
             },
           ],
@@ -483,6 +523,7 @@ module.exports = {
           text: 'good',
           expectationScores: [
             {
+              expectationId: '0',
               graderGrade: 'Good',
             },
           ],
@@ -491,6 +532,7 @@ module.exports = {
           text: 'good',
           expectationScores: [
             {
+              expectationId: '0',
               graderGrade: 'Good',
             },
           ],
@@ -499,6 +541,7 @@ module.exports = {
           text: 'good',
           expectationScores: [
             {
+              expectationId: '0',
               graderGrade: 'Good',
             },
           ],
@@ -507,6 +550,7 @@ module.exports = {
           text: 'good',
           expectationScores: [
             {
+              expectationId: '0',
               graderGrade: 'Good',
             },
           ],
@@ -522,6 +566,7 @@ module.exports = {
           text: '"good, not bad"',
           expectationScores: [
             {
+              expectationId: '0',
               graderGrade: 'Good',
             },
           ],
@@ -530,6 +575,7 @@ module.exports = {
           text: 'good, not bad',
           expectationScores: [
             {
+              expectationId: '0',
               graderGrade: 'Good',
             },
           ],
@@ -538,6 +584,7 @@ module.exports = {
           text: '"bad", not "good"',
           expectationScores: [
             {
+              expectationId: '0',
               graderGrade: 'Bad',
             },
           ],
@@ -546,6 +593,7 @@ module.exports = {
           text: 'bad',
           expectationScores: [
             {
+              expectationId: '0',
               graderGrade: 'Bad',
             },
           ],
@@ -554,6 +602,7 @@ module.exports = {
           text: 'neutral',
           expectationScores: [
             {
+              expectationId: '0',
               graderGrade: 'Neutral',
             },
           ],
@@ -562,6 +611,7 @@ module.exports = {
           text: 'neutral',
           expectationScores: [
             {
+              expectationId: '0',
               graderGrade: 'Neutral',
             },
           ],
@@ -570,6 +620,7 @@ module.exports = {
           text: 'neutral',
           expectationScores: [
             {
+              expectationId: '0',
               graderGrade: 'Neutral',
             },
           ],
@@ -578,6 +629,7 @@ module.exports = {
           text: 'neutral',
           expectationScores: [
             {
+              expectationId: '0',
               graderGrade: 'Neutral',
             },
           ],
@@ -586,6 +638,7 @@ module.exports = {
           text: 'neutral',
           expectationScores: [
             {
+              expectationId: '0',
               graderGrade: 'Neutral',
             },
           ],
@@ -594,6 +647,7 @@ module.exports = {
           text: 'neutral',
           expectationScores: [
             {
+              expectationId: '0',
               graderGrade: 'Neutral',
             },
           ],

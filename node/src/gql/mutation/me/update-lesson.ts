@@ -28,6 +28,7 @@ export interface UpdateHint {
 }
 
 export interface UpdateLessonExpectation {
+  expectationId: string;
   expectation: string;
   features: any;
   hints: UpdateHint[];

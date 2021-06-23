@@ -12,10 +12,12 @@ import LessonModel, { Lesson } from './Lesson';
 import UserModel, { User } from './User';
 
 interface Expectation extends Document {
+  expectationId: string;
   text: string;
 }
 
 const ExpectationSchema = new Schema({
+  expectationId: { type: String },
   text: { type: String },
 });
 
@@ -36,11 +38,15 @@ const QuestionSchema = new Schema({
 });
 
 export interface ExpectationScore extends Document {
+  expectationId: string;
   classifierGrade: Grade;
   graderGrade?: Grade;
 }
 
 const ExpectationScoreSchema = new Schema({
+  expectationId: {
+    type: String,
+  },
   classifierGrade: {
     type: String,
     enum: ['Good', 'Bad', 'Neutral'],

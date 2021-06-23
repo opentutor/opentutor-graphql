@@ -17,12 +17,14 @@ const HintSchema = new Schema({
 });
 
 export interface LessonExpectation extends Document {
+  expectationId: string;
   expectation: string;
   features: Features;
   hints: [Hint];
 }
 
 const LessonExpectationSchema = new Schema({
+  expectationId: { type: String },
   expectation: { type: String },
   features: { type: Object },
   hints: { type: [HintSchema] },

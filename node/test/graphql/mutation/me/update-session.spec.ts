@@ -730,13 +730,14 @@ describe('updateSession', () => {
         username: 'new username',
         question: {
           text: 'new question?',
-          expectations: [{ text: 'new expected text' }],
+          expectations: [{ expectationId: '0', text: 'new expected text' }],
         },
         userResponses: [
           {
             text: 'new answer',
             expectationScores: [
               {
+                expectationId: '0',
                 classifierGrade: 'Good',
               },
             ],
@@ -769,12 +770,14 @@ describe('updateSession', () => {
             question {
               text
               expectations {
+                expectationId
                 text
               }
             }
             userResponses {
               text
               expectationScores {
+                expectationId
                 classifierGrade
                 graderGrade
               }
@@ -789,13 +792,14 @@ describe('updateSession', () => {
       username: 'new username',
       question: {
         text: 'new question?',
-        expectations: [{ text: 'new expected text' }],
+        expectations: [{ expectationId: '0', text: 'new expected text' }],
       },
       userResponses: [
         {
           text: 'new answer',
           expectationScores: [
             {
+              expectationId: '0',
               classifierGrade: 'Good',
               graderGrade: null,
             },

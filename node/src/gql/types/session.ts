@@ -19,6 +19,7 @@ import { Lesson } from 'models';
 const ExpectationType = new GraphQLObjectType({
   name: 'Expectation',
   fields: {
+    expectationId: { type: GraphQLString },
     text: { type: GraphQLString },
   },
 });
@@ -34,6 +35,7 @@ const QuestionType = new GraphQLObjectType({
 const ExpectationScoreType = new GraphQLObjectType({
   name: 'ExpectationScore',
   fields: {
+    expectationId: { type: GraphQLString },
     classifierGrade: { type: GraphQLString },
     graderGrade: { type: GraphQLString },
   },
