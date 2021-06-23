@@ -230,7 +230,7 @@ SessionSchema.statics.getTrainingData = async function (
           expectationGradingStats[expIx][grade] += 1;
           // Classifier cannot use Neutral data
           if (grade !== 'Neutral') {
-            trainingData.push([`${expIx}`, response.text, grade]);
+            trainingData.push([response.expectationScores[expIx].expectationId, response.text, grade]);
           }
         }
       }
