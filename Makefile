@@ -8,10 +8,10 @@ docker-build:
 	cd node \
 	&& $(MAKE) docker-build
 
-PHONY: format
-format:
+PHONY: pretty
+pretty:
 	cd node \
-	&& $(MAKE) format
+	&& $(MAKE) pretty
 
 .PHONY: test
 test:
@@ -50,6 +50,11 @@ LICENSE_HEADER:
 license: LICENSE LICENSE_HEADER
 	cd node \
 	&& npm run license:fix
+
+PHONY: format
+format: LICENSE LICENSE_HEADER
+	cd node \
+	&& npm run license:fix && $(MAKE) pretty
 
 .PHONY: test-license
 test-license: LICENSE LICENSE_HEADER
