@@ -44,8 +44,8 @@ docker-run-shell:
 			-p 3001:3001 \
 		$(DOCKER_IMAGE)
 
-.PHONY: format
-format: node_modules/prettier
+.PHONY: pretty
+pretty: node_modules/prettier
 	npm run format
 
 .PHONY: lint-fix

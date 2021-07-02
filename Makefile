@@ -1,39 +1,39 @@
-PHONY: clean
+.PHONY: clean
 clean:
 	cd node \
 	&& $(MAKE) clean
 
-PHONY: docker-build
+.PHONY: docker-build
 docker-build:
 	cd node \
 	&& $(MAKE) docker-build
 
-PHONY: format
-format:
+.PHONY: pretty
+pretty:
 	cd node \
-	&& $(MAKE) format
+	&& $(MAKE) pretty
 
 .PHONY: test
 test:
 	cd node \
 	&& $(MAKE) test
 
-PHONY: test-all
+.PHONY: test-all
 test-all:
 	cd node \
 	&& $(MAKE) test-all
 
-PHONY: test-format
+.PHONY: test-format
 test-format:
 	cd node \
 	&& $(MAKE) test-format
 
-PHONY: test-lint
+.PHONY: test-lint
 test-lint:
 	cd node \
 	&& $(MAKE) test-lint
 
-PHONY: test-types
+.PHONY: test-types
 test-types:
 	cd node \
 	&& $(MAKE) test-types
@@ -50,6 +50,11 @@ LICENSE_HEADER:
 license: LICENSE LICENSE_HEADER
 	cd node \
 	&& npm run license:fix
+
+.PHONY: format
+format: LICENSE LICENSE_HEADER
+	cd node \
+	&& npm run license:fix && $(MAKE) pretty
 
 .PHONY: test-license
 test-license: LICENSE LICENSE_HEADER
