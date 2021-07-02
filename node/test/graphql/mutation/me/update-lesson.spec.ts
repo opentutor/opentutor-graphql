@@ -50,6 +50,7 @@ describe('updateLesson', () => {
       lessonId: 'newlesson',
       name: 'new name',
       intro: 'new intro',
+      dialogCategory: 'sensitive',
       question: 'new question',
       conclusion: ['new conclusion'],
       createdBy: '5f0cfea3395d762ca65405d1',
@@ -341,6 +342,7 @@ describe('updateLesson', () => {
       lessonId: 'newlesson',
       name: 'new name',
       intro: 'new intro',
+      dialogCategory: 'sensitive',
       question: 'new question',
       conclusion: ['new conclusion'],
       createdBy: '5f0cfea3395d762ca65405d1',
@@ -365,6 +367,7 @@ describe('updateLesson', () => {
               lessonId
               name
               intro
+              dialogCategory
               question
               expectations {
                 expectation
@@ -383,6 +386,7 @@ describe('updateLesson', () => {
       lessonId: 'newlesson',
       name: 'new name',
       intro: 'new intro',
+      dialogCategory: 'sensitive',
       question: 'new question',
       expectations: [
         {
@@ -406,6 +410,7 @@ describe('updateLesson', () => {
       createdBy: '5f0cfea3395d762ca65405d1',
       name: 'new name',
       intro: 'new intro',
+      dialogCategory: 'sensitive',
       question: 'new question',
       conclusion: ['new conclusion'],
       expectations: [
@@ -442,6 +447,7 @@ describe('updateLesson', () => {
             lessonId
             name
             intro
+            dialogCategory
             question
             expectations {
               expectation
@@ -459,6 +465,7 @@ describe('updateLesson', () => {
       lessonId: 'newlesson',
       name: 'new name',
       intro: 'new intro',
+      dialogCategory: 'sensitive',
       question: 'new question',
       expectations: [
         {
@@ -480,6 +487,7 @@ describe('updateLesson', () => {
       lessonId: 'lesson1',
       name: 'updated name',
       intro: 'updated intro',
+      dialogCategory: 'sensitive',
       question: 'updated question',
       conclusion: ['updated conclusion'],
       expectations: [
@@ -504,6 +512,7 @@ describe('updateLesson', () => {
               lessonId
               name
               intro
+              dialogCategory
               question
               expectations {
                 expectation
@@ -522,6 +531,7 @@ describe('updateLesson', () => {
       lessonId: 'lesson1',
       name: 'updated name',
       intro: 'updated intro',
+      dialogCategory: 'sensitive',
       question: 'updated question',
       expectations: [
         {
@@ -545,6 +555,7 @@ describe('updateLesson', () => {
       lessonId: 'lesson1',
       name: 'updated name',
       intro: 'updated intro',
+      dialogCategory: 'sensitive',
       question: 'updated question',
       conclusion: ['updated conclusion'],
       expectations: [
@@ -580,6 +591,7 @@ describe('updateLesson', () => {
             lessonId
             name
             intro
+            dialogCategory
             question
             expectations {
               expectation
@@ -597,6 +609,7 @@ describe('updateLesson', () => {
       lessonId: 'lesson1',
       name: 'updated name',
       intro: 'updated intro',
+      dialogCategory: 'sensitive',
       question: 'updated question',
       expectations: [
         {

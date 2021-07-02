@@ -119,6 +119,7 @@ describe('lesson', () => {
             lessonId
             name
             intro
+            dialogCategory
             question
             image
             expectations {
@@ -142,6 +143,7 @@ describe('lesson', () => {
       lessonId: 'lesson1',
       name: 'lesson name',
       intro: 'intro text',
+      dialogCategory: 'default',
       question: 'question?',
       expectations: [
         {

@@ -15,6 +15,7 @@ module.exports = {
       name: 'lesson name',
       image: 'some/image.png',
       intro: 'intro text',
+      dialogCategory: 'default',
       question: 'question?',
       expectations: [
         {
@@ -49,6 +50,7 @@ module.exports = {
       lessonId: 'lesson2',
       name: 'name',
       intro: 'intro',
+      dialogCategory: 'default',
       question: 'question',
       expectations: [
         {
@@ -69,6 +71,7 @@ module.exports = {
       lessonId: 'lesson3',
       name: 'name',
       intro: 'intro',
+      dialogCategory: 'default',
       question: 'question',
       expectations: [
         {
@@ -87,6 +90,7 @@ module.exports = {
       lessonId: 'lesson4',
       name: 'name',
       intro: 'intro',
+      dialogCategory: 'default',
       question: 'question',
       expectations: [
         {
@@ -105,6 +109,7 @@ module.exports = {
       lessonId: 'lesson5',
       name: 'name',
       intro: 'intro',
+      dialogCategory: 'default',
       question: 'question',
       expectations: [
         {
@@ -123,6 +128,7 @@ module.exports = {
       lessonId: 'lesson6',
       name: 'name',
       intro: 'intro',
+      dialogCategory: 'default',
       question: 'question',
       expectations: [
         {
@@ -146,6 +152,7 @@ module.exports = {
       lessonId: 'lesson8',
       name: 'name',
       intro: 'intro',
+      dialogCategory: 'default',
       question: 'question',
       expectations: [
         {

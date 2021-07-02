@@ -37,6 +37,7 @@ export interface UpdateLesson {
   lessonId: string;
   name: string;
   intro: string;
+  dialogCategory: string;
   question: string;
   image: string;
   expectations: UpdateLessonExpectation[];
@@ -69,6 +70,7 @@ export const UpdateLessonInputType = new GraphQLInputObjectType({
     lessonId: { type: GraphQLString },
     name: { type: GraphQLString },
     intro: { type: GraphQLString },
+    dialogCategory: { type: GraphQLString },
     question: { type: GraphQLString },
     image: { type: GraphQLString },
     expectations: { type: GraphQLList(UpdateLessonExpectationInputType) },
