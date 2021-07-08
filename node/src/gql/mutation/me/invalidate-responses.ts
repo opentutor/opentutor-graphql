@@ -12,6 +12,7 @@ import {
   GraphQLNonNull,
   GraphQLInt,
   GraphQLInputObjectType,
+  GraphQLList,
 } from 'graphql';
 import { Session as SessionModel } from 'models';
 import { Session } from 'models/Session';
@@ -19,40 +20,40 @@ import SessionType from 'gql/types/session';
 
 interface InvalidateResponse {
   sessionId: string;
-  responseId: string;
   expectation: number;
   invalid: boolean;
+  responseIds: string[];
 }
 
 const InvalidateResponseInputType = new GraphQLInputObjectType({
   name: 'InvalidateResponseInputType',
   fields: () => ({
     sessionId: { type: GraphQLNonNull(GraphQLString) },
-    responseId: { type: GraphQLNonNull(GraphQLID) },
     expectation: { type: GraphQLNonNull(GraphQLInt) },
     invalid: { type: GraphQLNonNull(GraphQLBoolean) },
+    responseIds: { type: GraphQLNonNull(GraphQLList(GraphQLID)) },
   }),
 });
 
-export const invalidateResponse = {
+export const userResponsesBatchInvalidate = {
   type: SessionType,
   args: {
-    invalidateResponse: { type: GraphQLNonNull(InvalidateResponseInputType) },
+    invalidateResponses: { type: GraphQLNonNull(InvalidateResponseInputType) },
   },
   resolve: async (
     _root: GraphQLObjectType,
     args: {
-      invalidateResponse: InvalidateResponse;
+      invalidateResponses: InvalidateResponse;
     }
   ): Promise<Session> => {
-    const session = await SessionModel.invalidateResponse(
-      args.invalidateResponse.sessionId,
-      args.invalidateResponse.responseId,
-      args.invalidateResponse.expectation,
-      args.invalidateResponse.invalid
+    const session = await SessionModel.invalidateResponses(
+      args.invalidateResponses.sessionId,
+      args.invalidateResponses.responseIds,
+      args.invalidateResponses.expectation,
+      args.invalidateResponses.invalid
     );
     return session;
   },
 };
 
-export default invalidateResponse;
+export default userResponsesBatchInvalidate;

@@ -137,9 +137,9 @@ export interface SessionModel extends Model<Session>, HasPaginate<Session> {
     grader: User
   ): Promise<Session>;
 
-  invalidateResponse(
+  invalidateResponses(
     sessionId: string,
-    responseId: string,
+    responseId: string[],
     expectation: number,
     invalid: boolean
   ): Promise<Session>;
@@ -308,9 +308,9 @@ SessionSchema.statics.setGrade = async function (
   );
 };
 
-SessionSchema.statics.invalidateResponse = async function (
+SessionSchema.statics.invalidateResponses = async function (
   sessionId: string,
-  responseId: string,
+  responseIds: string[],
   expectation: number,
   invalid: boolean
 ) {
@@ -318,20 +318,22 @@ SessionSchema.statics.invalidateResponse = async function (
   if (!session) {
     throw new Error(`failed to find session with sessionId ${sessionId}`);
   }
-  const responses = session.userResponses;
-  const rId = responses.findIndex((u) => `${u._id}` === responseId);
-  if (rId === -1) {
-    throw new Error(`failed to find response with id ${responseId}`);
-  }
-  const expectations = responses[rId].expectationScores;
-  if (expectation > expectations.length - 1 || expectation < 0) {
-    throw new Error(`no expectation at ${expectation}`);
-  }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const changesAsSet: any = {};
-  changesAsSet[
-    `userResponses.${rId}.expectationScores.${expectation}.invalidated`
-  ] = invalid;
+  const responses = session.userResponses;
+  for (const rId of responseIds) {
+    const rIdx = responses.findIndex((u) => `${u._id}` === rId);
+    if (rIdx === -1) {
+      continue;
+    }
+    const expectations = responses[rIdx].expectationScores;
+    if (expectation > expectations.length - 1 || expectation < 0) {
+      continue;
+    }
+    changesAsSet[
+      `userResponses.${rIdx}.expectationScores.${expectation}.invalidated`
+    ] = invalid;
+  }
   return await this.findOneAndUpdate(
     {
       sessionId: sessionId,

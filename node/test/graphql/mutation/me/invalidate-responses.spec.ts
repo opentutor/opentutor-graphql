@@ -10,9 +10,9 @@ import { Express } from 'express';
 import { describe } from 'mocha';
 import mongoUnit from 'mongo-unit';
 import request from 'supertest';
-import { authGql, getToken } from '../../../helpers';
+import { getToken } from '../../../helpers';
 
-describe('invalidateResponse', () => {
+describe('invalidateResponses', () => {
   let app: Express;
 
   beforeEach(async () => {
@@ -30,17 +30,17 @@ describe('invalidateResponse', () => {
     const response = await request(app)
       .post('/graphql')
       .send({
-        query: `mutation InvalidateResponse($invalidateResponse: InvalidateResponseInputType!) {
+        query: `mutation InvalidateResponse($invalidateResponses: InvalidateResponseInputType!) {
           me {
-            invalidateResponse(invalidateResponse: $invalidateResponse) { 
+            invalidateResponses(invalidateResponses: $invalidateResponses) { 
               username
             }
           }
         }`,
         variables: {
-          invalidateResponse: {
+          invalidateResponses: {
             sessionId: '',
-            responseId: '',
+            responseIds: [''],
             expectation: 0,
             invalid: true,
           },
@@ -57,16 +57,16 @@ describe('invalidateResponse', () => {
     const response = await request(app)
       .post('/graphql')
       .send({
-        query: `mutation InvalidateResponse($invalidateResponse: InvalidateResponseInputType!) {
+        query: `mutation InvalidateResponse($invalidateResponses: InvalidateResponseInputType!) {
           me {
-            invalidateResponse(invalidateResponse: $invalidateResponse) { 
+            invalidateResponses(invalidateResponses: $invalidateResponses) { 
               username
             }
           }
         }`,
         variables: {
-          invalidateResponse: {
-            responseId: '',
+          invalidateResponses: {
+            responseIds: [''],
             expectation: 0,
             invalid: true,
           },
@@ -77,19 +77,19 @@ describe('invalidateResponse', () => {
     );
   });
 
-  it(`throws an error if no responseId`, async () => {
+  it(`throws an error if no responseIds`, async () => {
     const response = await request(app)
       .post('/graphql')
       .send({
-        query: `mutation InvalidateResponse($invalidateResponse: InvalidateResponseInputType!) {
+        query: `mutation InvalidateResponse($invalidateResponses: InvalidateResponseInputType!) {
           me {
-            invalidateResponse(invalidateResponse: $invalidateResponse) { 
+            invalidateResponses(invalidateResponses: $invalidateResponses) { 
               username
             }
           }
         }`,
         variables: {
-          invalidateResponse: {
+          invalidateResponses: {
             sessionId: '',
             expectation: 0,
             invalid: true,
@@ -97,7 +97,7 @@ describe('invalidateResponse', () => {
         },
       });
     expect(response.body.errors[0].message).to.have.string(
-      'Field "responseId" of required type "ID!" was not provided.'
+      'Field "responseIds" of required type "[ID]!" was not provided.'
     );
   });
 
@@ -105,17 +105,17 @@ describe('invalidateResponse', () => {
     const response = await request(app)
       .post('/graphql')
       .send({
-        query: `mutation InvalidateResponse($invalidateResponse: InvalidateResponseInputType!) {
+        query: `mutation InvalidateResponse($invalidateResponses: InvalidateResponseInputType!) {
           me {
-            invalidateResponse(invalidateResponse: $invalidateResponse) { 
+            invalidateResponses(invalidateResponses: $invalidateResponses) { 
               username
             }
           }
         }`,
         variables: {
-          invalidateResponse: {
+          invalidateResponses: {
             sessionId: '',
-            responseId: '',
+            responseIds: [''],
             invalid: true,
           },
         },
@@ -129,17 +129,17 @@ describe('invalidateResponse', () => {
     const response = await request(app)
       .post('/graphql')
       .send({
-        query: `mutation InvalidateResponse($invalidateResponse: InvalidateResponseInputType!) {
+        query: `mutation InvalidateResponse($invalidateResponses: InvalidateResponseInputType!) {
           me {
-            invalidateResponse(invalidateResponse: $invalidateResponse) { 
+            invalidateResponses(invalidateResponses: $invalidateResponses) { 
               username
             }
           }
         }`,
         variables: {
-          invalidateResponse: {
+          invalidateResponses: {
             sessionId: '',
-            responseId: '',
+            responseIds: [''],
             expectation: 0,
           },
         },
@@ -155,17 +155,17 @@ describe('invalidateResponse', () => {
       .post('/graphql')
       .set('Authorization', `bearer ${token}`)
       .send({
-        query: `mutation InvalidateResponse($invalidateResponse: InvalidateResponseInputType!) {
+        query: `mutation InvalidateResponse($invalidateResponses: InvalidateResponseInputType!) {
           me {
-            invalidateResponse(invalidateResponse: $invalidateResponse) { 
+            invalidateResponses(invalidateResponses: $invalidateResponses) { 
               username
             }
           }
         }`,
         variables: {
-          invalidateResponse: {
+          invalidateResponses: {
             sessionId: 'asdf',
-            responseId: '5f20c63646f6110a6a5b2135',
+            responseIds: ['5f20c63646f6110a6a5b2135'],
             expectation: 0,
             invalid: true,
           },
@@ -175,67 +175,15 @@ describe('invalidateResponse', () => {
     expect(response.body).to.have.deep.nested.property('errors[0].message');
   });
 
-  it(`fails if responseId is invalid`, async () => {
+  it(`sets responses for expectation to invalid`, async () => {
     const token = getToken('5f0cfea3395d762ca65405d1');
     const response = await request(app)
       .post('/graphql')
       .set('Authorization', `bearer ${token}`)
       .send({
-        query: `mutation InvalidateResponse($invalidateResponse: InvalidateResponseInputType!) {
+        query: `mutation InvalidateResponse($invalidateResponses: InvalidateResponseInputType!) {
           me {
-            invalidateResponse(invalidateResponse: $invalidateResponse) { 
-              username
-            }
-          }
-        }`,
-        variables: {
-          invalidateResponse: {
-            sessionId: 'session 2',
-            responseId: 'asdf',
-            expectation: 0,
-            invalid: true,
-          },
-        },
-      });
-    expect(response.status).to.equal(200);
-    expect(response.body).to.have.deep.nested.property('errors[0].message');
-  });
-
-  it(`fails if expectation is invalid`, async () => {
-    const token = getToken('5f0cfea3395d762ca65405d1');
-    const response = await request(app)
-      .post('/graphql')
-      .set('Authorization', `bearer ${token}`)
-      .send({
-        query: `mutation InvalidateResponse($invalidateResponse: InvalidateResponseInputType!) {
-          me {
-            invalidateResponse(invalidateResponse: $invalidateResponse) { 
-              username
-            }
-          }
-        }`,
-        variables: {
-          invalidateResponse: {
-            sessionId: 'session 2',
-            responseId: '5f20c63646f6110a6a5b2135',
-            expectation: 10239,
-            invalid: true,
-          },
-        },
-      });
-    expect(response.status).to.equal(200);
-    expect(response.body).to.have.deep.nested.property('errors[0].message');
-  });
-
-  it(`sets response for expectation to invalid`, async () => {
-    const token = getToken('5f0cfea3395d762ca65405d1');
-    const response = await request(app)
-      .post('/graphql')
-      .set('Authorization', `bearer ${token}`)
-      .send({
-        query: `mutation InvalidateResponse($invalidateResponse: InvalidateResponseInputType!) {
-          me {
-            invalidateResponse(invalidateResponse: $invalidateResponse) { 
+            invalidateResponses(invalidateResponses: $invalidateResponses) { 
               sessionId
               userResponses {
                 _id
@@ -247,16 +195,16 @@ describe('invalidateResponse', () => {
           }
         }`,
         variables: {
-          invalidateResponse: {
+          invalidateResponses: {
             sessionId: 'session 2',
-            responseId: '5f20c63646f6110a6a5b2135',
+            responseIds: ['5f20c63646f6110a6a5b2135'],
             expectation: 0,
             invalid: true,
           },
         },
       });
     expect(response.status).to.equal(200);
-    expect(response.body.data.me.invalidateResponse).to.eql({
+    expect(response.body.data.me.invalidateResponses).to.eql({
       sessionId: 'session 2',
       userResponses: [
         {
