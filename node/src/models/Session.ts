@@ -36,11 +36,13 @@ const QuestionSchema = new Schema({
 });
 
 export interface ExpectationScore extends Document {
+  invalidated: boolean;
   classifierGrade: Grade;
   graderGrade?: Grade;
 }
 
 const ExpectationScoreSchema = new Schema({
+  invalidated: { type: Boolean, default: false },
   classifierGrade: {
     type: String,
     enum: ['Good', 'Bad', 'Neutral'],
@@ -81,7 +83,7 @@ export interface Session extends Document {
 
 export const SessionSchema = new Schema<Session>(
   {
-    sessionId: { type: String, required: '{PATH} is required!' },
+    sessionId: { type: String, unique: true, required: '{PATH} is required!' },
     lessonId: { type: String, required: '{PATH} is required!' },
     lessonName: { type: String },
     lessonCreatedBy: { type: String },
@@ -133,6 +135,13 @@ export interface SessionModel extends Model<Session>, HasPaginate<Session> {
     userExpectationIndex: number,
     grade: string,
     grader: User
+  ): Promise<Session>;
+
+  invalidateResponse(
+    sessionId: string,
+    responseId: string,
+    expectation: number,
+    invalid: boolean
   ): Promise<Session>;
 }
 
@@ -286,6 +295,43 @@ SessionSchema.statics.setGrade = async function (
   changesAsSet['lastGradedByName'] = grader.name;
   changesAsSet['lastGradedAt'] = new Date();
   changesAsSet['graderGrade'] = score;
+  return await this.findOneAndUpdate(
+    {
+      sessionId: sessionId,
+    },
+    {
+      $set: changesAsSet,
+    },
+    {
+      new: true,
+    }
+  );
+};
+
+SessionSchema.statics.invalidateResponse = async function (
+  sessionId: string,
+  responseId: string,
+  expectation: number,
+  invalid: boolean
+) {
+  const session: Session = await this.findOne({ sessionId: sessionId });
+  if (!session) {
+    throw new Error(`failed to find session with sessionId ${sessionId}`);
+  }
+  const responses = session.userResponses;
+  const rId = responses.findIndex((u) => `${u._id}` === responseId);
+  if (rId === -1) {
+    throw new Error(`failed to find response with id ${responseId}`);
+  }
+  const expectations = responses[rId].expectationScores;
+  if (expectation > expectations.length - 1 || expectation < 0) {
+    throw new Error(`no expectation at ${expectation}`);
+  }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const changesAsSet: any = {};
+  changesAsSet[
+    `userResponses.${rId}.expectationScores.${expectation}.invalidated`
+  ] = invalid;
   return await this.findOneAndUpdate(
     {
       sessionId: sessionId,

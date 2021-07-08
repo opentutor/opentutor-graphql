@@ -245,6 +245,7 @@ module.exports = {
       },
       userResponses: [
         {
+          _id: ObjectId('5f20c63646f6110a6a5b2135'),
           text: 'answer1',
           expectationScores: [
             {
