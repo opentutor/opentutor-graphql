@@ -30,20 +30,22 @@ describe('invalidateResponses', () => {
     const response = await request(app)
       .post('/graphql')
       .send({
-        query: `mutation InvalidateResponse($invalidateResponses: InvalidateResponseInputType!) {
+        query: `mutation InvalidateResponse($expectation: Int!, $invalid: Boolean!, $invalidateResponses: [InvalidateResponseInputType!]) {
           me {
-            invalidateResponses(invalidateResponses: $invalidateResponses) { 
+            invalidateResponses(expectation: $expectation, invalid: $invalid, invalidateResponses: $invalidateResponses) { 
               username
             }
           }
         }`,
         variables: {
-          invalidateResponses: {
-            sessionId: '',
-            responseIds: [''],
-            expectation: 0,
-            invalid: true,
-          },
+          expectation: 0,
+          invalid: true,
+          invalidateResponses: [
+            {
+              sessionId: '',
+              responseIds: [''],
+            },
+          ],
         },
       });
     expect(response.status).to.equal(200);
@@ -57,19 +59,21 @@ describe('invalidateResponses', () => {
     const response = await request(app)
       .post('/graphql')
       .send({
-        query: `mutation InvalidateResponse($invalidateResponses: InvalidateResponseInputType!) {
+        query: `mutation InvalidateResponse($expectation: Int!, $invalid: Boolean!, $invalidateResponses: [InvalidateResponseInputType!]) {
           me {
-            invalidateResponses(invalidateResponses: $invalidateResponses) { 
+            invalidateResponses(expectation: $expectation, invalid: $invalid, invalidateResponses: $invalidateResponses) { 
               username
             }
           }
         }`,
         variables: {
-          invalidateResponses: {
-            responseIds: [''],
-            expectation: 0,
-            invalid: true,
-          },
+          expectation: 0,
+          invalid: true,
+          invalidateResponses: [
+            {
+              responseIds: [''],
+            },
+          ],
         },
       });
     expect(response.body.errors[0].message).to.have.string(
@@ -81,19 +85,21 @@ describe('invalidateResponses', () => {
     const response = await request(app)
       .post('/graphql')
       .send({
-        query: `mutation InvalidateResponse($invalidateResponses: InvalidateResponseInputType!) {
+        query: `mutation InvalidateResponse($expectation: Int!, $invalid: Boolean!, $invalidateResponses: [InvalidateResponseInputType!]) {
           me {
-            invalidateResponses(invalidateResponses: $invalidateResponses) { 
+            invalidateResponses(expectation: $expectation, invalid: $invalid, invalidateResponses: $invalidateResponses) { 
               username
             }
           }
         }`,
         variables: {
-          invalidateResponses: {
-            sessionId: '',
-            expectation: 0,
-            invalid: true,
-          },
+          expectation: 0,
+          invalid: true,
+          invalidateResponses: [
+            {
+              sessionId: '',
+            },
+          ],
         },
       });
     expect(response.body.errors[0].message).to.have.string(
@@ -105,23 +111,25 @@ describe('invalidateResponses', () => {
     const response = await request(app)
       .post('/graphql')
       .send({
-        query: `mutation InvalidateResponse($invalidateResponses: InvalidateResponseInputType!) {
+        query: `mutation InvalidateResponse($expectation: Int!, $invalid: Boolean!, $invalidateResponses: [InvalidateResponseInputType!]) {
           me {
-            invalidateResponses(invalidateResponses: $invalidateResponses) { 
+            invalidateResponses(invalid: $invalid, invalidateResponses: $invalidateResponses) { 
               username
             }
           }
         }`,
         variables: {
-          invalidateResponses: {
-            sessionId: '',
-            responseIds: [''],
-            invalid: true,
-          },
+          invalid: true,
+          invalidateResponses: [
+            {
+              sessionId: '',
+              responseIds: [''],
+            },
+          ],
         },
       });
     expect(response.body.errors[0].message).to.have.string(
-      'Field "expectation" of required type "Int!" was not provided.'
+      'Field "invalidateResponses" argument "expectation" of type "Int!" is required, but it was not provided.'
     );
   });
 
@@ -129,61 +137,37 @@ describe('invalidateResponses', () => {
     const response = await request(app)
       .post('/graphql')
       .send({
-        query: `mutation InvalidateResponse($invalidateResponses: InvalidateResponseInputType!) {
+        query: `mutation InvalidateResponse($expectation: Int!, $invalid: Boolean!, $invalidateResponses: [InvalidateResponseInputType!]) {
           me {
-            invalidateResponses(invalidateResponses: $invalidateResponses) { 
+            invalidateResponses(expectation: $expectation, invalidateResponses: $invalidateResponses) { 
               username
             }
           }
         }`,
         variables: {
-          invalidateResponses: {
-            sessionId: '',
-            responseIds: [''],
-            expectation: 0,
-          },
+          expectation: 0,
+          invalidateResponses: [
+            {
+              sessionId: '',
+              responseIds: [''],
+            },
+          ],
         },
       });
     expect(response.body.errors[0].message).to.have.string(
-      'Field "invalid" of required type "Boolean!" was not provided.'
+      'Field "invalidateResponses" argument "invalid" of type "Boolean!" is required, but it was not provided.'
     );
   });
 
-  it(`fails if sessionId is invalid`, async () => {
+  it(`sets 1 response to invalid for 1 session`, async () => {
     const token = getToken('5f0cfea3395d762ca65405d1');
     const response = await request(app)
       .post('/graphql')
       .set('Authorization', `bearer ${token}`)
       .send({
-        query: `mutation InvalidateResponse($invalidateResponses: InvalidateResponseInputType!) {
+        query: `mutation InvalidateResponse($expectation: Int!, $invalid: Boolean!, $invalidateResponses: [InvalidateResponseInputType!]) {
           me {
-            invalidateResponses(invalidateResponses: $invalidateResponses) { 
-              username
-            }
-          }
-        }`,
-        variables: {
-          invalidateResponses: {
-            sessionId: 'asdf',
-            responseIds: ['5f20c63646f6110a6a5b2135'],
-            expectation: 0,
-            invalid: true,
-          },
-        },
-      });
-    expect(response.status).to.equal(200);
-    expect(response.body).to.have.deep.nested.property('errors[0].message');
-  });
-
-  it(`sets responses for expectation to invalid`, async () => {
-    const token = getToken('5f0cfea3395d762ca65405d1');
-    const response = await request(app)
-      .post('/graphql')
-      .set('Authorization', `bearer ${token}`)
-      .send({
-        query: `mutation InvalidateResponse($invalidateResponses: InvalidateResponseInputType!) {
-          me {
-            invalidateResponses(invalidateResponses: $invalidateResponses) { 
+            invalidateResponses(expectation: $expectation, invalid: $invalid, invalidateResponses: $invalidateResponses) { 
               sessionId
               userResponses {
                 _id
@@ -195,30 +179,204 @@ describe('invalidateResponses', () => {
           }
         }`,
         variables: {
-          invalidateResponses: {
-            sessionId: 'session 2',
-            responseIds: ['5f20c63646f6110a6a5b2135'],
-            expectation: 0,
-            invalid: true,
-          },
-        },
-      });
-    expect(response.status).to.equal(200);
-    expect(response.body.data.me.invalidateResponses).to.eql({
-      sessionId: 'session 2',
-      userResponses: [
-        {
-          _id: '5f20c63646f6110a6a5b2135',
-          expectationScores: [
+          expectation: 0,
+          invalid: true,
+          invalidateResponses: [
             {
-              invalidated: true,
-            },
-            {
-              invalidated: false,
+              sessionId: 'session 2',
+              responseIds: ['5f20c63646f6110a6a5b2135'],
             },
           ],
         },
-      ],
-    });
+      });
+    expect(response.status).to.equal(200);
+    expect(response.body.data.me.invalidateResponses).to.eql([
+      {
+        sessionId: 'session 2',
+        userResponses: [
+          {
+            _id: '5f20c63646f6110a6a5b2135',
+            expectationScores: [
+              {
+                invalidated: true,
+              },
+              {
+                invalidated: false,
+              },
+            ],
+          },
+        ],
+      },
+    ]);
+  });
+
+  it(`sets multiple responses to invalid for 1 session`, async () => {
+    const token = getToken('5f0cfea3395d762ca65405d1');
+    const response = await request(app)
+      .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
+      .send({
+        query: `mutation InvalidateResponse($expectation: Int!, $invalid: Boolean!, $invalidateResponses: [InvalidateResponseInputType!]) {
+          me {
+            invalidateResponses(expectation: $expectation, invalid: $invalid, invalidateResponses: $invalidateResponses) { 
+              sessionId
+              userResponses {
+                _id
+                expectationScores {
+                  invalidated
+                }
+              }
+            }
+          }
+        }`,
+        variables: {
+          expectation: 0,
+          invalid: true,
+          invalidateResponses: [
+            {
+              sessionId: 'session 6',
+              responseIds: [
+                '5f20c63646f6110a6a5b2131',
+                '5f20c63646f6110a6a5b2134',
+              ],
+            },
+          ],
+        },
+      });
+    expect(response.status).to.equal(200);
+    expect(response.body.data.me.invalidateResponses).to.eql([
+      {
+        sessionId: 'session 6',
+        userResponses: [
+          {
+            _id: '5f20c63646f6110a6a5b2131',
+            expectationScores: [
+              {
+                invalidated: true,
+              },
+            ],
+          },
+          {
+            _id: '5f20c63646f6110a6a5b2132',
+            expectationScores: [
+              {
+                invalidated: false,
+              },
+            ],
+          },
+          {
+            _id: '5f20c63646f6110a6a5b2133',
+            expectationScores: [
+              {
+                invalidated: false,
+              },
+            ],
+          },
+          {
+            _id: '5f20c63646f6110a6a5b2134',
+            expectationScores: [
+              {
+                invalidated: true,
+              },
+            ],
+          },
+        ],
+      },
+    ]);
+  });
+
+  it(`sets responses to invalid for multiple sessions`, async () => {
+    const token = getToken('5f0cfea3395d762ca65405d1');
+    const response = await request(app)
+      .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
+      .send({
+        query: `mutation InvalidateResponse($expectation: Int!, $invalid: Boolean!, $invalidateResponses: [InvalidateResponseInputType!]) {
+          me {
+            invalidateResponses(expectation: $expectation, invalid: $invalid, invalidateResponses: $invalidateResponses) { 
+              sessionId
+              userResponses {
+                _id
+                expectationScores {
+                  invalidated
+                }
+              }
+            }
+          }
+        }`,
+        variables: {
+          expectation: 0,
+          invalid: true,
+          invalidateResponses: [
+            {
+              sessionId: 'session 2',
+              responseIds: ['5f20c63646f6110a6a5b2135'],
+            },
+            {
+              sessionId: 'session 6',
+              responseIds: [
+                '5f20c63646f6110a6a5b2131',
+                '5f20c63646f6110a6a5b2134',
+              ],
+            },
+          ],
+        },
+      });
+    expect(response.status).to.equal(200);
+    expect(response.body.data.me.invalidateResponses).to.eql([
+      {
+        sessionId: 'session 2',
+        userResponses: [
+          {
+            _id: '5f20c63646f6110a6a5b2135',
+            expectationScores: [
+              {
+                invalidated: true,
+              },
+              {
+                invalidated: false,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        sessionId: 'session 6',
+        userResponses: [
+          {
+            _id: '5f20c63646f6110a6a5b2131',
+            expectationScores: [
+              {
+                invalidated: true,
+              },
+            ],
+          },
+          {
+            _id: '5f20c63646f6110a6a5b2132',
+            expectationScores: [
+              {
+                invalidated: false,
+              },
+            ],
+          },
+          {
+            _id: '5f20c63646f6110a6a5b2133',
+            expectationScores: [
+              {
+                invalidated: false,
+              },
+            ],
+          },
+          {
+            _id: '5f20c63646f6110a6a5b2134',
+            expectationScores: [
+              {
+                invalidated: true,
+              },
+            ],
+          },
+        ],
+      },
+    ]);
   });
 });

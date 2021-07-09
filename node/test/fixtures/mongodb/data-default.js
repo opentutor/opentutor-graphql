@@ -314,6 +314,7 @@ module.exports = {
       sessionId: 'session 6',
       userResponses: [
         {
+          _id: ObjectId('5f20c63646f6110a6a5b2131'),
           text: 'good',
           expectationScores: [
             {
@@ -322,6 +323,7 @@ module.exports = {
           ],
         },
         {
+          _id: ObjectId('5f20c63646f6110a6a5b2132'),
           text: 'good',
           expectationScores: [
             {
@@ -330,6 +332,7 @@ module.exports = {
           ],
         },
         {
+          _id: ObjectId('5f20c63646f6110a6a5b2133'),
           text: 'bad',
           expectationScores: [
             {
@@ -338,6 +341,7 @@ module.exports = {
           ],
         },
         {
+          _id: ObjectId('5f20c63646f6110a6a5b2134'),
           text: 'bad',
           expectationScores: [
             {

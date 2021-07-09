@@ -20,8 +20,6 @@ import SessionType from 'gql/types/session';
 
 interface InvalidateResponse {
   sessionId: string;
-  expectation: number;
-  invalid: boolean;
   responseIds: string[];
 }
 
@@ -29,30 +27,38 @@ const InvalidateResponseInputType = new GraphQLInputObjectType({
   name: 'InvalidateResponseInputType',
   fields: () => ({
     sessionId: { type: GraphQLNonNull(GraphQLString) },
-    expectation: { type: GraphQLNonNull(GraphQLInt) },
-    invalid: { type: GraphQLNonNull(GraphQLBoolean) },
     responseIds: { type: GraphQLNonNull(GraphQLList(GraphQLID)) },
   }),
 });
 
 export const userResponsesBatchInvalidate = {
-  type: SessionType,
+  type: GraphQLList(SessionType),
   args: {
-    invalidateResponses: { type: GraphQLNonNull(InvalidateResponseInputType) },
+    expectation: { type: GraphQLNonNull(GraphQLInt) },
+    invalid: { type: GraphQLNonNull(GraphQLBoolean) },
+    invalidateResponses: {
+      type: GraphQLList(GraphQLNonNull(InvalidateResponseInputType)),
+    },
   },
   resolve: async (
     _root: GraphQLObjectType,
     args: {
-      invalidateResponses: InvalidateResponse;
+      expectation: number;
+      invalid: boolean;
+      invalidateResponses: InvalidateResponse[];
     }
-  ): Promise<Session> => {
-    const session = await SessionModel.invalidateResponses(
-      args.invalidateResponses.sessionId,
-      args.invalidateResponses.responseIds,
-      args.invalidateResponses.expectation,
-      args.invalidateResponses.invalid
-    );
-    return session;
+  ): Promise<Session[]> => {
+    const updatedSessions: Session[] = [];
+    for (const invalidateResponses of args.invalidateResponses) {
+      const session = await SessionModel.invalidateResponses(
+        invalidateResponses.sessionId,
+        invalidateResponses.responseIds,
+        args.expectation,
+        args.invalid
+      );
+      updatedSessions.push(session);
+    }
+    return updatedSessions;
   },
 };
 
