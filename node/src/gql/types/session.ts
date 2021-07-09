@@ -19,6 +19,7 @@ import { Lesson } from 'models';
 const ExpectationType = new GraphQLObjectType({
   name: 'Expectation',
   fields: {
+    _id: { type: GraphQLID },
     text: { type: GraphQLString },
   },
 });
@@ -26,6 +27,7 @@ const ExpectationType = new GraphQLObjectType({
 const QuestionType = new GraphQLObjectType({
   name: 'Question',
   fields: {
+    _id: { type: GraphQLID },
     text: { type: GraphQLString },
     expectations: { type: GraphQLList(ExpectationType) },
   },
@@ -34,6 +36,8 @@ const QuestionType = new GraphQLObjectType({
 const ExpectationScoreType = new GraphQLObjectType({
   name: 'ExpectationScore',
   fields: {
+    _id: { type: GraphQLID },
+    invalidated: { type: GraphQLBoolean },
     classifierGrade: { type: GraphQLString },
     graderGrade: { type: GraphQLString },
   },
@@ -42,6 +46,7 @@ const ExpectationScoreType = new GraphQLObjectType({
 const ResponseType = new GraphQLObjectType({
   name: 'Response',
   fields: {
+    _id: { type: GraphQLID },
     text: { type: GraphQLString },
     expectationScores: { type: GraphQLList(ExpectationScoreType) },
   },
@@ -50,8 +55,8 @@ const ResponseType = new GraphQLObjectType({
 export const SessionType = new GraphQLObjectType({
   name: 'Session',
   fields: {
+    _id: { type: GraphQLID },
     deleted: { type: GraphQLBoolean },
-    id: { type: GraphQLID },
     sessionId: { type: GraphQLString },
     username: { type: GraphQLString },
     graderGrade: { type: GraphQLFloat },
