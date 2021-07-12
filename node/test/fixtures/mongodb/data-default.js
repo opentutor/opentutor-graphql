@@ -187,6 +187,25 @@ module.exports = {
         question: 'fake question',
       },
     },
+    {
+      _id: ObjectId('5f0cfea3395d762ca65405c9'),
+      lessonId: 'lessoninvalid',
+      name: 'name',
+      intro: 'intro',
+      dialogCategory: 'default',
+      question: 'question',
+      expectations: [
+        {
+          expectation: 'answer1',
+          hints: [
+            {
+              text: 'expectation 1 hint 1',
+            },
+          ],
+        },
+      ],
+      conclusion: ['conclusion'],
+    },
   ],
 
   sessions: [
@@ -617,6 +636,31 @@ module.exports = {
       sessionId: 'session 10',
       lessonId: '_deleted_lesson',
       deleted: true,
+    },
+    {
+      _id: ObjectId('5f20c63646f6110a6a5b2140'),
+      lessonId: 'lessoninvalid',
+      sessionId: 'sessioninvalid',
+      userResponses: [
+        {
+          text: 'bad',
+          expectationScores: [
+            {
+              invalidated: true,
+              graderGrade: 'Bad',
+            },
+          ],
+        },
+        {
+          text: 'bad',
+          expectationScores: [
+            {
+              invalidated: false,
+              graderGrade: 'Bad',
+            },
+          ],
+        },
+      ],
     },
   ],
 

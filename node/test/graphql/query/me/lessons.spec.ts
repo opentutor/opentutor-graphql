@@ -75,6 +75,11 @@ describe('lessons', () => {
       edges: [
         {
           node: {
+            lessonId: 'lessoninvalid',
+          },
+        },
+        {
+          node: {
             lessonId: 'lesson8',
           },
         },
@@ -141,6 +146,11 @@ describe('lessons', () => {
     expect(response.status).to.equal(200);
     expect(response.body.data.me.lessons).to.eql({
       edges: [
+        {
+          node: {
+            lessonId: 'lessoninvalid',
+          },
+        },
         {
           node: {
             lessonId: 'lesson8',

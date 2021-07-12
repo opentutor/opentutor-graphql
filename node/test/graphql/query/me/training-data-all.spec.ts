@@ -107,7 +107,7 @@ describe('training data all', () => {
     expect(response.body.data.me.allTrainingData.isTrainable).to.eql(true);
   });
 
-  it(`returns all training data for lesson`, async () => {
+  it(`returns all non-invalidated training data for lessons`, async () => {
     const token = getToken('5f0cfea3395d762ca65405d1');
     const response = await request(app)
       .post('/graphql')
@@ -155,6 +155,7 @@ describe('training data all', () => {
         '0,"""good, not bad""",Good,"{""question"":""question"",""ideal"":""answer1""}"\n' +
         '0,"good, not bad",Good,"{""question"":""question"",""ideal"":""answer1""}"\n' +
         '0,"""bad"", not ""good""",Bad,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,bad,Bad,"{""question"":""question"",""ideal"":""answer1""}"\n' +
         '0,bad,Bad,"{""question"":""question"",""ideal"":""answer1""}"\n'
     );
     expect(YAML.parse(response.body.data.me.allTrainingData.config)).to.eql({

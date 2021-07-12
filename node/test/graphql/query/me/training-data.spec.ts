@@ -115,6 +115,27 @@ describe('training data', () => {
     expect(response.body.data.me.trainingData.isTrainable).to.eql(false);
   });
 
+  it(`does not return invalidated training data`, async () => {
+    const response = await authGql({
+      app,
+      body: gqlQueryTrainingData('lessoninvalid'),
+      userId: '5f0cfea3395d762ca65405d1',
+    });
+    expect(response.body.data.me.trainingData.training).to.eql(
+      'exp_num,text,label\n0,bad,Bad\n'
+    );
+    expect(YAML.parse(response.body.data.me.trainingData.config)).to.eql({
+      question: 'question',
+      expectations: [
+        {
+          ideal: 'answer1',
+          features: null,
+        },
+      ],
+    });
+    expect(response.body.data.me.trainingData.isTrainable).to.eql(false);
+  });
+
   it(`returns all training data for lesson`, async () => {
     const response = await authGql({
       app,

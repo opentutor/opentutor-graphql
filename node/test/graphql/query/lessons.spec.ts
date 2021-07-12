@@ -48,6 +48,12 @@ describe('lessons', () => {
       edges: [
         {
           node: {
+            lessonId: 'lessoninvalid',
+            name: 'name',
+          },
+        },
+        {
+          node: {
             lessonId: 'lesson8',
             name: 'name',
           },
