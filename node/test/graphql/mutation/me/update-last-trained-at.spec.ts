@@ -10,7 +10,7 @@ import { Express } from 'express';
 import mongoUnit from 'mongo-unit';
 import request from 'supertest';
 import timekeeper from 'timekeeper';
-import { getToken } from '../../../helpers';
+import { getToken } from 'test/helpers';
 
 describe('updateLastTrainedAt', () => {
   let app: Express;

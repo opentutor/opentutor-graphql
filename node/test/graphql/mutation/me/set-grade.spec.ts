@@ -10,7 +10,7 @@ import { Express } from 'express';
 import { describe } from 'mocha';
 import mongoUnit from 'mongo-unit';
 import request from 'supertest';
-import { authGql, getToken } from '../../../helpers';
+import { authGql, getToken } from 'test/helpers';
 
 describe('setGrade', () => {
   let app: Express;

@@ -11,7 +11,7 @@ import { describe } from 'mocha';
 import mongoUnit from 'mongo-unit';
 import request from 'supertest';
 import * as YAML from 'yaml';
-import { authGql } from '../../../helpers';
+import { authGql } from 'test/helpers';
 
 const GQL_QUERY_CONFIG = `query Config($lessonId: String!) {
   me {

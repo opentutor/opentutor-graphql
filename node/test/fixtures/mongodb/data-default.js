@@ -266,6 +266,7 @@ module.exports = {
       sessionId: 'session 3',
       userResponses: [
         {
+          _id: ObjectId('5f20c63646f6110a5a5b2135'),
           text: 'a good answer',
           expectationScores: [
             {

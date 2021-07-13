@@ -176,8 +176,9 @@ SessionSchema.statics.getAllTrainingData =
           expIx < response.expectationScores.length;
           expIx++
         ) {
-          const grade = response.expectationScores[expIx].graderGrade;
-          if (grade) {
+          const exp = response.expectationScores[expIx];
+          const grade = exp.graderGrade;
+          if (!exp.invalidated && grade) {
             gradingStats.total += 1;
             gradingStats[grade] += 1;
             // Classifier cannot use Neutral data
@@ -227,8 +228,9 @@ SessionSchema.statics.getTrainingData = async function (
         if (expIx >= lesson.expectations.length) {
           continue;
         }
-        const grade = response.expectationScores[expIx].graderGrade;
-        if (grade) {
+        const exp = response.expectationScores[expIx];
+        const grade = exp.graderGrade;
+        if (!exp.invalidated && grade) {
           expectationGradingStats[expIx].total += 1;
           expectationGradingStats[expIx][grade] += 1;
           // Classifier cannot use Neutral data
