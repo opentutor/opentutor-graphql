@@ -12,7 +12,7 @@ import mongoUnit from 'mongo-unit';
 import request from 'supertest';
 import * as YAML from 'yaml';
 import { getToken } from '../../../helpers';
-import { gqlMutationInvalidateResponses } from '../../mutation/me/invalidate-responses.spec';
+import { gqlMutationInvalidateResponses } from 'test/graphql/mutation/me/invalidate-responses.spec';
 
 describe('training data all', () => {
   let app: Express;

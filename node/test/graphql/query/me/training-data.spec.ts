@@ -12,7 +12,7 @@ import mongoUnit from 'mongo-unit';
 import request from 'supertest';
 import * as YAML from 'yaml';
 import { authGql, getToken } from '../../../helpers';
-import { gqlMutationInvalidateResponses } from '../../mutation/me/invalidate-responses.spec';
+import { gqlMutationInvalidateResponses } from 'test/graphql/mutation/me/invalidate-responses.spec';
 
 const GQL_QUERY_TRAINING_DATA = `query TrainingData($lessonId: String!) {
   me {
