@@ -11,7 +11,7 @@ import { describe } from 'mocha';
 import mongoUnit from 'mongo-unit';
 import request from 'supertest';
 import * as YAML from 'yaml';
-import { getToken } from '../../../helpers';
+import { getToken } from 'test/helpers';
 import { gqlMutationInvalidateResponses } from 'test/graphql/mutation/me/invalidate-responses.spec';
 
 describe('training data all', () => {

@@ -10,7 +10,7 @@ import { Express } from 'express';
 import { describe } from 'mocha';
 import mongoUnit from 'mongo-unit';
 import request from 'supertest';
-import { getToken } from '../../../helpers';
+import { getToken } from 'test/helpers';
 
 export const GQL_INVALIDATE_RESPONSE_DEFAULT = `mutation InvalidateResponse($expectation: Int!, $invalid: Boolean!, $invalidateResponses: [InvalidateResponseInputType!]) {
   me {

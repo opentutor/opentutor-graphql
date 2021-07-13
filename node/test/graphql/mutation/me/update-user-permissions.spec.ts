@@ -15,7 +15,7 @@ import { expect } from 'chai';
 import { Express } from 'express';
 import mongoUnit from 'mongo-unit';
 import request from 'supertest';
-import { getToken } from '../../../helpers';
+import { getToken } from 'test/helpers';
 
 describe('updateUserPermissions', () => {
   let app: Express;
