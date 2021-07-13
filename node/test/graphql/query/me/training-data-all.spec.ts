@@ -12,6 +12,7 @@ import mongoUnit from 'mongo-unit';
 import request from 'supertest';
 import * as YAML from 'yaml';
 import { getToken } from '../../../helpers';
+import { gqlMutationInvalidateResponses } from '../../mutation/me/invalidate-responses.spec';
 
 describe('training data all', () => {
   let app: Express;
@@ -107,7 +108,7 @@ describe('training data all', () => {
     expect(response.body.data.me.allTrainingData.isTrainable).to.eql(true);
   });
 
-  it(`returns all non-invalidated training data for lessons`, async () => {
+  it(`returns all training data for lessons`, async () => {
     const token = getToken('5f0cfea3395d762ca65405d1');
     const response = await request(app)
       .post('/graphql')
@@ -155,7 +156,140 @@ describe('training data all', () => {
         '0,"""good, not bad""",Good,"{""question"":""question"",""ideal"":""answer1""}"\n' +
         '0,"good, not bad",Good,"{""question"":""question"",""ideal"":""answer1""}"\n' +
         '0,"""bad"", not ""good""",Bad,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,bad,Bad,"{""question"":""question"",""ideal"":""answer1""}"\n'
+    );
+    expect(YAML.parse(response.body.data.me.allTrainingData.config)).to.eql({
+      question: '',
+    });
+    expect(response.body.data.me.allTrainingData.isTrainable).to.eql(true);
+  });
+
+  it(`does not return invalidated training data for lessons`, async () => {
+    const token = getToken('5f0cfea3395d762ca65405d1');
+    let response = await request(app)
+      .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
+      .send({
+        query: `query {
+          me {
+            allTrainingData {
+              isTrainable
+              training
+              config
+            }  
+          }
+        }`,
+      });
+    expect(response.status).to.equal(200);
+    expect(response.body.data.me.allTrainingData.training).to.eql(
+      'exp_num,text,label,exp_data\n' +
+        '0,a good answer,Good,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,a bad answer,Bad,"{""question"":""question?"",""ideal"":""expected text 1""}"\n' +
+        '0,good,Good,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,good,Good,"{""question"":""question"",""ideal"":""answer1""}"\n' +
         '0,bad,Bad,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,bad,Bad,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,bad,Bad,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,bad,Bad,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,bad,Bad,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,bad,Bad,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,bad,Bad,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,bad,Bad,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,bad,Bad,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,bad,Bad,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,bad,Bad,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,bad,Bad,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,good,Good,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,good,Good,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,good,Good,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,good,Good,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,good,Good,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,good,Good,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,good,Good,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,good,Good,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,good,Good,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,good,Good,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,"""good, not bad""",Good,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,"good, not bad",Good,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,"""bad"", not ""good""",Bad,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,bad,Bad,"{""question"":""question"",""ideal"":""answer1""}"\n'
+    );
+    expect(YAML.parse(response.body.data.me.allTrainingData.config)).to.eql({
+      question: '',
+    });
+    expect(response.body.data.me.allTrainingData.isTrainable).to.eql(true);
+    response = await request(app)
+      .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
+      .send(
+        gqlMutationInvalidateResponses([
+          {
+            sessionId: 'session 3',
+            responseIds: ['5f20c63646f6110a5a5b2135'],
+          },
+        ])
+      );
+    expect(response.status).to.equal(200);
+    expect(response.body.data.me.invalidateResponses).to.eql([
+      {
+        sessionId: 'session 3',
+        userResponses: [
+          {
+            _id: '5f20c63646f6110a5a5b2135',
+            expectationScores: [
+              {
+                invalidated: true,
+              },
+            ],
+          },
+        ],
+      },
+    ]);
+    response = await request(app)
+      .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
+      .send({
+        query: `query {
+          me {
+            allTrainingData {
+              isTrainable
+              training
+              config
+            }  
+          }
+        }`,
+      });
+    expect(response.status).to.equal(200);
+    expect(response.body.data.me.allTrainingData.training).to.eql(
+      'exp_num,text,label,exp_data\n' +
+        '0,a bad answer,Bad,"{""question"":""question?"",""ideal"":""expected text 1""}"\n' +
+        '0,good,Good,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,good,Good,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,bad,Bad,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,bad,Bad,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,bad,Bad,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,bad,Bad,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,bad,Bad,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,bad,Bad,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,bad,Bad,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,bad,Bad,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,bad,Bad,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,bad,Bad,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,bad,Bad,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,bad,Bad,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,good,Good,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,good,Good,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,good,Good,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,good,Good,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,good,Good,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,good,Good,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,good,Good,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,good,Good,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,good,Good,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,good,Good,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,"""good, not bad""",Good,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,"good, not bad",Good,"{""question"":""question"",""ideal"":""answer1""}"\n' +
+        '0,"""bad"", not ""good""",Bad,"{""question"":""question"",""ideal"":""answer1""}"\n' +
         '0,bad,Bad,"{""question"":""question"",""ideal"":""answer1""}"\n'
     );
     expect(YAML.parse(response.body.data.me.allTrainingData.config)).to.eql({

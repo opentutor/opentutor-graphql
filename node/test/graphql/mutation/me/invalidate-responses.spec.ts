@@ -12,7 +12,7 @@ import mongoUnit from 'mongo-unit';
 import request from 'supertest';
 import { getToken } from '../../../helpers';
 
-const GQL_INVALIDATE_RESPONSE_DEFAULT = `mutation InvalidateResponse($expectation: Int!, $invalid: Boolean!, $invalidateResponses: [InvalidateResponseInputType!]) {
+export const GQL_INVALIDATE_RESPONSE_DEFAULT = `mutation InvalidateResponse($expectation: Int!, $invalid: Boolean!, $invalidateResponses: [InvalidateResponseInputType!]) {
   me {
     invalidateResponses(expectation: $expectation, invalid: $invalid, invalidateResponses: $invalidateResponses) { 
       sessionId
@@ -27,7 +27,7 @@ const GQL_INVALIDATE_RESPONSE_DEFAULT = `mutation InvalidateResponse($expectatio
 }
 `;
 
-function gqlMutationInvalidateResponses(
+export function gqlMutationInvalidateResponses(
   invalidateResponses: { sessionId?: string; responseIds?: string[] }[] = [],
   expectation = 0,
   invalid = true

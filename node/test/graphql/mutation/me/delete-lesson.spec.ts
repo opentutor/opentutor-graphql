@@ -221,11 +221,6 @@ describe('deleteLesson', () => {
         edges: [
           {
             node: {
-              lessonId: 'lessoninvalid',
-            },
-          },
-          {
-            node: {
               lessonId: 'lesson8',
             },
           },
@@ -293,11 +288,6 @@ describe('deleteLesson', () => {
     expect(response.body.data.me).to.eql({
       sessions: {
         edges: [
-          {
-            node: {
-              sessionId: 'sessioninvalid',
-            },
-          },
           {
             node: {
               sessionId: 'session 9',

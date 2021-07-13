@@ -12,6 +12,7 @@ import mongoUnit from 'mongo-unit';
 import request from 'supertest';
 import * as YAML from 'yaml';
 import { authGql, getToken } from '../../../helpers';
+import { gqlMutationInvalidateResponses } from '../../mutation/me/invalidate-responses.spec';
 
 const GQL_QUERY_TRAINING_DATA = `query TrainingData($lessonId: String!) {
   me {
@@ -115,27 +116,6 @@ describe('training data', () => {
     expect(response.body.data.me.trainingData.isTrainable).to.eql(false);
   });
 
-  it(`does not return invalidated training data`, async () => {
-    const response = await authGql({
-      app,
-      body: gqlQueryTrainingData('lessoninvalid'),
-      userId: '5f0cfea3395d762ca65405d1',
-    });
-    expect(response.body.data.me.trainingData.training).to.eql(
-      'exp_num,text,label\n0,bad,Bad\n'
-    );
-    expect(YAML.parse(response.body.data.me.trainingData.config)).to.eql({
-      question: 'question',
-      expectations: [
-        {
-          ideal: 'answer1',
-          features: null,
-        },
-      ],
-    });
-    expect(response.body.data.me.trainingData.isTrainable).to.eql(false);
-  });
-
   it(`returns all training data for lesson`, async () => {
     const response = await authGql({
       app,
@@ -158,6 +138,55 @@ describe('training data', () => {
         },
       ],
     });
+    expect(response.body.data.me.trainingData.isTrainable).to.eql(false);
+  });
+
+  it(`does not return invalidated training data for lesson`, async () => {
+    let response = await authGql({
+      app,
+      body: gqlQueryTrainingData('lesson2'),
+      userId: '5f0cfea3395d762ca65405d1',
+    });
+    expect(response.body.data.me.trainingData.training).to.eql(
+      'exp_num,text,label\n0,a good answer,Good\n'
+    );
+    expect(response.body.data.me.trainingData.isTrainable).to.eql(false);
+    const token = getToken('5f0cfea3395d762ca65405d1');
+    response = await request(app)
+      .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
+      .send(
+        gqlMutationInvalidateResponses([
+          {
+            sessionId: 'session 3',
+            responseIds: ['5f20c63646f6110a5a5b2135'],
+          },
+        ])
+      );
+    expect(response.status).to.equal(200);
+    expect(response.body.data.me.invalidateResponses).to.eql([
+      {
+        sessionId: 'session 3',
+        userResponses: [
+          {
+            _id: '5f20c63646f6110a5a5b2135',
+            expectationScores: [
+              {
+                invalidated: true,
+              },
+            ],
+          },
+        ],
+      },
+    ]);
+    response = await authGql({
+      app,
+      body: gqlQueryTrainingData('lesson2'),
+      userId: '5f0cfea3395d762ca65405d1',
+    });
+    expect(response.body.data.me.trainingData.training).to.eql(
+      'exp_num,text,label\n'
+    );
     expect(response.body.data.me.trainingData.isTrainable).to.eql(false);
   });
 
