@@ -40,6 +40,7 @@ export const LessonType = new GraphQLObjectType({
     lessonId: { type: GraphQLString },
     name: { type: GraphQLString },
     intro: { type: GraphQLString },
+    dialogCategory: { type: GraphQLString },
     question: { type: GraphQLString },
     image: { type: GraphQLString },
     expectations: { type: GraphQLList(LessonExpectationType) },

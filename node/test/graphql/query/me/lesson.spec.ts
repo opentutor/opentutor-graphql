@@ -10,7 +10,7 @@ import { Express } from 'express';
 import { describe } from 'mocha';
 import mongoUnit from 'mongo-unit';
 import request from 'supertest';
-import { getToken } from '../../../helpers';
+import { getToken } from 'test/helpers';
 
 describe('lesson', () => {
   let app: Express;
@@ -119,6 +119,7 @@ describe('lesson', () => {
             lessonId
             name
             intro
+            dialogCategory
             question
             image
             expectations {
@@ -142,6 +143,7 @@ describe('lesson', () => {
       lessonId: 'lesson1',
       name: 'lesson name',
       intro: 'intro text',
+      dialogCategory: 'default',
       question: 'question?',
       expectations: [
         {

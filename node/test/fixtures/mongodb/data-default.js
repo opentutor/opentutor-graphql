@@ -15,6 +15,7 @@ module.exports = {
       name: 'lesson name',
       image: 'some/image.png',
       intro: 'intro text',
+      dialogCategory: 'default',
       question: 'question?',
       expectations: [
         {
@@ -51,6 +52,7 @@ module.exports = {
       lessonId: 'lesson2',
       name: 'name',
       intro: 'intro',
+      dialogCategory: 'default',
       question: 'question',
       expectations: [
         {
@@ -72,6 +74,7 @@ module.exports = {
       lessonId: 'lesson3',
       name: 'name',
       intro: 'intro',
+      dialogCategory: 'default',
       question: 'question',
       expectations: [
         {
@@ -91,6 +94,7 @@ module.exports = {
       lessonId: 'lesson4',
       name: 'name',
       intro: 'intro',
+      dialogCategory: 'default',
       question: 'question',
       expectations: [
         {
@@ -110,6 +114,7 @@ module.exports = {
       lessonId: 'lesson5',
       name: 'name',
       intro: 'intro',
+      dialogCategory: 'default',
       question: 'question',
       expectations: [
         {
@@ -129,6 +134,7 @@ module.exports = {
       lessonId: 'lesson6',
       name: 'name',
       intro: 'intro',
+      dialogCategory: 'default',
       question: 'question',
       expectations: [
         {
@@ -153,6 +159,7 @@ module.exports = {
       lessonId: 'lesson8',
       name: 'name',
       intro: 'intro',
+      dialogCategory: 'default',
       question: 'question',
       expectations: [
         {
@@ -253,6 +260,7 @@ module.exports = {
       },
       userResponses: [
         {
+          _id: ObjectId('5f20c63646f6110a6a5b2135'),
           text: 'answer1',
           expectationScores: [
             {
@@ -275,6 +283,7 @@ module.exports = {
       sessionId: 'session 3',
       userResponses: [
         {
+          _id: ObjectId('5f20c63646f6110a5a5b2135'),
           text: 'a good answer',
           expectationScores: [
             {
@@ -326,6 +335,7 @@ module.exports = {
       sessionId: 'session 6',
       userResponses: [
         {
+          _id: ObjectId('5f20c63646f6110a6a5b2131'),
           text: 'good',
           expectationScores: [
             {
@@ -335,6 +345,7 @@ module.exports = {
           ],
         },
         {
+          _id: ObjectId('5f20c63646f6110a6a5b2132'),
           text: 'good',
           expectationScores: [
             {
@@ -344,6 +355,7 @@ module.exports = {
           ],
         },
         {
+          _id: ObjectId('5f20c63646f6110a6a5b2133'),
           text: 'bad',
           expectationScores: [
             {
@@ -353,6 +365,7 @@ module.exports = {
           ],
         },
         {
+          _id: ObjectId('5f20c63646f6110a6a5b2134'),
           text: 'bad',
           expectationScores: [
             {

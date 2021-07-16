@@ -7,6 +7,7 @@ The full terms of this copyright and license should always be found in the root 
 import { GraphQLObjectType } from 'graphql';
 import { User } from 'models/User';
 import deleteLesson from './delete-lesson';
+import invalidateResponses from './invalidate-responses';
 import setGrade from './set-grade';
 import updateLastTrainedAt from './update-last-trained-at';
 import updateLesson from './update-lesson';
@@ -18,6 +19,7 @@ export const Me: GraphQLObjectType = new GraphQLObjectType({
   name: 'MeMutation',
   fields: {
     deleteLesson,
+    invalidateResponses,
     setGrade,
     updateLastTrainedAt,
     updateLesson,

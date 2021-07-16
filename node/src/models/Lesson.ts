@@ -36,6 +36,7 @@ export interface Lesson extends Document {
   lessonId: string;
   name: string;
   intro: string;
+  dialogCategory: string;
   question: string;
   image: string;
   expectations: [LessonExpectation];
@@ -52,6 +53,7 @@ export const LessonSchema = new Schema(
     lessonId: { type: String, required: true, unique: true },
     name: { type: String },
     intro: { type: String },
+    dialogCategory: { type: String },
     question: { type: String },
     image: { type: String },
     expectations: { type: [LessonExpectationSchema] },
