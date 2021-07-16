@@ -58,6 +58,7 @@ export const UpdateHintInputType = new GraphQLInputObjectType({
 export const UpdateLessonExpectationInputType = new GraphQLInputObjectType({
   name: 'UpdateLessonExpectationInputType',
   fields: () => ({
+    expectationId: { type: GraphQLString },
     expectation: { type: GraphQLString },
     features: { type: GraphQLJSON },
     hints: { type: GraphQLList(UpdateHintInputType) },
