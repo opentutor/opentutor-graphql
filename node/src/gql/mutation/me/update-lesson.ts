@@ -114,8 +114,8 @@ export const updateLesson = {
       throw new Error('user does not have permission to edit this lesson');
     }
 
-    lesson.expectations.forEach(element => {
-      if(element.expectationId == undefined)
+    lesson.expectations.forEach((element) => {
+      if (element.expectationId == undefined)
         element.expectationId = uuid.v4().toString();
     });
 
