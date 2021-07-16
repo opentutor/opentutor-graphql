@@ -270,19 +270,27 @@ SessionSchema.statics.getTrainingData = async function (
 
 SessionSchema.statics.updateLesson = async function (
   lessonId: string,
-  updatedLesson: { lessonId: string; createdBy: string; name: string }
+  updatedLesson: { lessonId?: string; createdBy?: string; name?: string }
 ) {
-  const createdBy = await UserModel.findOne({ _id: updatedLesson.createdBy });
+  const sessionUpdates: Partial<Session> = {};
+  if (updatedLesson.lessonId) {
+    sessionUpdates.lessonId = updatedLesson.lessonId;
+  }
+  if (updatedLesson.createdBy) {
+    const createdBy = await UserModel.findOne({ _id: updatedLesson.createdBy });
+    if (createdBy) {
+      sessionUpdates.lessonCreatedBy = createdBy ? createdBy.name : '';
+    }
+  }
+  if (updatedLesson.name) {
+    sessionUpdates.lessonName = updatedLesson.name;
+  }
   await this.updateMany(
     {
       lessonId: lessonId,
     },
     {
-      $set: {
-        lessonId: updatedLesson.lessonId,
-        lessonName: updatedLesson.name,
-        lessonCreatedBy: createdBy ? createdBy.name : '',
-      },
+      $set: sessionUpdates,
     }
   );
 };

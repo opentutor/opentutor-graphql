@@ -6,10 +6,27 @@ The full terms of this copyright and license should always be found in the root 
 */
 import createApp, { appStart, appStop } from 'app';
 import { expect } from 'chai';
+import { describe } from 'mocha';
 import { Express } from 'express';
 import mongoUnit from 'mongo-unit';
 import request from 'supertest';
 import { getToken } from 'test/helpers';
+
+const GQL_UPDATE_LESSON_DEFAULT = {
+  query: `mutation UpdateLesson($lessonId: ID!, $lesson: UpdateLessonInputType!) {
+  me {
+    updateLesson(lessonId: $lessonId, lesson: $lesson) {
+      lessonId
+    }   
+  }
+}`,
+  variables: {
+    lessonId: 'lesson1',
+    lesson: {
+      lessonId: 'lesson1-updated',
+    },
+  },
+};
 
 describe('updateLesson', () => {
   let app: Express;
@@ -28,15 +45,7 @@ describe('updateLesson', () => {
   it(`throws an error if not logged in`, async () => {
     const response = await request(app)
       .post('/graphql')
-      .send({
-        query: `mutation {
-          me {
-            updateLesson(lesson: {}) { 
-              lessonId
-            }   
-          }
-        }`,
-      });
+      .send(GQL_UPDATE_LESSON_DEFAULT);
     expect(response.status).to.equal(200);
     expect(response.body).to.have.deep.nested.property(
       'errors[0].message',
@@ -90,18 +99,15 @@ describe('updateLesson', () => {
       .post('/graphql')
       .set('Authorization', `bearer ${token}`)
       .send({
-        query: `mutation {
-          me {
-            updateLesson(lesson: {}) { 
-              lessonId
-            }   
-          }
-        }`,
+        ...GQL_UPDATE_LESSON_DEFAULT,
+        variables: {
+          lesson: GQL_UPDATE_LESSON_DEFAULT.variables.lesson,
+        },
       });
-    expect(response.status).to.equal(200);
+    expect(response.status).to.equal(500);
     expect(response.body).to.have.deep.nested.property(
       'errors[0].message',
-      'missing required param lessonId'
+      'Variable "$lessonId" of required type "ID!" was not provided.'
     );
   });
 
@@ -252,17 +258,17 @@ describe('updateLesson', () => {
       .set('opentutor-api-req', 'true')
       .set('Authorization', `bearer ${process.env.API_SECRET}`)
       .send({
-        query: `mutation {
-          me {
-            updateLesson(lessonId: "lesson1", lesson: ${lesson}) {
-              lessonId
-            }   
-          }
-        }`,
+        query: GQL_UPDATE_LESSON_DEFAULT,
+        variables: {
+          lessonId: 'lesson1',
+          lesson: {
+            lessonId: 'lesson1-updated',
+          },
+        },
       });
     expect(response.status).to.equal(200);
     expect(response.body.data.me.updateLesson).to.eql({
-      lessonId: 'lesson1',
+      lessonId: 'lesson1-updated',
     });
   });
 
