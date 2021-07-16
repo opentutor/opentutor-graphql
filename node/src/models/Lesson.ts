@@ -7,7 +7,7 @@ The full terms of this copyright and license should always be found in the root 
 import mongoose, { Schema, Document, Model } from 'mongoose';
 import { HasPaginate, pluginPagination } from './Paginatation';
 import UserModel, { User, UserRole } from './User';
-import uuid from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 
 export interface UpdateHint {
   text: string;
@@ -117,13 +117,13 @@ LessonSchema.statics.findAndUpdateLessonById = async function (
 ): Promise<Lesson> {
   const updateDoc = {
     ...lessonUpdates,
-  } as any;  // eslint-disable-line @typescript-eslint/no-explicit-any
+  } as any; // eslint-disable-line @typescript-eslint/no-explicit-any
   if (updateDoc.lessonId && !updateDoc.lessonId?.match(/^[a-z0-9\-]+$/)) {
     throw new Error('lessonId must match [a-z0-9-]');
   }
   if (updateDoc.expectations) {
     (updateDoc.expectations as UpdateLessonExpectation[]).forEach((element) => {
-      if (!element.expectationId) element.expectationId = uuid.v4().toString();
+      if (!element.expectationId) element.expectationId = uuidv4().toString();
     });
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
