@@ -22,6 +22,7 @@ import {
 } from 'models';
 import { Lesson } from 'models/Lesson';
 import { User } from 'models/User';
+import uuid from 'uuid';
 
 export interface UpdateHint {
   text: string;
@@ -112,6 +113,12 @@ export const updateLesson = {
     if (!LessonModel.userCanEdit(context.user, lesson)) {
       throw new Error('user does not have permission to edit this lesson');
     }
+
+    lesson.expectations.forEach(element => {
+      if(element.expectationId == undefined)
+        element.expectationId = uuid.v4().toString();
+    });
+
     await SessionModel.updateLesson(args.lessonId, lesson);
     const createdBy = await UserModel.findOne({ _id: lesson.createdBy });
 
