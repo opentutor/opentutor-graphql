@@ -18,9 +18,9 @@ module.exports = {
     const lessons =  await getCollection("lessons");
 
     lessons.forEach(item=>{
-      console.log(item.expectations);
       item.expectations.forEach(expectation=>{
-        expectation.expectationId = expectation._id.toString();
+        if(!expectation.expectationId)
+          expectation.expectationId = expectation._id.toString();
       })
     })
 
@@ -32,7 +32,8 @@ module.exports = {
       session.question.expectations.forEach((expectation, index)=>{
         if (index < lesson.expectations.length)
         {
-          expectation.expectationId = lesson.expectations[index].expectationId;
+          if(!expectation.expectationId)
+           expectation.expectationId = lesson.expectations[index].expectationId;
         }
 
       })
@@ -43,8 +44,8 @@ module.exports = {
           console.log(index);
           if(index < lesson.expectations.length)
           {
-            expectationScore.expectationId = lesson.expectations[index].expectationId;
-            console.log(expectationScore.expectationId);
+            if(!expectationScore.expectationId)
+              expectationScore.expectationId = lesson.expectations[index].expectationId;
           }  
         })
       })
