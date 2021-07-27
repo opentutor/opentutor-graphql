@@ -11,42 +11,38 @@ module.exports = {
       return result
     }
 
+    const lessons =  await getCollection("lessons");
+
     function getLessonById(lessons, id) {
       return lessons.find(({lessonId})=>lessonId === id)
     }
 
-    const lessons =  await getCollection("lessons");
-
     lessons.forEach(item=>{
       item.expectations.forEach(expectation=>{
-        if(!expectation.expectationId)
+        if(!expectation.expectationId){
           expectation.expectationId = expectation._id.toString();
+        }
       })
     })
 
     const sessions = await getCollection("sessions");
 
     sessions.forEach(session=>{
-      lesson = getLessonById(lessons, session.lessonId);
+      const lesson = getLessonById(lessons, session.lessonId);
 
       session.question.expectations.forEach((expectation, index)=>{
-        if (index < lesson.expectations.length)
-        {
-          if(!expectation.expectationId)
-           expectation.expectationId = lesson.expectations[index].expectationId;
+        if (index >= lesson.expectations.length || !expectation.expectationId){
+          return;
         }
-
+        expectation.expectationId = lesson.expectations[index].expectationId;
       })
 
       session.userResponses.forEach(response=>{
         response.expectationScores.forEach((expectationScore, index) =>{
-          console.log(JSON.stringify(lesson.expectations.length))
-          console.log(index);
-          if(index < lesson.expectations.length)
-          {
-            if(!expectationScore.expectationId)
-              expectationScore.expectationId = lesson.expectations[index].expectationId;
-          }  
+          if(index >= lessons.expectations.length || !expectationScore.expectationId){
+            return;
+          }
+          expectationScore.expectationId = lesson.expectations[index].expectationId; 
         })
       })
     })
