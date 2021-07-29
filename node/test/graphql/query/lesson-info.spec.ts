@@ -59,19 +59,26 @@ describe('lessonInfo', () => {
     );
   });
 
-  it('returns data for a lesson', async () => {
+  it.only('returns data for a lesson', async () => {
     const response = await request(app)
       .post('/graphql')
       .send({
         query: `query {
         lessonInfo(lessonId: "lesson1") {
             id
+            mediaType
             image
+            video {
+              link
+              start
+              end
+            }
             lessonId
             name
           }
       }`,
       });
+    console.log(response)
     expect(response.status).to.equal(200);
     expect(response.body).to.have.deep.nested.property(
       'data.lessonInfo.id',
@@ -80,6 +87,10 @@ describe('lessonInfo', () => {
     expect(response.body).to.have.deep.nested.property(
       'data.lessonInfo.image',
       'some/image.png'
+    );
+    expect(response.body).to.have.deep.nested.property(
+      'data.lessonInfo.mediaType',
+      'image'
     );
     expect(response.body).to.have.deep.nested.property(
       'data.lessonInfo.lessonId',
