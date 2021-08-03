@@ -126,7 +126,7 @@ describe('lesson', () => {
             video {
               link
               start
-              stop
+              end
             }
             expectations {
               expectation

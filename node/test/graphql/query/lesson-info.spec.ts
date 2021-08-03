@@ -59,7 +59,7 @@ describe('lessonInfo', () => {
     );
   });
 
-  it.only('returns data for a lesson', async () => {
+  it('returns data for a lesson', async () => {
     const response = await request(app)
       .post('/graphql')
       .send({
