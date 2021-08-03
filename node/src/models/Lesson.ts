@@ -13,10 +13,12 @@ export interface UpdateHint {
   text: string;
 }
 
+export type Features = Record<string, unknown>;
+
 export interface UpdateLessonExpectation {
   expectationId: string;
   expectation: string;
-  features: any;
+  features: Features;
   hints: UpdateHint[];
 }
 
@@ -30,7 +32,7 @@ export interface UpdateLesson {
   expectations: UpdateLessonExpectation[];
   conclusion: string[];
   lastTrainedAt: Date;
-  features: any;
+  features: Features;
   createdBy: string;
   deleted: boolean;
 }
@@ -57,8 +59,6 @@ const LessonExpectationSchema = new Schema({
   hints: { type: [HintSchema] },
 });
 
-export type Features = Record<string, unknown>;
-
 export interface Lesson extends Document {
   lessonId: string;
   name: string;
@@ -75,7 +75,19 @@ export interface Lesson extends Document {
   deleted: boolean;
 }
 
-export const LessonSchema = new Schema(
+export interface LessonModel extends Model<Lesson>, HasPaginate<Lesson> {
+  findAndUpdateLessonById(
+    lessonId: string,
+    lessonDoc: UpdateLesson
+  ): Promise<Lesson>;
+
+  userCanEdit(
+    user: User,
+    lesson: { createdBy: string | mongoose.Types.ObjectId }
+  ): boolean;
+}
+
+export const LessonSchema = new Schema<Lesson, LessonModel>(
   {
     lessonId: { type: String, required: true, unique: true },
     name: { type: String },
@@ -93,18 +105,6 @@ export const LessonSchema = new Schema(
   },
   { timestamps: true, collation: { locale: 'en', strength: 2 } }
 );
-
-export interface LessonModel extends Model<Lesson>, HasPaginate<Lesson> {
-  findAndUpdateLessonById(
-    lessonId: string,
-    lessonDoc: UpdateLesson
-  ): Promise<Lesson>;
-
-  userCanEdit(
-    user: User,
-    lesson: { createdBy: string | mongoose.Types.ObjectId }
-  ): boolean;
-}
 
 /**
  * Update a lesson, setting any of it's provided props
