@@ -39,7 +39,7 @@ module.exports = {
 
       session.userResponses.forEach(response=>{
         response.expectationScores.forEach((expectationScore, index) =>{
-          if(index >= lessons.expectations.length || !expectationScore.expectationId){
+          if(index >= lesson.expectations.length || !expectationScore.expectationId){
             return;
           }
           expectationScore.expectationId = lesson.expectations[index].expectationId; 
