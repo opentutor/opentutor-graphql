@@ -49,7 +49,6 @@ export const config = {
         stringified: YAML.stringify(config),
       };
     } catch (err) {
-      console.error(err);
       throw err;
     }
   },
