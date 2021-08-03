@@ -4,7 +4,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { Schema } from 'mongoose';
+import { ExtractMethods, Model, Schema } from 'mongoose';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const mongoPaging = require('mongo-cursor-pagination');
 mongoPaging.config.COLLATION = { locale: 'en', strength: 2 };
@@ -37,6 +37,13 @@ export interface HasPaginate<T> {
   ): Promise<PaginatedResolveResult<T>>;
 }
 
-export function pluginPagination(s: Schema): void {
+// DocType = Document, M extends Model<DocType, any, any> = Model<any, any, any>, SchemaDefinitionType = undefined, TInstanceMethods = ExtractMethods<M>
+export function pluginPagination<
+  DocType = Document,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  M extends Model<DocType, any, any> = Model<any, any, any>,
+  SchemaDefinitionType = undefined,
+  TInstanceMethods = ExtractMethods<M>
+>(s: Schema<DocType, M, SchemaDefinitionType, TInstanceMethods>): void {
   s.plugin(mongoPaging.mongoosePlugin);
 }
