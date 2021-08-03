@@ -22,7 +22,9 @@ export interface User extends Document {
   lastLoginAt: Date;
 }
 
-export const UserSchema = new Schema(
+export interface UserModel extends Model<User>, HasPaginate<User> {}
+
+export const UserSchema = new Schema<User, UserModel>(
   {
     googleId: { type: String },
     email: { type: String },
@@ -37,8 +39,6 @@ export const UserSchema = new Schema(
   },
   { timestamps: true, collation: { locale: 'en', strength: 2 } }
 );
-
-export interface UserModel extends Model<User>, HasPaginate<User> {}
 
 UserSchema.index({ name: -1, _id: -1 });
 UserSchema.index({ email: -1, _id: -1 });

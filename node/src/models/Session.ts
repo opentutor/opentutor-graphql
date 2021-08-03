@@ -85,9 +85,10 @@ export interface Session extends Document {
   question: Question;
   userResponses: [Response];
   deleted: boolean;
+  score: number;
 }
 
-export const SessionSchema = new Schema<Session>(
+export const SessionSchema = new Schema<Session, SessionModel>(
   {
     sessionId: { type: String, unique: true, required: '{PATH} is required!' },
     lessonId: { type: String, required: '{PATH} is required!' },
@@ -299,7 +300,7 @@ SessionSchema.statics.setGrade = async function (
   sessionId: string,
   userAnswerIndex: number,
   userExpectationIndex: number,
-  grade: string,
+  grade: Grade,
   grader: User
 ) {
   const session = await this.findOne({ sessionId: sessionId });
