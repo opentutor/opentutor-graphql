@@ -12,7 +12,6 @@ import {
   GraphQLList,
   GraphQLBoolean,
   GraphQLID,
-  GraphQLFloat,
 } from 'graphql';
 import GraphQLJSON from 'graphql-type-json';
 import LessonType from 'gql/types/lesson';
@@ -36,12 +35,12 @@ export const UpdateLessonExpectationInputType = new GraphQLInputObjectType({
   }),
 });
 
-const UpdateVideoInputType = new GraphQLInputObjectType({
-  name: 'UpdateVideoInputType',
+const UpdateMediaInputType = new GraphQLInputObjectType({
+  name: 'UpdateMediaInputType',
   fields: () => ({
     link: { type: GraphQLString },
-    start: { type: GraphQLFloat },
-    end: { type: GraphQLFloat },
+    type: { type: GraphQLString },
+    props: { type: GraphQLJSON },
   }),
 });
 
@@ -53,9 +52,8 @@ export const UpdateLessonInputType = new GraphQLInputObjectType({
     intro: { type: GraphQLString },
     dialogCategory: { type: GraphQLString },
     question: { type: GraphQLString },
-    mediaType: { type: GraphQLString },
     image: { type: GraphQLString },
-    video: { type: UpdateVideoInputType },
+    media: { type: UpdateMediaInputType },
     expectations: { type: GraphQLList(UpdateLessonExpectationInputType) },
     conclusion: { type: GraphQLList(GraphQLString) },
     lastTrainedAt: { type: GraphQLString },

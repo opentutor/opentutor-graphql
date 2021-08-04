@@ -15,15 +15,18 @@ module.exports = {
 
     lessons.forEach(lesson => {
       if(lesson.image) {
-        lesson.mediaType = "image"
+        lesson.media = {
+          link: lesson.image,
+          type: "image",
+          props: []
+        } 
       } else {
-        lesson.mediaType = "none"
+        lesson.media = {
+          link: "",
+          type: "none",
+          props: []
+        } 
       }
-      // item.expectations.forEach(expectation=>{
-      //   if(!expectation.expectationId){
-      //     expectation.expectationId = expectation._id.toString();
-      //   }
-      // })
     })
 
     lessons.forEach(lesson => {

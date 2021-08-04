@@ -66,12 +66,11 @@ describe('lessonInfo', () => {
         query: `query {
         lessonInfo(lessonId: "lesson1") {
             id
-            mediaType
             image
-            video {
+            media {
               link
-              start
-              end
+              type
+              props
             }
             lessonId
             name
@@ -88,7 +87,7 @@ describe('lessonInfo', () => {
       'some/image.png'
     );
     expect(response.body).to.have.deep.nested.property(
-      'data.lessonInfo.mediaType',
+      'data.lessonInfo.media.type',
       'image'
     );
     expect(response.body).to.have.deep.nested.property(

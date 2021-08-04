@@ -14,6 +14,8 @@ export interface UpdateHint {
 }
 
 export type Features = Record<string, unknown>;
+// export type MediaProps = Array<{ name: string; value: string }>;
+export type MediaProps = Record<string, string>;
 
 export interface UpdateLessonExpectation {
   expectationId: string;
@@ -22,10 +24,10 @@ export interface UpdateLessonExpectation {
   hints: UpdateHint[];
 }
 
-export interface UpdateVideo {
+export interface UpdateMedia {
   link: string;
-  start: number;
-  end: number;
+  type: string;
+  props: MediaProps;
 }
 
 export interface UpdateLesson {
@@ -34,9 +36,8 @@ export interface UpdateLesson {
   intro: string;
   dialogCategory: string;
   question: string;
-  mediaType: string;
   image: string;
-  video: UpdateVideo;
+  media: UpdateMedia;
   expectations: UpdateLessonExpectation[];
   conclusion: string[];
   lastTrainedAt: Date;
@@ -67,16 +68,16 @@ const LessonExpectationSchema = new Schema({
   hints: { type: [HintSchema] },
 });
 
-export interface Video extends Document {
+export interface Media extends Document {
   link: string;
-  start: number;
-  end: number;
+  type: string;
+  props: MediaProps;
 }
 
-const VideoSchema = new Schema({
+const MediaSchema = new Schema({
   link: { type: String },
-  start: { type: Number },
-  end: { type: Number },
+  type: { type: String },
+  props: { type: Object },
 });
 
 export interface Lesson extends Document {
@@ -85,9 +86,8 @@ export interface Lesson extends Document {
   intro: string;
   dialogCategory: string;
   question: string;
-  mediaType: string;
   image: string;
-  video: Video;
+  media: Media;
   expectations: [LessonExpectation];
   conclusion: [string];
   lastTrainedAt: Date;
@@ -116,9 +116,8 @@ export const LessonSchema = new Schema<Lesson, LessonModel>(
     intro: { type: String },
     dialogCategory: { type: String },
     question: { type: String },
-    mediaType: { type: String },
     image: { type: String },
-    video: { type: VideoSchema },
+    media: { type: MediaSchema },
     expectations: { type: [LessonExpectationSchema] },
     conclusion: { type: [String] },
     lastTrainedAt: { type: Date },

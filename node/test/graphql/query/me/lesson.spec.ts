@@ -121,12 +121,11 @@ describe('lesson', () => {
             intro
             dialogCategory
             question
-            mediaType
             image
-            video {
+            media {
               link
-              start
-              end
+              type
+              props
             }
             expectations {
               expectation
@@ -179,12 +178,11 @@ describe('lesson', () => {
       ],
       conclusion: ['conclusion text'],
       features: null,
-      mediaType: 'image',
       image: 'some/image.png',
-      video: {
-        link: '',
-        start: null,
-        end: null,
+      media: {
+        link: 'some/image.png',
+        type: 'image',
+        props: [],
       },
       createdBy: '5f0cfea3395d762ca65405d1',
       createdByName: 'Admin',

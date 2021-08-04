@@ -10,7 +10,6 @@ import {
   GraphQLID,
   GraphQLList,
   GraphQLBoolean,
-  GraphQLFloat,
 } from 'graphql';
 import { Session } from 'models';
 import DateType from './date';
@@ -33,12 +32,12 @@ const LessonExpectationType = new GraphQLObjectType({
   },
 });
 
-export const VideoType = new GraphQLObjectType({
-  name: 'Video',
+export const MediaType = new GraphQLObjectType({
+  name: 'Media',
   fields: {
     link: { type: GraphQLString },
-    start: { type: GraphQLFloat },
-    end: { type: GraphQLFloat },
+    type: { type: GraphQLString },
+    props: { type: GraphQLJSON },
   },
 });
 
@@ -52,9 +51,8 @@ export const LessonType = new GraphQLObjectType({
     intro: { type: GraphQLString },
     dialogCategory: { type: GraphQLString },
     question: { type: GraphQLString },
-    mediaType: { type: GraphQLString },
     image: { type: GraphQLString },
-    video: { type: VideoType },
+    media: { type: MediaType },
     expectations: { type: GraphQLList(LessonExpectationType) },
     conclusion: { type: GraphQLList(GraphQLString) },
     lastTrainedAt: { type: DateType },
