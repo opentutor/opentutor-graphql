@@ -95,7 +95,6 @@ export const updateLesson = {
         lessonUpdates
       );
     } catch (err) {
-      console.error(err);
       throw err;
     }
   },

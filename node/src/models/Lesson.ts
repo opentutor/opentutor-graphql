@@ -13,10 +13,12 @@ export interface UpdateHint {
   text: string;
 }
 
+export type Features = Record<string, unknown>;
+
 export interface UpdateLessonExpectation {
   expectationId: string;
   expectation: string;
-  features: any;
+  features: Features;
   hints: UpdateHint[];
 }
 
@@ -38,7 +40,7 @@ export interface UpdateLesson {
   expectations: UpdateLessonExpectation[];
   conclusion: string[];
   lastTrainedAt: Date;
-  features: any;
+  features: Features;
   createdBy: string;
   deleted: boolean;
 }
@@ -77,9 +79,6 @@ const VideoSchema = new Schema({
   end: { type: Number },
 });
 
-
-export type Features = Record<string, unknown>;
-
 export interface Lesson extends Document {
   lessonId: string;
   name: string;
@@ -98,7 +97,19 @@ export interface Lesson extends Document {
   deleted: boolean;
 }
 
-export const LessonSchema = new Schema(
+export interface LessonModel extends Model<Lesson>, HasPaginate<Lesson> {
+  findAndUpdateLessonById(
+    lessonId: string,
+    lessonDoc: UpdateLesson
+  ): Promise<Lesson>;
+
+  userCanEdit(
+    user: User,
+    lesson: { createdBy: string | mongoose.Types.ObjectId }
+  ): boolean;
+}
+
+export const LessonSchema = new Schema<Lesson, LessonModel>(
   {
     lessonId: { type: String, required: true, unique: true },
     name: { type: String },
@@ -119,17 +130,47 @@ export const LessonSchema = new Schema(
   { timestamps: true, collation: { locale: 'en', strength: 2 } }
 );
 
-export interface LessonModel extends Model<Lesson>, HasPaginate<Lesson> {
-  findAndUpdateLessonById(
-    lessonId: string,
-    lessonDoc: UpdateLesson
-  ): Promise<Lesson>;
-
-  userCanEdit(
-    user: User,
-    lesson: { createdBy: string | mongoose.Types.ObjectId }
-  ): boolean;
-}
+/**
+ * Update a lesson, setting any of it's provided props
+ * This is functionally the same as mongoose findOneAndUpdate,
+ * but enforces lesson-specific rules. Always use this and not findOneAndUpdate
+ */
+LessonSchema.statics.findAndUpdateLessonById = async function (
+  lessonId: string,
+  lessonUpdates: UpdateLesson
+): Promise<Lesson> {
+  const updateDoc = {
+    ...lessonUpdates,
+  } as any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  if (updateDoc.lessonId && !updateDoc.lessonId?.match(/^[a-z0-9\-]+$/)) {
+    throw new Error('lessonId must match [a-z0-9-]');
+  }
+  if (updateDoc.expectations) {
+    (updateDoc.expectations as UpdateLessonExpectation[]).forEach((element) => {
+      if (!element.expectationId) element.expectationId = uuidv4().toString();
+    });
+  }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  await (mongoose.model('Session') as any).updateLesson(lessonId, updateDoc);
+  if (updateDoc.createdBy) {
+    const createdBy = await UserModel.findOne({ _id: updateDoc.createdBy });
+    if (createdBy) {
+      updateDoc.createdByName = createdBy.name;
+    }
+  }
+  return await this.findOneAndUpdate(
+    {
+      lessonId: lessonId,
+    },
+    {
+      $set: updateDoc,
+    },
+    {
+      new: true, // return the updated doc rather than pre update
+      upsert: true,
+    }
+  );
+};
 
 /**
  * Update a lesson, setting any of it's provided props
