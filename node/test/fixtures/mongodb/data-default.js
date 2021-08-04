@@ -16,7 +16,7 @@ module.exports = {
       mediaType: 'image',
       image: 'some/image.png',
       video: {
-        link:"",
+        link: '',
         start: null,
         end: null,
       },

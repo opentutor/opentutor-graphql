@@ -182,9 +182,9 @@ describe('lesson', () => {
       mediaType: 'image',
       image: 'some/image.png',
       video: {
-        link: "",
+        link: '',
         start: null,
-        end: null
+        end: null,
       },
       createdBy: '5f0cfea3395d762ca65405d1',
       createdByName: 'Admin',

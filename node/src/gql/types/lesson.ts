@@ -33,14 +33,14 @@ const LessonExpectationType = new GraphQLObjectType({
   },
 });
 
-const VideoType = new GraphQLObjectType({
+export const VideoType = new GraphQLObjectType({
   name: 'Video',
   fields: {
     link: { type: GraphQLString },
     start: { type: GraphQLFloat },
     end: { type: GraphQLFloat },
   },
-})
+});
 
 export const LessonType = new GraphQLObjectType({
   name: 'Lesson',
