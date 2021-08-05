@@ -29,9 +29,8 @@ module.exports = {
 
     sessions.forEach(session=>{
       const lesson = getLessonById(lessons, session.lessonId);
-
       session.question.expectations.forEach((expectation, index)=>{
-        if (index >= lesson.expectations.length || !expectation.expectationId){
+        if (index >= lesson.expectations.length || expectation.expectationId){
           return;
         }
         expectation.expectationId = lesson.expectations[index].expectationId;
@@ -39,7 +38,7 @@ module.exports = {
 
       session.userResponses.forEach(response=>{
         response.expectationScores.forEach((expectationScore, index) =>{
-          if(index >= lesson.expectations.length || !expectationScore.expectationId){
+          if(index >= lesson.expectations.length || expectationScore.expectationId){
             return;
           }
           expectationScore.expectationId = lesson.expectations[index].expectationId; 
