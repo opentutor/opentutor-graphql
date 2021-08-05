@@ -127,6 +127,7 @@ describe('lesson', () => {
               type
               props
             }
+            surveySays
             expectations {
               expectation
               hints {
@@ -184,6 +185,7 @@ describe('lesson', () => {
         type: 'image',
         props: [],
       },
+      surveySays: true,
       createdBy: '5f0cfea3395d762ca65405d1',
       createdByName: 'Admin',
       lastTrainedAt: null,

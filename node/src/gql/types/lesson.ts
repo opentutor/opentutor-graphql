@@ -53,6 +53,7 @@ export const LessonType = new GraphQLObjectType({
     question: { type: GraphQLString },
     image: { type: GraphQLString },
     media: { type: MediaType },
+    surveySays: { type: GraphQLBoolean },
     expectations: { type: GraphQLList(LessonExpectationType) },
     conclusion: { type: GraphQLList(GraphQLString) },
     lastTrainedAt: { type: DateType },

@@ -19,6 +19,7 @@ module.exports = {
         type: 'image',
         props: [],
       },
+      surveySays: true,
       intro: 'intro text',
       dialogCategory: 'default',
       question: 'question?',
