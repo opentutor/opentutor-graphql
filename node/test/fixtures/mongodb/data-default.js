@@ -15,9 +15,12 @@ module.exports = {
       name: 'lesson name',
       image: 'some/image.png',
       media: {
-        link: 'some/image.png',
-        type: 'image',
-        props: [],
+        url: 'some/video.mp4',
+        type: 'video',
+        props: [
+          { name: 'start', value: '0' },
+          { name: 'end', value: '100' },
+        ],
       },
       intro: 'intro text',
       dialogCategory: 'default',

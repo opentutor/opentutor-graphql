@@ -35,12 +35,20 @@ export const UpdateLessonExpectationInputType = new GraphQLInputObjectType({
   }),
 });
 
-const UpdateMediaInputType = new GraphQLInputObjectType({
+export const UpdateMediaPropType = new GraphQLInputObjectType({
+  name: 'UpdateMediaPropInputType',
+  fields: {
+    name: { type: GraphQLNonNull(GraphQLID) },
+    value: { type: GraphQLString },
+  },
+});
+
+export const UpdateMediaInputType = new GraphQLInputObjectType({
   name: 'UpdateMediaInputType',
   fields: () => ({
-    link: { type: GraphQLString },
-    type: { type: GraphQLString },
-    props: { type: GraphQLJSON },
+    url: { type: GraphQLNonNull(GraphQLString) },
+    type: { type: GraphQLNonNull(GraphQLID) },
+    props: { type: GraphQLList(UpdateMediaPropType) },
   }),
 });
 

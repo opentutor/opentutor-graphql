@@ -10,6 +10,7 @@ import {
   GraphQLID,
   GraphQLList,
   GraphQLBoolean,
+  GraphQLNonNull,
 } from 'graphql';
 import { Session } from 'models';
 import DateType from './date';
@@ -32,12 +33,20 @@ const LessonExpectationType = new GraphQLObjectType({
   },
 });
 
+export const MediaPropType = new GraphQLObjectType({
+  name: 'MediaProp',
+  fields: {
+    name: { type: GraphQLNonNull(GraphQLID) },
+    value: { type: GraphQLString },
+  },
+});
+
 export const MediaType = new GraphQLObjectType({
   name: 'Media',
   fields: {
-    link: { type: GraphQLString },
-    type: { type: GraphQLString },
-    props: { type: GraphQLJSON },
+    url: { type: GraphQLNonNull(GraphQLString) },
+    type: { type: GraphQLNonNull(GraphQLID) },
+    props: { type: GraphQLList(MediaPropType) },
   },
 });
 
