@@ -12,7 +12,6 @@ module.exports = {
     }
 
     const lessons =  await getCollection("lessons");
-
     lessons.forEach(lesson => {
       if(lesson.image) {
         lesson.media = {
