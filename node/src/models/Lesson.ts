@@ -14,8 +14,6 @@ export interface UpdateHint {
 }
 
 export type Features = Record<string, unknown>;
-// export type MediaProps = Array<{ name: string; value: string }>;
-export type MediaProps = Record<string, string>;
 
 export interface UpdateLessonExpectation {
   expectationId: string;
@@ -24,10 +22,15 @@ export interface UpdateLessonExpectation {
   hints: UpdateHint[];
 }
 
+export interface UpdateMediaProp {
+  name: string;
+  value: string;
+}
+
 export interface UpdateMedia {
-  link: string;
+  url: string;
   type: string;
-  props: MediaProps;
+  props: UpdateMediaProp[];
 }
 
 export interface UpdateLesson {
@@ -69,16 +72,26 @@ const LessonExpectationSchema = new Schema({
   hints: { type: [HintSchema] },
 });
 
-export interface Media extends Document {
-  link: string;
-  type: string;
-  props: MediaProps;
+export interface MediaProp {
+  name: string;
+  value: string;
 }
 
+export interface Media extends Document {
+  url: string;
+  type: string;
+  props: MediaProp[];
+}
+
+const MediaPropSchema = new Schema({
+  name: { type: String },
+  value: { type: String },
+});
+
 const MediaSchema = new Schema({
-  link: { type: String },
+  url: { type: String },
   type: { type: String },
-  props: { type: Object },
+  props: { type: [MediaPropSchema] },
 });
 
 export interface Lesson extends Document {

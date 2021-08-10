@@ -68,9 +68,12 @@ describe('lessonInfo', () => {
             id
             image
             media {
-              link
+              url
               type
-              props
+              props {
+                name
+                value
+              }
             }
             lessonId
             name
@@ -87,8 +90,19 @@ describe('lessonInfo', () => {
       'some/image.png'
     );
     expect(response.body).to.have.deep.nested.property(
+      'data.lessonInfo.media.url',
+      'some/video.mp4'
+    );
+    expect(response.body).to.have.deep.nested.property(
       'data.lessonInfo.media.type',
-      'image'
+      'video'
+    );
+    expect(response.body).to.have.deep.nested.property(
+      'data.lessonInfo.media.props',
+      [
+        { name: 'start', value: '0' },
+        { name: 'end', value: '100' },
+      ]
     );
     expect(response.body).to.have.deep.nested.property(
       'data.lessonInfo.lessonId',

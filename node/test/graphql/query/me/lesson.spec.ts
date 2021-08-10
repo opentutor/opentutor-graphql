@@ -123,9 +123,12 @@ describe('lesson', () => {
             question
             image
             media {
-              link
+              url
               type
-              props
+              props {
+                name
+                value
+              }
             }
             surveySays
             expectations {
@@ -181,9 +184,12 @@ describe('lesson', () => {
       features: null,
       image: 'some/image.png',
       media: {
-        link: 'some/image.png',
-        type: 'image',
-        props: [],
+        url: 'some/video.mp4',
+        type: 'video',
+        props: [
+          { name: 'start', value: '0' },
+          { name: 'end', value: '100' },
+        ],
       },
       surveySays: true,
       createdBy: '5f0cfea3395d762ca65405d1',
