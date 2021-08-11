@@ -22,7 +22,7 @@ module.exports = {
           { name: 'end', value: '100' },
         ],
       },
-      surveySays: true,
+      learningFormat: "surveySays",
       intro: 'intro text',
       dialogCategory: 'default',
       question: 'question?',

@@ -62,7 +62,7 @@ export const UpdateLessonInputType = new GraphQLInputObjectType({
     question: { type: GraphQLString },
     image: { type: GraphQLString },
     media: { type: UpdateMediaInputType },
-    surveySays: { type: GraphQLBoolean },
+    learningFormat: { type: GraphQLString },
     expectations: { type: GraphQLList(UpdateLessonExpectationInputType) },
     conclusion: { type: GraphQLList(GraphQLString) },
     lastTrainedAt: { type: GraphQLString },

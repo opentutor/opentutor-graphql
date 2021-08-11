@@ -41,7 +41,7 @@ export interface UpdateLesson {
   question: string;
   image: string;
   media: UpdateMedia;
-  surveySays: boolean;
+  learningFormat: string;
   expectations: UpdateLessonExpectation[];
   conclusion: string[];
   lastTrainedAt: Date;
@@ -102,7 +102,7 @@ export interface Lesson extends Document {
   question: string;
   image: string;
   media: Media;
-  surveySays: boolean;
+  learningFormat: string;
   expectations: [LessonExpectation];
   conclusion: [string];
   lastTrainedAt: Date;
@@ -133,7 +133,7 @@ export const LessonSchema = new Schema<Lesson, LessonModel>(
     question: { type: String },
     image: { type: String },
     media: { type: MediaSchema },
-    surveySays: { type: Boolean },
+    learningFormat: { type: String },
     expectations: { type: [LessonExpectationSchema] },
     conclusion: { type: [String] },
     lastTrainedAt: { type: Date },

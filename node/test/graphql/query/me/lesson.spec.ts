@@ -130,7 +130,7 @@ describe('lesson', () => {
                 value
               }
             }
-            surveySays
+            learningFormat
             expectations {
               expectation
               hints {
@@ -191,7 +191,7 @@ describe('lesson', () => {
           { name: 'end', value: '100' },
         ],
       },
-      surveySays: true,
+      learningFormat: "surveySays",
       createdBy: '5f0cfea3395d762ca65405d1',
       createdByName: 'Admin',
       lastTrainedAt: null,

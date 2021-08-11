@@ -8,7 +8,6 @@ import {
   GraphQLString,
   GraphQLObjectType,
   GraphQLID,
-  GraphQLBoolean,
 } from 'graphql';
 import { MediaType } from './lesson';
 
@@ -18,7 +17,7 @@ export const LessonInfoType = new GraphQLObjectType({
     id: { type: GraphQLID },
     image: { type: GraphQLString },
     media: { type: MediaType },
-    surveySays: { type: GraphQLBoolean },
+    learningFormat: { type: GraphQLString },
     lessonId: { type: GraphQLString },
     name: { type: GraphQLString },
   },
