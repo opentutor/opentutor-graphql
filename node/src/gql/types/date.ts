@@ -14,7 +14,7 @@ export const DateType: GraphQLScalarType = new GraphQLScalarType({
     return new Date(value);
   },
   serialize(value) {
-    return value.toLocaleString();
+    return value.toISOString();
   },
   parseLiteral(ast) {
     if (ast.kind === Kind.INT) {
