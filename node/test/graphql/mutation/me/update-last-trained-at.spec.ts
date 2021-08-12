@@ -91,6 +91,7 @@ describe('updateLastTrainedAt', () => {
 
   it('succeeds for api key', async () => {
     const date = new Date();
+    timekeeper.freeze(date);
     const response = await request(app)
       .post('/graphql')
       .set('opentutor-api-req', 'true')
@@ -106,13 +107,14 @@ describe('updateLastTrainedAt', () => {
       });
     expect(response.status).to.equal(200);
     expect(response.body.data.me.updateLastTrainedAt).to.eql({
-      lastTrainedAt: date.toLocaleString(),
+      lastTrainedAt: date.toISOString(),
     });
   });
 
   it('succeeds for admin', async () => {
     const token = getToken('5f0cfea3395d762ca65405d1');
     const date = new Date();
+    timekeeper.freeze(date);
     const response = await request(app)
       .post('/graphql')
       .set('Authorization', `bearer ${token}`)
@@ -127,13 +129,14 @@ describe('updateLastTrainedAt', () => {
       });
     expect(response.status).to.equal(200);
     expect(response.body.data.me.updateLastTrainedAt).to.eql({
-      lastTrainedAt: date.toLocaleString(),
+      lastTrainedAt: date.toISOString(),
     });
   });
 
   it('succeeds for content manager', async () => {
     const token = getToken('5f0cfea3395d762ca65405d2');
     const date = new Date();
+    timekeeper.freeze(date);
     const response = await request(app)
       .post('/graphql')
       .set('Authorization', `bearer ${token}`)
@@ -148,7 +151,7 @@ describe('updateLastTrainedAt', () => {
       });
     expect(response.status).to.equal(200);
     expect(response.body.data.me.updateLastTrainedAt).to.eql({
-      lastTrainedAt: date.toLocaleString(),
+      lastTrainedAt: date.toISOString(),
     });
   });
 
@@ -170,13 +173,14 @@ describe('updateLastTrainedAt', () => {
       });
     expect(response.status).to.equal(200);
     expect(response.body.data.me.updateLastTrainedAt).to.eql({
-      lastTrainedAt: date.toLocaleString(),
+      lastTrainedAt: date.toISOString(),
     });
   });
 
   it(`update with given date`, async () => {
     const token = getToken('5f0cfea3395d762ca65405d1');
     const date = new Date();
+    timekeeper.freeze(date);
     const response = await request(app)
       .post('/graphql')
       .set('Authorization', `bearer ${token}`)
@@ -191,7 +195,7 @@ describe('updateLastTrainedAt', () => {
       });
     expect(response.status).to.equal(200);
     expect(response.body.data.me.updateLastTrainedAt).to.eql({
-      lastTrainedAt: date.toLocaleString(),
+      lastTrainedAt: date.toISOString(),
     });
   });
 
