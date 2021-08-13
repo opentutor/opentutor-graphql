@@ -60,7 +60,6 @@ export const UpdateLessonInputType = new GraphQLInputObjectType({
     intro: { type: GraphQLString },
     dialogCategory: { type: GraphQLString },
     question: { type: GraphQLString },
-    image: { type: GraphQLString },
     media: { type: UpdateMediaInputType },
     learningFormat: { type: GraphQLString },
     expectations: { type: GraphQLList(UpdateLessonExpectationInputType) },

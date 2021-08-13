@@ -13,7 +13,6 @@ module.exports = {
       _id: ObjectId('5f0cfea3395d762ca65405c1'),
       lessonId: 'lesson1',
       name: 'lesson name',
-      image: 'some/image.png',
       media: {
         url: 'some/video.mp4',
         type: 'video',

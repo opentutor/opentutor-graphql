@@ -121,7 +121,6 @@ describe('lesson', () => {
             intro
             dialogCategory
             question
-            image
             media {
               url
               type
@@ -182,7 +181,6 @@ describe('lesson', () => {
       ],
       conclusion: ['conclusion text'],
       features: null,
-      image: 'some/image.png',
       media: {
         url: 'some/video.mp4',
         type: 'video',

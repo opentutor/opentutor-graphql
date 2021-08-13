@@ -101,11 +101,11 @@ export interface Lesson extends Document {
   dialogCategory: string;
   question: string;
   image: string;
-  media: Media;
+  media?: Media;
   learningFormat: string;
   expectations: [LessonExpectation];
   conclusion: [string];
-  lastTrainedAt: Date;
+  lastTrainedAt?: Date;
   features: Features;
   createdBy: mongoose.Types.ObjectId;
   createdByName: string;

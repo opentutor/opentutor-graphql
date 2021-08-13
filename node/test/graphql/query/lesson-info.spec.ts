@@ -66,7 +66,6 @@ describe('lessonInfo', () => {
         query: `query {
         lessonInfo(lessonId: "lesson1") {
             id
-            image
             media {
               url
               type
@@ -84,10 +83,6 @@ describe('lessonInfo', () => {
     expect(response.body).to.have.deep.nested.property(
       'data.lessonInfo.id',
       '5f0cfea3395d762ca65405c1'
-    );
-    expect(response.body).to.have.deep.nested.property(
-      'data.lessonInfo.image',
-      'some/image.png'
     );
     expect(response.body).to.have.deep.nested.property(
       'data.lessonInfo.media.url',

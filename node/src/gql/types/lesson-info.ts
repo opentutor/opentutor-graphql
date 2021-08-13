@@ -11,7 +11,6 @@ export const LessonInfoType = new GraphQLObjectType({
   name: 'LessonInfo',
   fields: {
     id: { type: GraphQLID },
-    image: { type: GraphQLString },
     media: { type: MediaType },
     learningFormat: { type: GraphQLString },
     lessonId: { type: GraphQLString },
