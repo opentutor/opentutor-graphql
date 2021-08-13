@@ -39,12 +39,12 @@ export interface UpdateLesson {
   intro: string;
   dialogCategory: string;
   question: string;
-  image: string;
+  image?: string;
   media: UpdateMedia;
   learningFormat: string;
   expectations: UpdateLessonExpectation[];
   conclusion: string[];
-  lastTrainedAt: Date;
+  lastTrainedAt?: Date;
   features: Features;
   createdBy: string;
   deleted: boolean;
