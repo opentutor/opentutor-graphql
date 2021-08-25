@@ -51,7 +51,7 @@ To build/push a pre-release semver tag of `opentutor-graphql` for the current co
 
 - create a [github release](https://github.com/ICTLearningSciences/opentutor-graphql/releases/new) **from your development branch** with tag format `/^\d+\.\d+\.\d+(-[a-z\d\-.]+)?$/` (e.g. `1.0.0-alpha.1`)
 - find the `docker_tag_release` workflow for your git tag in [github actions](https://github.com/ICTLearningSciences/opentutor-graphql/actions?query=workflow%3A%22build%2Fpub+candidate%22)
-- this will create a tag like `uscictdocker/opentutor-graphql:1.0.0-alpha.1`
+- this will create a tag like `opentutor/opentutor-graphql:1.0.0-alpha.1`
 
 
 
@@ -59,4 +59,4 @@ Once your changes are approved and merged to main, you should create a release t
 
 - create a [github release](https://github.com/ICTLearningSciences/opentutor-graphql/releases/new) **from main** with tag format `/^\d+\.\d+\.\d$/` (e.g. `1.0.0`)
 - find the `docker_tag_release` workflow for your git tag in [github actions](https://github.com/ICTLearningSciences/opentutor-graphql/actions?query=workflow%3A%22build%2Fpub+release%22)
-- this will create a tag like `uscictdocker/opentutor-graphql:1.0.0`
+- this will create a tag like `opentutor/opentutor-graphql:1.0.0`
