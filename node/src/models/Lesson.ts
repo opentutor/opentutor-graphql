@@ -39,9 +39,8 @@ export interface UpdateLesson {
   intro: string;
   dialogCategory: string;
   question: string;
-  image?: string;
-  media: UpdateMedia;
-  learningFormat: string;
+  media?: UpdateMedia;
+  learningFormat?: string;
   expectations: UpdateLessonExpectation[];
   conclusion: string[];
   lastTrainedAt?: Date;
@@ -102,7 +101,7 @@ export interface Lesson extends Document {
   question: string;
   image: string;
   media?: Media;
-  learningFormat: string;
+  learningFormat?: string;
   expectations: [LessonExpectation];
   conclusion: [string];
   lastTrainedAt?: Date;
