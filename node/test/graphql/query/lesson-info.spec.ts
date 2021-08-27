@@ -66,7 +66,14 @@ describe('lessonInfo', () => {
         query: `query {
         lessonInfo(lessonId: "lesson1") {
             id
-            image
+            media {
+              url
+              type
+              props {
+                name
+                value
+              }
+            }
             lessonId
             name
           }
@@ -78,8 +85,19 @@ describe('lessonInfo', () => {
       '5f0cfea3395d762ca65405c1'
     );
     expect(response.body).to.have.deep.nested.property(
-      'data.lessonInfo.image',
-      'some/image.png'
+      'data.lessonInfo.media.url',
+      'some/video.mp4'
+    );
+    expect(response.body).to.have.deep.nested.property(
+      'data.lessonInfo.media.type',
+      'video'
+    );
+    expect(response.body).to.have.deep.nested.property(
+      'data.lessonInfo.media.props',
+      [
+        { name: 'start', value: '0' },
+        { name: 'end', value: '100' },
+      ]
     );
     expect(response.body).to.have.deep.nested.property(
       'data.lessonInfo.lessonId',

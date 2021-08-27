@@ -121,7 +121,15 @@ describe('lesson', () => {
             intro
             dialogCategory
             question
-            image
+            media {
+              url
+              type
+              props {
+                name
+                value
+              }
+            }
+            learningFormat
             expectations {
               expectation
               hints {
@@ -173,7 +181,15 @@ describe('lesson', () => {
       ],
       conclusion: ['conclusion text'],
       features: null,
-      image: 'some/image.png',
+      media: {
+        url: 'some/video.mp4',
+        type: 'video',
+        props: [
+          { name: 'start', value: '0' },
+          { name: 'end', value: '100' },
+        ],
+      },
+      learningFormat: 'surveySays',
       createdBy: '5f0cfea3395d762ca65405d1',
       createdByName: 'Admin',
       lastTrainedAt: null,

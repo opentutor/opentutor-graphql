@@ -35,6 +35,23 @@ export const UpdateLessonExpectationInputType = new GraphQLInputObjectType({
   }),
 });
 
+export const UpdateMediaPropType = new GraphQLInputObjectType({
+  name: 'UpdateMediaPropInputType',
+  fields: {
+    name: { type: GraphQLNonNull(GraphQLID) },
+    value: { type: GraphQLString },
+  },
+});
+
+export const UpdateMediaInputType = new GraphQLInputObjectType({
+  name: 'UpdateMediaInputType',
+  fields: () => ({
+    url: { type: GraphQLNonNull(GraphQLString) },
+    type: { type: GraphQLNonNull(GraphQLID) },
+    props: { type: GraphQLList(UpdateMediaPropType) },
+  }),
+});
+
 export const UpdateLessonInputType = new GraphQLInputObjectType({
   name: 'UpdateLessonInputType',
   fields: () => ({
@@ -43,7 +60,8 @@ export const UpdateLessonInputType = new GraphQLInputObjectType({
     intro: { type: GraphQLString },
     dialogCategory: { type: GraphQLString },
     question: { type: GraphQLString },
-    image: { type: GraphQLString },
+    media: { type: UpdateMediaInputType },
+    learningFormat: { type: GraphQLString },
     expectations: { type: GraphQLList(UpdateLessonExpectationInputType) },
     conclusion: { type: GraphQLList(GraphQLString) },
     lastTrainedAt: { type: GraphQLString },

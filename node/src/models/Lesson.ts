@@ -22,16 +22,28 @@ export interface UpdateLessonExpectation {
   hints: UpdateHint[];
 }
 
+export interface UpdateMediaProp {
+  name: string;
+  value: string;
+}
+
+export interface UpdateMedia {
+  url: string;
+  type: string;
+  props: UpdateMediaProp[];
+}
+
 export interface UpdateLesson {
   lessonId: string;
   name: string;
   intro: string;
   dialogCategory: string;
   question: string;
-  image: string;
+  media?: UpdateMedia;
+  learningFormat?: string;
   expectations: UpdateLessonExpectation[];
   conclusion: string[];
-  lastTrainedAt: Date;
+  lastTrainedAt?: Date;
   features: Features;
   createdBy: string;
   deleted: boolean;
@@ -59,6 +71,28 @@ const LessonExpectationSchema = new Schema({
   hints: { type: [HintSchema] },
 });
 
+export interface MediaProp {
+  name: string;
+  value: string;
+}
+
+export interface Media extends Document {
+  url: string;
+  type: string;
+  props: MediaProp[];
+}
+
+const MediaPropSchema = new Schema({
+  name: { type: String },
+  value: { type: String },
+});
+
+const MediaSchema = new Schema({
+  url: { type: String },
+  type: { type: String },
+  props: { type: [MediaPropSchema] },
+});
+
 export interface Lesson extends Document {
   lessonId: string;
   name: string;
@@ -66,9 +100,11 @@ export interface Lesson extends Document {
   dialogCategory: string;
   question: string;
   image: string;
+  media?: Media;
+  learningFormat?: string;
   expectations: [LessonExpectation];
   conclusion: [string];
-  lastTrainedAt: Date;
+  lastTrainedAt?: Date;
   features: Features;
   createdBy: mongoose.Types.ObjectId;
   createdByName: string;
@@ -95,6 +131,8 @@ export const LessonSchema = new Schema<Lesson, LessonModel>(
     dialogCategory: { type: String },
     question: { type: String },
     image: { type: String },
+    media: { type: MediaSchema },
+    learningFormat: { type: String },
     expectations: { type: [LessonExpectationSchema] },
     conclusion: { type: [String] },
     lastTrainedAt: { type: Date },
@@ -105,6 +143,48 @@ export const LessonSchema = new Schema<Lesson, LessonModel>(
   },
   { timestamps: true, collation: { locale: 'en', strength: 2 } }
 );
+
+/**
+ * Update a lesson, setting any of it's provided props
+ * This is functionally the same as mongoose findOneAndUpdate,
+ * but enforces lesson-specific rules. Always use this and not findOneAndUpdate
+ */
+LessonSchema.statics.findAndUpdateLessonById = async function (
+  lessonId: string,
+  lessonUpdates: UpdateLesson
+): Promise<Lesson> {
+  const updateDoc = {
+    ...lessonUpdates,
+  } as any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  if (updateDoc.lessonId && !updateDoc.lessonId?.match(/^[a-z0-9\-]+$/)) {
+    throw new Error('lessonId must match [a-z0-9-]');
+  }
+  if (updateDoc.expectations) {
+    (updateDoc.expectations as UpdateLessonExpectation[]).forEach((element) => {
+      if (!element.expectationId) element.expectationId = uuidv4().toString();
+    });
+  }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  await (mongoose.model('Session') as any).updateLesson(lessonId, updateDoc);
+  if (updateDoc.createdBy) {
+    const createdBy = await UserModel.findOne({ _id: updateDoc.createdBy });
+    if (createdBy) {
+      updateDoc.createdByName = createdBy.name;
+    }
+  }
+  return await this.findOneAndUpdate(
+    {
+      lessonId: lessonId,
+    },
+    {
+      $set: updateDoc,
+    },
+    {
+      new: true, // return the updated doc rather than pre update
+      upsert: true,
+    }
+  );
+};
 
 /**
  * Update a lesson, setting any of it's provided props
