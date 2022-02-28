@@ -86,6 +86,9 @@ export interface Session extends Document {
   userResponses: [Response];
   deleted: boolean;
   score: number;
+  sessionStartedAt?: Date;
+  sessionEndedAt?: Date;
+  sessionSkippedAt?: Date;
 }
 
 export const SessionSchema = new Schema<Session, SessionModel>(
@@ -103,6 +106,9 @@ export const SessionSchema = new Schema<Session, SessionModel>(
     question: { type: QuestionSchema },
     userResponses: [ResponseSchema],
     deleted: { type: Boolean },
+    sessionStartedAt: { type: Date },
+    sessionEndedAt: { type: Date },
+    sessionSkippedAt: { type: Date },
   },
   { timestamps: true, collation: { locale: 'en', strength: 2 } }
 );
