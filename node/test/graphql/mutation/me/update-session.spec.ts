@@ -14,6 +14,7 @@ import createApp, { appStart, appStop } from 'app';
 import { expect } from 'chai';
 import { Express } from 'express';
 import mongoUnit from 'mongo-unit';
+import MockDate from 'mockdate';
 import request from 'supertest';
 import { getToken } from 'test/helpers';
 
@@ -870,6 +871,105 @@ describe('updateSession', () => {
     expect(updated.body.data.me.updateSession).to.eql({
       graderGrade: 0,
       classifierGrade: 1,
+    });
+  });
+
+  it(`updates sessionStartedAt, sessionEndedAt and SessionSkippedAt in database`, async () => {
+    MockDate.set('2000-11-22');
+    const date = new Date();
+    const token = getToken('5f0cfea3395d762ca65405d1');
+    const session = encodeURI(
+      JSON.stringify({
+        lessonId: 'lesson1',
+        sessionId: 'session 1',
+        username: 'new username',
+        question: {
+          text: 'new question?',
+          expectations: [{ expectationId: '0', text: 'new expected text' }],
+        },
+        userResponses: [
+          {
+            text: 'new answer',
+            expectationScores: [
+              {
+                expectationId: '0',
+                classifierGrade: 'Good',
+              },
+            ],
+          },
+        ],
+        sessionStartedAt: date,
+        sessionEndedAt: date,
+        sessionSkippedAt: date,
+      })
+    );
+    await request(app)
+      .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
+      .send({
+        query: `mutation {
+            me {
+              updateSession(sessionId: "session 1", session: "${session}") {
+                username
+              }  
+            }
+          }`,
+      });
+
+    const response = await request(app)
+      .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
+      .send({
+        query: `query {
+        me {
+          session(sessionId: "session 1") {
+            sessionId
+            username
+            question {
+              text
+              expectations {
+                expectationId
+                text
+              }
+            }
+            userResponses {
+              text
+              expectationScores {
+                expectationId
+                classifierGrade
+                graderGrade
+              }
+            }
+            sessionStartedAt
+            sessionEndedAt
+            sessionSkippedAt
+          }  
+        }
+      }`,
+      });
+    expect(response.status).to.equal(200);
+    expect(response.body.data.me.session).to.eql({
+      sessionId: 'session 1',
+      username: 'new username',
+      question: {
+        text: 'new question?',
+        expectations: [{ expectationId: '0', text: 'new expected text' }],
+      },
+      userResponses: [
+        {
+          text: 'new answer',
+          expectationScores: [
+            {
+              expectationId: '0',
+              classifierGrade: 'Good',
+              graderGrade: null,
+            },
+          ],
+        },
+      ],
+      sessionStartedAt: date.toISOString(),
+      sessionEndedAt: date.toISOString(),
+      sessionSkippedAt: date.toISOString(),
     });
   });
 });

@@ -8,8 +8,8 @@ jobs:
       - uses: actions/checkout@v2
       - name: install
         run: cd node && npm ci
-      - name: test audit
-        run: cd node && npm run test:audit
+      #- name: test audit
+      #  run: cd node && npm run test:audit
       - name: test format
         run: cd node && npm run test:format
       - name: test lint
