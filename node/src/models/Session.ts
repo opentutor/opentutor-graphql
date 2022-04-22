@@ -132,10 +132,16 @@ export interface TrainingDataAll {
   isTrainable: boolean;
 }
 
+export interface ExpectationDataAll {
+  csv: string;
+}
+
 export interface SessionModel extends Model<Session>, HasPaginate<Session> {
   getTrainingData(lessonId: string): Promise<TrainingData>;
 
   getAllTrainingData(): Promise<TrainingData>;
+
+  getAllExpectationData(): Promise<ExpectationDataAll>;
 
   updateLesson(
     lessonId: string,
@@ -168,6 +174,43 @@ function _toCsv(data: string[][]): Promise<string> {
       }
     });
   });
+}
+
+
+SessionSchema.statics.getAllExpectationData = async function(): Promise<ExpectationDataAll> {
+  const sessions: Session[] = await this.find({});
+  const lessons: Lesson[] = await LessonModel.find({});
+  const expectationData = [['lesson_name', 'expectation_id', 'answer', 'grade']];
+
+  sessions.forEach((session: Session)=>{
+    const lesson: Lesson = lessons.find((current: Lesson) => {
+      return current.lessonId === session.lessonId;
+    });
+    if (!lesson && Array.isArray(lesson.expectations)) {
+      return;
+    }
+    session.userResponses.forEach((response: Response) => {
+      const userResponse = response.text
+      for (
+        let expIx = 0;
+        expIx < response.expectationScores.length;
+        expIx++
+      ) {
+        const exp = response.expectationScores[expIx];
+        const grade = exp.graderGrade;
+        if (!exp.invalidated && grade) {
+          if (expIx >= lesson.expectations.length) {
+            continue;
+          }
+          expectationData.push([lesson.name, expIx.toString(), userResponse, grade.toString()]);
+        }
+      }
+    });
+  });
+
+  return {
+    csv: await _toCsv(expectationData),
+  };
 }
 
 SessionSchema.statics.getAllTrainingData =
