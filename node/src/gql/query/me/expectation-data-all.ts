@@ -25,7 +25,7 @@ export const allExpectationData = {
       const expectationData = await Session.getAllExpectationData();
 
       return {
-       csv: expectationData.csv,
+        csv: expectationData.csv,
       };
     } catch (err) {
       throw err;
