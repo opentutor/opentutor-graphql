@@ -5,51 +5,32 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import { GraphQLObjectType } from 'graphql';
-import { User } from 'models/User';
-import config from './config';
-import lesson from './lesson';
-import lessons from './lessons';
-import session from './session';
-import sessions from './sessions';
-import trainingData from './training-data';
-import allTrainingData from './training-data-all';
-import allExpectationData from './expectation-data-all';
-import users from './users';
+import { Session } from 'models';
+import { User, UserRole } from 'models/User';
+import { CSVFile, CSVFileType } from 'gql/types/csvFile';
 
-export const Me: GraphQLObjectType = new GraphQLObjectType({
-  name: 'MeQuery',
-  fields: {
-    config,
-    lesson,
-    lessons,
-    session,
-    sessions,
-    trainingData,
-    allTrainingData,
-    allExpectationData,
-    users,
-  },
-});
-
-interface ResolvedUser {
-  user: User;
-}
-
-export const me = {
-  type: Me,
-  resolve: (
-    _: GraphQLObjectType,
+export const allExpectationData = {
+  type: CSVFileType,
+  args: {},
+  resolve: async (
+    _root: GraphQLObjectType,
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     args: any,
     context: { user: User }
-  ): ResolvedUser => {
-    if (!context.user) {
-      throw new Error('Only authenticated users');
+  ): Promise<CSVFile> => {
+    if (context.user.userRole !== UserRole.ADMIN) {
+      throw new Error('only admins can train the default model');
     }
-    return {
-      user: context.user,
-    };
+    try {
+      const expectationData = await Session.getAllExpectationData();
+
+      return {
+        csv: expectationData.csv,
+      };
+    } catch (err) {
+      throw err;
+    }
   },
 };
 
-export default me;
+export default allExpectationData;
