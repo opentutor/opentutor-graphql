@@ -1,3 +1,5 @@
+LICENSE_CONFIG?="license-config.json"
+
 .PHONY: clean
 clean:
 	cd node \
@@ -50,6 +52,11 @@ LICENSE_HEADER:
 license: LICENSE LICENSE_HEADER
 	cd node \
 	&& npm run license:fix
+	
+.PHONY: license-deploy
+license-deploy: node_modules/license-check-and-add LICENSE LICENSE_HEADER
+	cd node \
+	&& LICENSE_CONFIG=${LICENSE_CONFIG} npm run license:deploy
 
 .PHONY: format
 format: LICENSE LICENSE_HEADER
@@ -62,4 +69,5 @@ test-license: LICENSE LICENSE_HEADER
 	&& npm run test:license
 
 node_modules/license-check-and-add:
-	npm ci
+	cd node \
+	&& npm ci
