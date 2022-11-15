@@ -7,15 +7,19 @@ The full terms of this copyright and license should always be found in the root 
 import { GraphQLObjectType } from 'graphql';
 import appConfig from './app-config';
 import lessonInfo from './lesson-info';
+import lesson from './lesson';
 import lessons from './lessons';
 import me from './me';
 import health from './health';
+import config from './config'
 
 export default new GraphQLObjectType({
   name: 'Query',
   fields: {
     appConfig,
     lessonInfo,
+    config,
+    lesson,
     lessons,
     me,
     health,
