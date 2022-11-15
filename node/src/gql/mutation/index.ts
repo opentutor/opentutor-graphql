@@ -9,11 +9,13 @@ import me from './me';
 import login from './login';
 import loginGoogle from './login-google';
 import signup from './signup';
+import updateSession from './update-session'
 
 export default new GraphQLObjectType({
   name: 'Mutation',
   fields: {
     me,
+    updateSession,
     login,
     loginGoogle,
     signup,
