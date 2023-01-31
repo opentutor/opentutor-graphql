@@ -41,7 +41,7 @@
     "jsonwebtoken": "^9.0.0",
     "longjohn": "^0.2.12",
     "mongo-cursor-pagination": "^7.4.0",
-    "mongoose": "^5.13.5",
+    "mongoose": "^5.13.15",
     "morgan": "^1.10.0",
     "object-path": "^0.11.5",
     "passport": "^0.4.1",
