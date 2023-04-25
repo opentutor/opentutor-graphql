@@ -29,8 +29,8 @@ after(async () => {
 });
 
 mongoUnit.start().then((url) => {
-  const replacedurl = url.replace("localhost", "127.0.0.1")
+  const replacedurl = url.replace('localhost', '127.0.0.1');
   process.env.MONGO_URI = replacedurl; // this const process.env.DATABASE_URL = will keep link to fake mongo
-  console.log(replacedurl)
+  console.log(replacedurl);
   run(); // this line start mocha tests
 });
