@@ -59,6 +59,7 @@ const init = async () => {
     }
   });
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   process.on('unhandledRejection', (reason: Error, promise: Promise<any>) => {
     logger.error('Unhandled Rejection at:', promise, 'reason:', reason);
     if (process.env.IS_SENTRY_ENABLED === 'true') {
@@ -71,6 +72,7 @@ const init = async () => {
 
 const initPromise = init();
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const handler = async (event: any, context: any) => {
   // Ensure init has completed before proceeding
   const app = await initPromise;
