@@ -10,7 +10,10 @@
   "scripts": {
     "build": "tsc",
     "deps:update": "npx ncu -u",
-    "format": "prettier --write '**/*.{js,jsx,json,ts,tsx}'",
+    "deploy:dev": "NODE_OPTIONS=--max_old_space_size=4000 sls deploy -s dev --region us-east-1",
+    "deploy:qa": "NODE_OPTIONS=--max_old_space_size=4000 sls deploy -s qa --region us-east-1",
+    "deploy:prod": "NODE_OPTIONS=--max_old_space_size=4000 sls deploy -s prod --region us-east-1",
+    "format": "prettier --write '**/*.{js,jsx,json,ts,tsx,yml,yaml}'",
     "lint:fix": "eslint src --ext ts --ext js --fix",
     "start": "tsc && node dist/server.js",
     "test": "export ENV=test && export NODE_ENV=test && npx mocha -r tsconfig-paths/register -r ts-node/register -r source-map-support/register './test/**/*.{spec,test}.{js,ts}' --timeout 10000 --full-trace --recursive --reporter spec --delay --exit",
@@ -26,6 +29,7 @@
   "author": "CVM",
   "license": "ISC",
   "dependencies": {
+    "@sentry/serverless": "^7.51.2",
     "@types/object-path": "^0.11.1",
     "axios": "^0.21.1",
     "base64url": "^3.0.1",
@@ -47,6 +51,7 @@
     "passport": "^0.6.0",
     "passport-http-bearer": "^1.0.1",
     "passport-jwt": "^4.0.0",
+    "serverless-http": "^3.2.0",
     "uuid": "^8.3.2",
     "winston": "^3.3.3",
     "yaml": "^1.10.2"
