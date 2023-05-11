@@ -51,6 +51,8 @@
     "passport": "^0.6.0",
     "passport-http-bearer": "^1.0.1",
     "passport-jwt": "^4.0.0",
+    "serverless-domain-manager": "^7.0.4",
+    "serverless-esbuild": "^1.44.0",
     "serverless-http": "^3.2.0",
     "uuid": "^8.3.2",
     "winston": "^3.3.3",
