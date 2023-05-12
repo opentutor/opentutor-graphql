@@ -7,12 +7,14 @@ The full terms of this copyright and license should always be found in the root 
 import winston from 'winston';
 
 export const logger = winston.createLogger({
-  level: process.env['NODE_ENV'] === 'test' ? 'warning' : 'info',
+  level: process.env.LOG_LEVEL_GRAPHQL || 'debug',
   format: winston.format.json(),
   transports: [
-    new winston.transports.Console({
-      format: winston.format.simple(),
-    }),
+    new winston.transports.Console(
+      process.env.NODE_ENV?.includes('dev')
+        ? { format: winston.format.simple() }
+        : undefined
+    ),
   ],
 });
 
