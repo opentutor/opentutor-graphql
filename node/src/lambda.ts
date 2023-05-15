@@ -75,6 +75,7 @@ const initPromise = init();
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const handler = async (event: any, context: any) => {
   // Ensure init has completed before proceeding
+  logger.info(JSON.stringify(event));
   const app = await initPromise;
   const slsHandler = serverless(app);
   const result = await slsHandler(event, context);
