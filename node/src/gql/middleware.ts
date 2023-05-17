@@ -9,6 +9,7 @@ import { graphqlHTTP } from 'express-graphql';
 import schema from './schema';
 import { Request, Response } from 'express';
 import { User } from 'models/User';
+import logger from 'utils/logging';
 
 function isApiReq(req: Request): boolean {
   return Boolean(req.headers['opentutor-api-req']);
@@ -25,6 +26,7 @@ export default graphqlHTTP((req: Request, res: Response) => {
         },
       });
     };
+
     /**
      * Try to authenticate using passport,
      * but never block the call from here.
