@@ -1,0 +1,9 @@
+{
+  "resource": "/graphql/graphql",
+  "path": "/graphql/graphql",
+  "httpMethod": "POST",
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "body": "{ \"query\": \"      query FetchConfig {        appConfig {          googleClientId        }      }    \"}"
+}
