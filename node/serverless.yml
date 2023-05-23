@@ -68,7 +68,7 @@ provider:
   stage: ${opt:stage, 'dev'} # stage is dev unless otherwise specified with --stage flag
   runtime: nodejs18.x # should match custom.esbuild.target
   endpointType: regional
-  memorySize: 256
+  memorySize: 2048
   tracing:
     lambda: true
     apiGateway: true
