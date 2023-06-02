@@ -9,6 +9,7 @@ import { User } from 'models/User';
 import deleteLesson from './delete-lesson';
 import invalidateResponses from './invalidate-responses';
 import setGrade from './set-grade';
+import updateAppConfig from './update-app-config';
 import updateLastTrainedAt from './update-last-trained-at';
 import updateLesson from './update-lesson';
 import updateLessonFeatures from './update-lesson-features';
@@ -21,6 +22,7 @@ export const Me: GraphQLObjectType = new GraphQLObjectType({
     deleteLesson,
     invalidateResponses,
     setGrade,
+    updateAppConfig,
     updateLastTrainedAt,
     updateLesson,
     updateLessonFeatures,

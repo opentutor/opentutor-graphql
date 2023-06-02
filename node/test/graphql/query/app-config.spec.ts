@@ -10,6 +10,7 @@ import { Express } from 'express';
 import { describe } from 'mocha';
 import mongoUnit from 'mongo-unit';
 import request from 'supertest';
+import SettingModel, { AppConfig } from 'models/Setting';
 
 describe('appConfig', () => {
   let app: Express;
@@ -70,6 +71,55 @@ describe('appConfig', () => {
           googleClientId: 'clientIdSetByEnv',
         },
       },
+    });
+  });
+
+  it(`serves default config when no settings`, async () => {
+    process.env.GOOGLE_CLIENT_ID = 'clientIdSetByEnv';
+    const response = await request(app)
+      .post('/graphql')
+      .send({
+        query: `query {
+          appConfig {
+            googleClientId
+            logoIcon
+            logoLargeIcon
+            featuredLessons
+          }
+        }`,
+      });
+    expect(response.status).to.equal(200);
+    expect(response.body.data?.appConfig).to.eql({
+      googleClientId: 'clientIdSetByEnv',
+      logoIcon: '',
+      logoLargeIcon: '',
+      featuredLessons: [],
+    });
+  });
+
+  it(`serves config from Settings`, async () => {
+    const appConfig: AppConfig = {
+      googleClientId: '',
+      logoIcon: 'logo.png',
+      logoLargeIcon: 'logoLarge.png',
+      featuredLessons: ['somementor'],
+    };
+    await SettingModel.saveConfig(appConfig);
+    const response = await request(app)
+      .post('/graphql')
+      .send({
+        query: `query {
+          appConfig {
+            googleClientId
+            logoIcon
+            logoLargeIcon
+            featuredLessons
+          }
+        }`,
+      });
+    expect(response.status).to.equal(200);
+    expect(response.body.data).to.eql({
+      appConfig,
     });
   });
 });
