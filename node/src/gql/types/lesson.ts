@@ -23,7 +23,7 @@ const HintType = new GraphQLObjectType({
   },
 });
 
-const LessonExpectationType = new GraphQLObjectType({
+export const LessonExpectationType = new GraphQLObjectType({
   name: 'LessonExpectation',
   fields: {
     expectationId: { type: GraphQLString },

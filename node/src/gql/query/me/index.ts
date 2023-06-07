@@ -15,6 +15,7 @@ import trainingData from './training-data';
 import allTrainingData from './training-data-all';
 import allExpectationData from './expectation-data-all';
 import users from './users';
+import offlineLessonData from './offline-data';
 
 export const Me: GraphQLObjectType = new GraphQLObjectType({
   name: 'MeQuery',
@@ -28,6 +29,7 @@ export const Me: GraphQLObjectType = new GraphQLObjectType({
     allTrainingData,
     allExpectationData,
     users,
+    offlineLessonData,
   },
 });
 
