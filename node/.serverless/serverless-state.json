@@ -206,7 +206,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/opentutor-graphql/dev/1686139637474-2023-06-07T12:07:17.474Z/app.zip"
+                "S3Key": "serverless/opentutor-graphql/dev/1685609475388-2023-06-01T08:51:15.388Z/app.zip"
               },
               "Handler": "./src/lambda.handler",
               "Runtime": "nodejs18.x",
@@ -235,14 +235,14 @@
             },
             "DependsOn": ["AppLogGroup"]
           },
-          "AppLambdaVersionsKvgmh8cQmy6Qw12If9lLrD3vY9Vi0WpcMuL15jd8BQ": {
+          "AppLambdaVersion3YuY7R3pzbjkg3MW5h93hPAaQAWryCGNPYoKIoDpJ8": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "AppLambdaFunction"
               },
-              "CodeSha256": "vu4NNPAYarIhZ9UKK09dXF+hWmxzjJR2r2dbSYqawN8="
+              "CodeSha256": "1ENDTcKGTRZXrMdcs7Nx1xl7dEuHRnlnzYkD2BTmt2U="
             }
           },
           "ApiGatewayRestApi": {
@@ -440,7 +440,7 @@
             },
             "DependsOn": ["AppLambdaPermissionApiGateway"]
           },
-          "ApiGatewayDeployment1686139631748": {
+          "ApiGatewayDeployment1685609469805": {
             "Type": "AWS::ApiGateway::Deployment",
             "Properties": {
               "RestApiId": {
@@ -588,7 +588,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/opentutor-graphql/dev/1686139637474-2023-06-07T12:07:17.474Z/custom-resources.zip"
+                "S3Key": "serverless/opentutor-graphql/dev/1685609475388-2023-06-01T08:51:15.388Z/custom-resources.zip"
               },
               "FunctionName": "opentutor-graphql-dev-custom-resource-apigw-cw-role",
               "Handler": "api-gateway-cloud-watch-role/handler.handler",
@@ -649,7 +649,7 @@
           "AppLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "AppLambdaVersionsKvgmh8cQmy6Qw12If9lLrD3vY9Vi0WpcMuL15jd8BQ"
+              "Ref": "AppLambdaVersion3YuY7R3pzbjkg3MW5h93hPAaQAWryCGNPYoKIoDpJ8"
             },
             "Export": {
               "Name": "sls-opentutor-graphql-dev-AppLambdaFunctionQualifiedArn"
@@ -889,7 +889,7 @@
         "memory": 2048,
         "runtime": "nodejs18.x",
         "vpc": {},
-        "versionLogicalId": "AppLambdaVersionsKvgmh8cQmy6Qw12If9lLrD3vY9Vi0WpcMuL15jd8BQ"
+        "versionLogicalId": "AppLambdaVersion3YuY7R3pzbjkg3MW5h93hPAaQAWryCGNPYoKIoDpJ8"
       }
     },
     "resources": {
@@ -974,7 +974,7 @@
   },
   "package": {
     "individually": true,
-    "artifactDirectoryName": "serverless/opentutor-graphql/dev/1686139637474-2023-06-07T12:07:17.474Z",
+    "artifactDirectoryName": "serverless/opentutor-graphql/dev/1685609475388-2023-06-01T08:51:15.388Z",
     "artifact": ""
   }
 }
