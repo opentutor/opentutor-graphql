@@ -5,14 +5,13 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 
-import AppConfigType, { AppConfig } from 'gql/types/appConfig';
+import AppConfigType from 'gql/types/appConfig';
+import SettingModel, { AppConfig } from '../../models/Setting';
 
 export const appConfig = {
   type: AppConfigType,
   resolve: async (): Promise<AppConfig> => {
-    return {
-      googleClientId: process.env.GOOGLE_CLIENT_ID || '',
-    };
+    return await SettingModel.getConfig();
   },
 };
 

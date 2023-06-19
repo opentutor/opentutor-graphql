@@ -4,16 +4,48 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { GraphQLString, GraphQLObjectType, GraphQLList } from 'graphql';
+import {
+  GraphQLObjectType,
+  GraphQLNonNull,
+  GraphQLInputObjectType,
+  GraphQLList,
+  GraphQLString,
+} from 'graphql';
+import SettingModel, { AppConfig } from '../../../models/Setting';
+import { User, UserRole } from '../../../models/User';
+import { AppConfigType } from '../../types/appConfig';
 
-export const AppConfigType = new GraphQLObjectType({
-  name: 'AppConfig',
+export interface AppConfigUpdateInput {
+  logoIcon: string;
+  logoLargeIcon: string;
+  featuredLessons: string[];
+}
+
+export const AppConfigUpdateInputType = new GraphQLInputObjectType({
+  name: 'AppConfigUpdateInputType',
   fields: () => ({
-    googleClientId: { type: GraphQLString },
     logoIcon: { type: GraphQLString },
     logoLargeIcon: { type: GraphQLString },
     featuredLessons: { type: GraphQLList(GraphQLString) },
   }),
 });
 
-export default AppConfigType;
+export const updateAppConfig = {
+  type: AppConfigType,
+  args: {
+    appConfig: { type: GraphQLNonNull(AppConfigUpdateInputType) },
+  },
+  resolve: async (
+    _root: GraphQLObjectType,
+    args: { appConfig: AppConfigUpdateInput },
+    context: { user: User }
+  ): Promise<AppConfig> => {
+    if (!context.user || context.user.userRole !== UserRole.ADMIN) {
+      throw new Error('you do not have permission to edit appConfig');
+    }
+    await SettingModel.saveConfig(args.appConfig);
+    return await SettingModel.getConfig();
+  },
+};
+
+export default updateAppConfig;
