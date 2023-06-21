@@ -139,7 +139,7 @@ export interface ExpectationDataAll {
 export interface SessionModel extends Model<Session>, HasPaginate<Session> {
   getTrainingData(lessonId: string): Promise<TrainingData>;
 
-  getAllTrainingData(): Promise<TrainingData>;
+  getAllTrainingData(limit: number): Promise<TrainingData>;
 
   getAllExpectationData(): Promise<ExpectationDataAll>;
 
@@ -220,63 +220,67 @@ SessionSchema.statics.getAllExpectationData =
     };
   };
 
-SessionSchema.statics.getAllTrainingData =
-  async function (): Promise<TrainingDataAll> {
-    const sessions: Session[] = await this.find({});
-    const gradingStats = { Good: 0, Bad: 0, Neutral: 0, total: 0 };
-    const lessons: Lesson[] = await LessonModel.find({});
-    const trainingData = [['exp_num', 'text', 'label', 'exp_data']];
-    sessions.forEach((session: Session) => {
-      const lesson: Lesson = lessons.find((current: Lesson) => {
-        return current.lessonId === session.lessonId;
-      });
-      if (!lesson && Array.isArray(lesson.expectations)) {
-        return;
-      }
-      session.userResponses.forEach((response: Response) => {
-        for (
-          let expIx = 0;
-          expIx < response.expectationScores.length;
-          expIx++
-        ) {
-          const exp = response.expectationScores[expIx];
-          const grade = exp.graderGrade;
-          if (!exp.invalidated && grade) {
-            gradingStats.total += 1;
-            gradingStats[grade] += 1;
-            // Classifier cannot use Neutral data
-            if (grade === 'Neutral') {
-              continue;
-            }
-            if (expIx >= lesson.expectations.length) {
-              continue;
-            }
-            const expData = JSON.stringify({
-              question: lesson.question,
-              ideal: lesson.expectations[expIx].expectation,
-            });
-            trainingData.push([
-              response.expectationScores[expIx].expectationId,
-              response.text,
-              grade,
-              expData,
-            ]);
-          }
-        }
-      });
+SessionSchema.statics.getAllTrainingData = async function (
+  limit: number
+): Promise<TrainingDataAll> {
+  let sessions: Session[];
+
+  if (limit < 0)
+    sessions = await this.find({ lastGradedAt: { $exists: true } });
+  else
+    sessions = await this.find({ lastGradedAt: { $exists: true } }).limit(
+      limit
+    );
+  const gradingStats = { Good: 0, Bad: 0, Neutral: 0, total: 0 };
+  const lessons: Lesson[] = await LessonModel.find({});
+  const trainingData = [['exp_num', 'text', 'label', 'exp_data']];
+  sessions.forEach((session: Session) => {
+    const lesson: Lesson = lessons.find((current: Lesson) => {
+      return current.lessonId === session.lessonId;
     });
-    return {
-      data: gradingStats,
-      csv: await _toCsv(trainingData),
-      // Does the lesson have enough data for training, based on these requirements:
-      //   * At least 10 graded answers per expectation
-      //   * At least 2 Good and 2 Bad answers per expectation
-      isTrainable:
-        gradingStats.total >= 10 &&
-        gradingStats.Bad >= 2 &&
-        gradingStats.Good >= 2,
-    };
+    if (!lesson && Array.isArray(lesson.expectations)) {
+      return;
+    }
+    session.userResponses.forEach((response: Response) => {
+      for (let expIx = 0; expIx < response.expectationScores.length; expIx++) {
+        const exp = response.expectationScores[expIx];
+        const grade = exp.graderGrade;
+        if (!exp.invalidated && grade) {
+          gradingStats.total += 1;
+          gradingStats[grade] += 1;
+          // Classifier cannot use Neutral data
+          if (grade === 'Neutral') {
+            continue;
+          }
+          if (expIx >= lesson.expectations.length) {
+            continue;
+          }
+          const expData = JSON.stringify({
+            question: lesson.question,
+            ideal: lesson.expectations[expIx].expectation,
+          });
+          trainingData.push([
+            response.expectationScores[expIx].expectationId,
+            response.text,
+            grade,
+            expData,
+          ]);
+        }
+      }
+    });
+  });
+  return {
+    data: gradingStats,
+    csv: await _toCsv(trainingData),
+    // Does the lesson have enough data for training, based on these requirements:
+    //   * At least 10 graded answers per expectation
+    //   * At least 2 Good and 2 Bad answers per expectation
+    isTrainable:
+      gradingStats.total >= 10 &&
+      gradingStats.Bad >= 2 &&
+      gradingStats.Good >= 2,
   };
+};
 
 SessionSchema.statics.getTrainingData = async function (
   lessonId: string

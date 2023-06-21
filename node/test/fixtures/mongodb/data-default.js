@@ -289,6 +289,7 @@ module.exports = {
       _id: ObjectId('5f20c63646f6110a6a5b2133'),
       lessonId: 'lesson2',
       sessionId: 'session 3',
+      lastGradedAt: '2020-07-28T00:00:00.000Z',
       userResponses: [
         {
           _id: ObjectId('5f20c63646f6110a5a5b2135'),
@@ -307,6 +308,7 @@ module.exports = {
       _id: ObjectId('5f20c63646f6110a6a5b2134'),
       lessonId: 'lesson1',
       sessionId: 'session 4',
+      lastGradedAt: '2020-07-28T00:00:00.000Z',
       userResponses: [
         {
           text: 'a bad answer',
@@ -324,6 +326,7 @@ module.exports = {
       _id: ObjectId('5f20c63646f6110a6a5b2135'),
       lessonId: 'lesson1',
       sessionId: 'session 5',
+      lastGradedAt: '2020-07-28T00:00:00.000Z',
       userResponses: [
         {
           text: 'a neutral answer',
@@ -341,6 +344,7 @@ module.exports = {
       _id: ObjectId('5f20c63646f6110a6a5b2136'),
       lessonId: 'lesson3',
       sessionId: 'session 6',
+      lastGradedAt: '2020-07-28T00:00:00.000Z',
       userResponses: [
         {
           _id: ObjectId('5f20c63646f6110a6a5b2131'),
@@ -388,6 +392,7 @@ module.exports = {
       _id: ObjectId('5f20c63646f6110a6a5b2137'),
       lessonId: 'lesson4',
       sessionId: 'session 7',
+      lastGradedAt: '2020-07-28T00:00:00.000Z',
       userResponses: [
         {
           text: 'bad',
@@ -485,6 +490,7 @@ module.exports = {
       _id: ObjectId('5f20c63646f6110a6a5b2138'),
       lessonId: 'lesson5',
       sessionId: 'session 8',
+      lastGradedAt: '2020-07-28T00:00:00.000Z',
       userResponses: [
         {
           text: 'good',
@@ -582,6 +588,7 @@ module.exports = {
       _id: ObjectId('5f20c63646f6110a6a5b2139'),
       lessonId: 'lesson6',
       sessionId: 'session 9',
+      lastGradedAt: '2020-07-28T00:00:00.000Z',
       userResponses: [
         {
           text: '"good, not bad"',
