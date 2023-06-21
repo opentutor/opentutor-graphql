@@ -4,7 +4,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { GraphQLObjectType } from 'graphql';
+import { GraphQLInt, GraphQLObjectType } from 'graphql';
 import { Session } from 'models';
 import { User, UserRole } from 'models/User';
 import { TrainingData, TrainingDataType } from 'gql/types/training-data';
@@ -12,18 +12,18 @@ import * as YAML from 'yaml';
 
 export const allTrainingData = {
   type: TrainingDataType,
-  args: {},
+  args: { limit: { type: GraphQLInt, defaultValue: -1 } },
   resolve: async (
     _root: GraphQLObjectType,
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-    args: any,
+    args: { limit: number },
     context: { user: User }
   ): Promise<TrainingData> => {
     if (context.user.userRole !== UserRole.ADMIN) {
       throw new Error('only admins can train the default model');
     }
     try {
-      const trainingData = await Session.getAllTrainingData();
+      const trainingData = await Session.getAllTrainingData(args.limit);
       const config = {
         question: '',
       };
