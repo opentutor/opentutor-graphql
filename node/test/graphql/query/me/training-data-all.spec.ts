@@ -164,6 +164,33 @@ describe('training data all', () => {
     expect(response.body.data.me.allTrainingData.isTrainable).to.eql(true);
   });
 
+  it(`returns limited training data for lessons`, async () => {
+    const token = getToken('5f0cfea3395d762ca65405d1');
+    const response = await request(app)
+      .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
+      .send({
+        query: `query {
+          me {
+            allTrainingData(limit: 1) {
+              isTrainable
+              training
+              config
+            }  
+          }
+        }`,
+      });
+    expect(response.status).to.equal(200);
+    expect(response.body.data.me.allTrainingData.training).to.eql(
+      'exp_num,text,label,exp_data\n' +
+        '0,a good answer,Good,"{""question"":""question"",""ideal"":""answer1""}"\n'
+    );
+    expect(YAML.parse(response.body.data.me.allTrainingData.config)).to.eql({
+      question: '',
+    });
+    expect(response.body.data.me.allTrainingData.isTrainable).to.eql(false);
+  });
+
   it(`does not return invalidated training data for lessons`, async () => {
     const token = getToken('5f0cfea3395d762ca65405d1');
     let response = await request(app)
