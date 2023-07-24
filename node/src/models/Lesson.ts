@@ -35,6 +35,7 @@ export interface UpdateMedia {
 
 export interface UpdateLesson {
   lessonId: string;
+  arch: string;
   name: string;
   intro: string;
   dialogCategory: string;
@@ -95,6 +96,7 @@ const MediaSchema = new Schema({
 
 export interface Lesson extends Document {
   lessonId: string;
+  arch: string;
   name: string;
   intro: string;
   dialogCategory: string;
@@ -126,6 +128,7 @@ export interface LessonModel extends Model<Lesson>, HasPaginate<Lesson> {
 export const LessonSchema = new Schema<Lesson, LessonModel>(
   {
     lessonId: { type: String, required: true, unique: true },
+    arch: { type: String },
     name: { type: String },
     intro: { type: String },
     dialogCategory: { type: String },
