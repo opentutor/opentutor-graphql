@@ -117,6 +117,7 @@ describe('lesson', () => {
         me {
           lesson(lessonId: "lesson1") {
             lessonId
+            arch
             name
             intro
             dialogCategory
@@ -179,6 +180,7 @@ describe('lesson', () => {
           features: null,
         },
       ],
+      arch: null,
       conclusion: ['conclusion text'],
       features: null,
       media: {
