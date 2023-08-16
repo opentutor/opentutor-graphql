@@ -64,24 +64,43 @@ export const updateSession = {
     const classifierGrade = calculateScore(session, 'classifierGrade');
     const createdBy = await UserModel.findOne({ _id: lesson.createdBy });
 
-    return await SessionModel.findOneAndUpdate(
-      {
-        sessionId: args.sessionId,
-      },
-      {
-        $set: {
-          ...session,
-          graderGrade: grade,
-          classifierGrade: classifierGrade,
-          lessonName: lesson.name,
-          lessonCreatedBy: createdBy ? createdBy.name : '',
+    if (!classifierGrade) {
+      return await SessionModel.findOneAndUpdate(
+        {
+          sessionId: args.sessionId,
         },
-      },
-      {
-        new: true, // return the updated doc rather than pre update
-        upsert: true, // insert if no user session found
-      }
-    );
+        {
+          $set: {
+            ...session,
+            lessonName: lesson.name,
+            lessonCreatedBy: createdBy ? createdBy.name : '',
+          },
+        },
+        {
+          new: true, // return the updated doc rather than pre update
+          upsert: true, // insert if no user session found
+        }
+      );
+    } else {
+      return await SessionModel.findOneAndUpdate(
+        {
+          sessionId: args.sessionId,
+        },
+        {
+          $set: {
+            ...session,
+            graderGrade: grade,
+            classifierGrade: classifierGrade,
+            lessonName: lesson.name,
+            lessonCreatedBy: createdBy ? createdBy.name : '',
+          },
+        },
+        {
+          new: true, // return the updated doc rather than pre update
+          upsert: true, // insert if no user session found
+        }
+      );
+    }
   },
 };
 
