@@ -12,7 +12,7 @@ import mongoUnit from 'mongo-unit';
 import request from 'supertest';
 import { getToken } from 'test/helpers';
 
-export const GQL_INVALIDATE_RESPONSE_DEFAULT = `mutation InvalidateResponse($expectation: Int!, $invalid: Boolean!, $invalidateResponses: [InvalidateResponseInputType!]) {
+export const GQL_INVALIDATE_RESPONSE_DEFAULT = `mutation InvalidateResponse($expectation: String!, $invalid: Boolean!, $invalidateResponses: [InvalidateResponseInputType!]) {
   me {
     invalidateResponses(expectation: $expectation, invalid: $invalid, invalidateResponses: $invalidateResponses) { 
       sessionId
@@ -29,7 +29,7 @@ export const GQL_INVALIDATE_RESPONSE_DEFAULT = `mutation InvalidateResponse($exp
 
 export function gqlMutationInvalidateResponses(
   invalidateResponses: { sessionId?: string; responseIds?: string[] }[] = [],
-  expectation = 0,
+  expectation = '0',
   invalid = true
 ) {
   return {
@@ -101,7 +101,7 @@ describe('invalidateResponses', () => {
     const response = await request(app)
       .post('/graphql')
       .send({
-        query: `mutation InvalidateResponse($expectation: Int!, $invalid: Boolean!, $invalidateResponses: [InvalidateResponseInputType!]) {
+        query: `mutation InvalidateResponse($expectation: String!, $invalid: Boolean!, $invalidateResponses: [InvalidateResponseInputType!]) {
           me {
             invalidateResponses(invalid: $invalid, invalidateResponses: $invalidateResponses) { 
               username
@@ -119,7 +119,7 @@ describe('invalidateResponses', () => {
         },
       });
     expect(response.body.errors[0].message).to.have.string(
-      'Field "invalidateResponses" argument "expectation" of type "Int!" is required, but it was not provided.'
+      'Field "invalidateResponses" argument "expectation" of type "String!" is required, but it was not provided.'
     );
   });
 
@@ -127,7 +127,7 @@ describe('invalidateResponses', () => {
     const response = await request(app)
       .post('/graphql')
       .send({
-        query: `mutation InvalidateResponse($expectation: Int!, $invalid: Boolean!, $invalidateResponses: [InvalidateResponseInputType!]) {
+        query: `mutation InvalidateResponse($expectation: String!, $invalid: Boolean!, $invalidateResponses: [InvalidateResponseInputType!]) {
           me {
             invalidateResponses(expectation: $expectation, invalidateResponses: $invalidateResponses) { 
               username
@@ -135,7 +135,7 @@ describe('invalidateResponses', () => {
           }
         }`,
         variables: {
-          expectation: 0,
+          expectation: '0',
           invalidateResponses: [
             {
               sessionId: '',

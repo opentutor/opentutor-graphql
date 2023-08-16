@@ -159,7 +159,7 @@ export interface SessionModel extends Model<Session>, HasPaginate<Session> {
   invalidateResponses(
     sessionId: string,
     responseId: string[],
-    expectation: number,
+    expectation: string,
     invalid: boolean
   ): Promise<Session>;
 }
@@ -397,7 +397,7 @@ SessionSchema.statics.setGrade = async function (
 SessionSchema.statics.invalidateResponses = async function (
   sessionId: string,
   responseIds: string[],
-  expectation: number,
+  expectation: string,
   invalid: boolean
 ) {
   const session: Session = await this.findOne({ sessionId: sessionId });
@@ -413,11 +413,14 @@ SessionSchema.statics.invalidateResponses = async function (
       continue;
     }
     const expectations = responses[rIdx].expectationScores;
-    if (expectation > expectations.length - 1 || expectation < 0) {
+    const expectationIndex = expectations.findIndex(
+      (e) => e.expectationId == expectation
+    );
+    if (expectationIndex == -1) {
       continue;
     }
     changesAsSet[
-      `userResponses.${rIdx}.expectationScores.${expectation}.invalidated`
+      `userResponses.${rIdx}.expectationScores.${expectationIndex}.invalidated`
     ] = invalid;
   }
   return await this.findOneAndUpdate(

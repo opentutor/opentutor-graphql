@@ -10,7 +10,6 @@ import {
   GraphQLID,
   GraphQLBoolean,
   GraphQLNonNull,
-  GraphQLInt,
   GraphQLInputObjectType,
   GraphQLList,
 } from 'graphql';
@@ -34,7 +33,7 @@ const InvalidateResponseInputType = new GraphQLInputObjectType({
 export const userResponsesBatchInvalidate = {
   type: GraphQLList(SessionType),
   args: {
-    expectation: { type: GraphQLNonNull(GraphQLInt) },
+    expectation: { type: GraphQLNonNull(GraphQLString) },
     invalid: { type: GraphQLNonNull(GraphQLBoolean) },
     invalidateResponses: {
       type: GraphQLList(GraphQLNonNull(InvalidateResponseInputType)),
@@ -43,7 +42,7 @@ export const userResponsesBatchInvalidate = {
   resolve: async (
     _root: GraphQLObjectType,
     args: {
-      expectation: number;
+      expectation: string;
       invalid: boolean;
       invalidateResponses: InvalidateResponse[];
     }
