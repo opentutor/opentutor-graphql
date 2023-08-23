@@ -323,7 +323,7 @@ SessionSchema.statics.getTrainingData = async function (
     // Does the lesson have enough data for training, based on these requirements:
     //   * At least 10 graded answers per expectation
     //   * At least 2 Good and 2 Bad answers per expectation
-    isTrainable: expectationGradingStats.every((exp) => {
+    isTrainable: expectationGradingStats.some((exp) => {
       return exp.total >= 10 && exp.Bad >= 2 && exp.Good >= 2;
     }),
   };
