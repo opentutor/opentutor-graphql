@@ -60,6 +60,7 @@ export const SessionType = new GraphQLObjectType({
     _id: { type: GraphQLID },
     deleted: { type: GraphQLBoolean },
     sessionId: { type: GraphQLString },
+    sessionStatus: { type: GraphQLString },
     username: { type: GraphQLString },
     graderGrade: { type: GraphQLFloat },
     classifierGrade: { type: GraphQLFloat },
