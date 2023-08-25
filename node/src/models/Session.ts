@@ -73,6 +73,7 @@ const ResponseSchema = new Schema({
 
 export interface Session extends Document {
   sessionId: string;
+  sessionStatus: string;
   lessonId: string;
   lessonName: string;
   lessonCreatedBy: string;
@@ -95,6 +96,7 @@ export const SessionSchema = new Schema<Session, SessionModel>(
   {
     sessionId: { type: String, unique: true, required: '{PATH} is required!' },
     lessonId: { type: String, required: '{PATH} is required!' },
+    sessionStatus: { type: String },
     lessonName: { type: String },
     lessonCreatedBy: { type: String },
     lastGradedBy: { type: Schema.Types.ObjectId, ref: 'User' },
