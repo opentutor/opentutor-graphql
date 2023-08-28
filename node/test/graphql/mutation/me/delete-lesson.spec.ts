@@ -290,6 +290,11 @@ describe('deleteLesson', () => {
         edges: [
           {
             node: {
+              sessionId: 'session2.5',
+            },
+          },
+          {
+            node: {
               sessionId: 'session 9',
             },
           },

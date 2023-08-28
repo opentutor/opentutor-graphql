@@ -74,6 +74,11 @@ describe('sessions', () => {
       edges: [
         {
           node: {
+            sessionId: 'session2.5',
+          },
+        },
+        {
+          node: {
             sessionId: 'session 9',
           },
         },
@@ -148,6 +153,11 @@ describe('sessions', () => {
     expect(response.status).to.equal(200);
     expect(response.body.data.me.sessions).to.eql({
       edges: [
+        {
+          node: {
+            sessionId: 'session2.5',
+          },
+        },
         {
           node: {
             sessionId: 'session 9',
@@ -229,7 +239,7 @@ describe('sessions', () => {
       edges: [
         {
           node: {
-            sessionId: 'session 9',
+            sessionId: 'session2.5',
           },
         },
       ],
@@ -238,7 +248,7 @@ describe('sessions', () => {
         hasNextPage: true,
         startCursor: null,
         endCursor:
-          'WyJzZXNzaW9uIDkiLHsiJG9pZCI6IjVmMjBjNjM2NDZmNjExMGE2YTViMjEzOSJ9XQ',
+          'WyJzZXNzaW9uMi41Iix7IiRvaWQiOiI1ZjIwYzYzNjQ2ZjYxMTBhNmE1YjIxNDkifV0',
       },
     });
   });
@@ -251,51 +261,7 @@ describe('sessions', () => {
       .send({
         query: `query { 
           me {
-            sessions(sortBy: "sessionId", limit: 1, cursor: "WyJzZXNzaW9uIDkiLHsiJG9pZCI6IjVmMjBjNjM2NDZmNjExMGE2YTViMjEzOSJ9XQ") { 
-              edges {
-                node {
-                  sessionId
-                }
-              }
-              pageInfo {
-                hasNextPage
-                hasPreviousPage
-                endCursor
-                startCursor
-              }
-            }   
-          }
-        }`,
-      });
-    expect(response.status).to.equal(200);
-    expect(response.body.data.me.sessions).to.eql({
-      edges: [
-        {
-          node: {
-            sessionId: 'session 8',
-          },
-        },
-      ],
-      pageInfo: {
-        hasPreviousPage: true,
-        hasNextPage: true,
-        startCursor:
-          'WyJzZXNzaW9uIDgiLHsiJG9pZCI6IjVmMjBjNjM2NDZmNjExMGE2YTViMjEzOCJ9XQ',
-        endCursor:
-          'WyJzZXNzaW9uIDgiLHsiJG9pZCI6IjVmMjBjNjM2NDZmNjExMGE2YTViMjEzOCJ9XQ',
-      },
-    });
-  });
-
-  it('gets previous page of sessions sorted in ascending order by sessionId with limit = 1', async () => {
-    const token = getToken('5f0cfea3395d762ca65405d1');
-    const response = await request(app)
-      .post('/graphql')
-      .set('Authorization', `bearer ${token}`)
-      .send({
-        query: `query { 
-          me {
-            sessions(sortBy: "sessionId", limit: 1, cursor: "prev__WyJzZXNzaW9uIDgiLHsiJG9pZCI6IjVmMjBjNjM2NDZmNjExMGE2YTViMjEzOCJ9XQ") { 
+            sessions(sortBy: "sessionId", limit: 1, cursor: "WyJzZXNzaW9uMi41Iix7IiRvaWQiOiI1ZjIwYzYzNjQ2ZjYxMTBhNmE1YjIxNDkifV0") { 
               edges {
                 node {
                   sessionId
@@ -321,11 +287,55 @@ describe('sessions', () => {
         },
       ],
       pageInfo: {
+        hasPreviousPage: true,
+        hasNextPage: true,
+        startCursor:
+          'WyJzZXNzaW9uIDkiLHsiJG9pZCI6IjVmMjBjNjM2NDZmNjExMGE2YTViMjEzOSJ9XQ',
+        endCursor:
+          'WyJzZXNzaW9uIDkiLHsiJG9pZCI6IjVmMjBjNjM2NDZmNjExMGE2YTViMjEzOSJ9XQ',
+      },
+    });
+  });
+
+  it('gets previous page of sessions sorted in ascending order by sessionId with limit = 1', async () => {
+    const token = getToken('5f0cfea3395d762ca65405d1');
+    const response = await request(app)
+      .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
+      .send({
+        query: `query { 
+          me {
+            sessions(sortBy: "sessionId", limit: 1, cursor: "prev__WyJzZXNzaW9uIDkiLHsiJG9pZCI6IjVmMjBjNjM2NDZmNjExMGE2YTViMjEzOSJ9XQ") { 
+              edges {
+                node {
+                  sessionId
+                }
+              }
+              pageInfo {
+                hasNextPage
+                hasPreviousPage
+                endCursor
+                startCursor
+              }
+            }   
+          }
+        }`,
+      });
+    expect(response.status).to.equal(200);
+    expect(response.body.data.me.sessions).to.eql({
+      edges: [
+        {
+          node: {
+            sessionId: 'session2.5',
+          },
+        },
+      ],
+      pageInfo: {
         hasPreviousPage: false,
         hasNextPage: true,
         startCursor: null,
         endCursor:
-          'WyJzZXNzaW9uIDkiLHsiJG9pZCI6IjVmMjBjNjM2NDZmNjExMGE2YTViMjEzOSJ9XQ',
+          'WyJzZXNzaW9uMi41Iix7IiRvaWQiOiI1ZjIwYzYzNjQ2ZjYxMTBhNmE1YjIxNDkifV0',
       },
     });
   });
@@ -363,6 +373,85 @@ describe('sessions', () => {
         {
           node: {
             sessionId: 'session 4',
+          },
+        },
+        {
+          node: {
+            sessionId: 'session 2',
+          },
+        },
+        {
+          node: {
+            sessionId: 'session 1',
+          },
+        },
+      ],
+      pageInfo: {
+        hasNextPage: false,
+      },
+    });
+  });
+
+  it('gets sessions that were not abandoned', async () => {
+    const token = getToken('5f0cfea3395d762ca65405d1');
+    const filter = encodeURI(
+      JSON.stringify({ sessionStatus: { $ne: 'LAUNCHED' } })
+    );
+    const response = await request(app)
+      .post('/graphql')
+      .set('Authorization', `bearer ${token}`)
+      .send({
+        query: `query { 
+          me {
+            sessions(filter: "${filter}") { 
+              edges {
+                node {
+                  sessionId
+                }
+              }
+              pageInfo {
+                hasNextPage
+              }
+            }   
+          }
+        }`,
+      });
+    expect(response.status).to.equal(200);
+    expect(response.body.data.me.sessions).to.eql({
+      edges: [
+        {
+          node: {
+            sessionId: 'session 9',
+          },
+        },
+        {
+          node: {
+            sessionId: 'session 8',
+          },
+        },
+        {
+          node: {
+            sessionId: 'session 7',
+          },
+        },
+        {
+          node: {
+            sessionId: 'session 6',
+          },
+        },
+        {
+          node: {
+            sessionId: 'session 5',
+          },
+        },
+        {
+          node: {
+            sessionId: 'session 4',
+          },
+        },
+        {
+          node: {
+            sessionId: 'session 3',
           },
         },
         {
