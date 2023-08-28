@@ -212,6 +212,7 @@ module.exports = {
       sessionId: 'session 1',
       lessonId: 'lesson1',
       username: 'username1',
+      sessionStatus: 'COMPLETED',
       question: {
         text: 'question?',
         expectations: [
@@ -253,6 +254,7 @@ module.exports = {
       sessionId: 'session 2',
       lessonId: 'lesson1',
       username: 'username2',
+      sessionStatus: 'COMPLETED',
       question: {
         text: 'question',
         expectations: [
@@ -286,9 +288,30 @@ module.exports = {
       ],
     },
     {
+      _id: ObjectId('5f20c63646f6110a6a5b2149'),
+      lessonId: 'lesson2',
+      sessionId: 'session2.5',
+      sessionStatus: 'LAUNCHED',
+      question: {
+        text: 'question?',
+        expectations: [
+          {
+            expectationId: '0',
+            text: 'expected text 1',
+          },
+          {
+            expectationId: '1',
+            text: 'expected text 2',
+          },
+        ],
+      },
+      userResponses: [],
+    },
+    {
       _id: ObjectId('5f20c63646f6110a6a5b2133'),
       lessonId: 'lesson2',
       sessionId: 'session 3',
+      sessionStatus: 'STARTED',
       lastGradedAt: '2020-07-28T00:00:00.000Z',
       userResponses: [
         {
@@ -308,6 +331,7 @@ module.exports = {
       _id: ObjectId('5f20c63646f6110a6a5b2134'),
       lessonId: 'lesson1',
       sessionId: 'session 4',
+      sessionStatus: 'STARTED',
       lastGradedAt: '2020-07-28T00:00:00.000Z',
       userResponses: [
         {
@@ -327,6 +351,7 @@ module.exports = {
       lessonId: 'lesson1',
       sessionId: 'session 5',
       lastGradedAt: '2020-07-28T00:00:00.000Z',
+      sessionStatus: 'STARTED',
       userResponses: [
         {
           text: 'a neutral answer',
@@ -345,6 +370,7 @@ module.exports = {
       lessonId: 'lesson3',
       sessionId: 'session 6',
       lastGradedAt: '2020-07-28T00:00:00.000Z',
+      sessionStatus: 'COMPLETED',
       userResponses: [
         {
           _id: ObjectId('5f20c63646f6110a6a5b2131'),
@@ -392,6 +418,7 @@ module.exports = {
       _id: ObjectId('5f20c63646f6110a6a5b2137'),
       lessonId: 'lesson4',
       sessionId: 'session 7',
+      sessionStatus: 'COMPLETED',
       lastGradedAt: '2020-07-28T00:00:00.000Z',
       userResponses: [
         {
@@ -491,6 +518,7 @@ module.exports = {
       lessonId: 'lesson5',
       sessionId: 'session 8',
       lastGradedAt: '2020-07-28T00:00:00.000Z',
+      sessionStatus: 'COMPLETED',
       userResponses: [
         {
           text: 'good',
@@ -588,6 +616,7 @@ module.exports = {
       _id: ObjectId('5f20c63646f6110a6a5b2139'),
       lessonId: 'lesson6',
       sessionId: 'session 9',
+      sessionStatus: 'COMPLETED',
       lastGradedAt: '2020-07-28T00:00:00.000Z',
       userResponses: [
         {
