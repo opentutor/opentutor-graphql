@@ -73,6 +73,7 @@ const ResponseSchema = new Schema({
 
 export interface Session extends Document {
   sessionId: string;
+  sessionStatus: string;
   lessonId: string;
   lessonName: string;
   lessonCreatedBy: string;
@@ -95,6 +96,7 @@ export const SessionSchema = new Schema<Session, SessionModel>(
   {
     sessionId: { type: String, unique: true, required: '{PATH} is required!' },
     lessonId: { type: String, required: '{PATH} is required!' },
+    sessionStatus: { type: String },
     lessonName: { type: String },
     lessonCreatedBy: { type: String },
     lastGradedBy: { type: Schema.Types.ObjectId, ref: 'User' },
@@ -159,7 +161,7 @@ export interface SessionModel extends Model<Session>, HasPaginate<Session> {
   invalidateResponses(
     sessionId: string,
     responseId: string[],
-    expectation: number,
+    expectation: string,
     invalid: boolean
   ): Promise<Session>;
 }
@@ -323,7 +325,7 @@ SessionSchema.statics.getTrainingData = async function (
     // Does the lesson have enough data for training, based on these requirements:
     //   * At least 10 graded answers per expectation
     //   * At least 2 Good and 2 Bad answers per expectation
-    isTrainable: expectationGradingStats.every((exp) => {
+    isTrainable: expectationGradingStats.some((exp) => {
       return exp.total >= 10 && exp.Bad >= 2 && exp.Good >= 2;
     }),
   };
@@ -397,7 +399,7 @@ SessionSchema.statics.setGrade = async function (
 SessionSchema.statics.invalidateResponses = async function (
   sessionId: string,
   responseIds: string[],
-  expectation: number,
+  expectation: string,
   invalid: boolean
 ) {
   const session: Session = await this.findOne({ sessionId: sessionId });
@@ -413,11 +415,14 @@ SessionSchema.statics.invalidateResponses = async function (
       continue;
     }
     const expectations = responses[rIdx].expectationScores;
-    if (expectation > expectations.length - 1 || expectation < 0) {
+    const expectationIndex = expectations.findIndex(
+      (e) => e.expectationId == expectation
+    );
+    if (expectationIndex == -1) {
       continue;
     }
     changesAsSet[
-      `userResponses.${rIdx}.expectationScores.${expectation}.invalidated`
+      `userResponses.${rIdx}.expectationScores.${expectationIndex}.invalidated`
     ] = invalid;
   }
   return await this.findOneAndUpdate(
