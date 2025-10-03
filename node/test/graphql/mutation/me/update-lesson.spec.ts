@@ -425,6 +425,7 @@ describe('updateLesson', () => {
     const lesson = JSON.stringify({
       lessonId: 'newlesson',
       createdBy: '5f0cfea3395d762ca65405d1',
+      llmModelName: 'llm_model_name',
       name: 'new name',
       intro: 'new intro',
       dialogCategory: 'sensitive',
@@ -462,6 +463,7 @@ describe('updateLesson', () => {
         me {
           lesson(lessonId: "newlesson") { 
             lessonId
+            llmModelName
             name
             intro
             dialogCategory
@@ -481,6 +483,7 @@ describe('updateLesson', () => {
     expect(newLesson.body.data.me.lesson).to.eql({
       lessonId: 'newlesson',
       name: 'new name',
+      llmModelName: 'llm_model_name',
       intro: 'new intro',
       dialogCategory: 'sensitive',
       question: 'new question',

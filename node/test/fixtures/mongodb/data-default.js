@@ -21,6 +21,7 @@ module.exports = {
           { name: 'end', value: '100' },
         ],
       },
+      llmModelName: 'llm_model_name',
       learningFormat: 'surveySays',
       intro: 'intro text',
       dialogCategory: 'default',

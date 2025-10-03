@@ -56,6 +56,7 @@ export const LessonType = new GraphQLObjectType({
     deleted: { type: GraphQLBoolean },
     id: { type: GraphQLID },
     lessonId: { type: GraphQLString },
+    llmModelName: { type: GraphQLString },
     arch: { type: GraphQLString },
     name: { type: GraphQLString },
     intro: { type: GraphQLString },

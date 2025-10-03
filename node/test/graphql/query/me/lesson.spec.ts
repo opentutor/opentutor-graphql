@@ -119,6 +119,7 @@ describe('lesson', () => {
             lessonId
             arch
             name
+            llmModelName
             intro
             dialogCategory
             question
@@ -151,6 +152,7 @@ describe('lesson', () => {
     expect(response.body.data.me.lesson).to.eql({
       lessonId: 'lesson1',
       name: 'lesson name',
+      llmModelName: 'llm_model_name',
       intro: 'intro text',
       dialogCategory: 'default',
       question: 'question?',
