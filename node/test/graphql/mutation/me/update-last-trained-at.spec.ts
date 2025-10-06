@@ -7,7 +7,7 @@ The full terms of this copyright and license should always be found in the root 
 import createApp, { appStart, appStop } from 'app';
 import { expect } from 'chai';
 import { Express } from 'express';
-import mongoUnit from 'mongo-unit';
+import { loadMongo, wipeMongo } from 'test/fixtures/mongodb/data-default';
 import request from 'supertest';
 import timekeeper from 'timekeeper';
 import { getToken } from 'test/helpers';
@@ -16,15 +16,15 @@ describe('updateLastTrainedAt', () => {
   let app: Express;
 
   beforeEach(async () => {
-    await mongoUnit.load(require('test/fixtures/mongodb/data-default.js'));
+    await loadMongo();
     app = await createApp();
     await appStart();
   });
 
   afterEach(async () => {
     timekeeper.reset();
+    await wipeMongo();
     await appStop();
-    await mongoUnit.drop();
   });
 
   it(`throws an error if not logged in`, async () => {

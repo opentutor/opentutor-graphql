@@ -8,9 +8,9 @@ import createApp, { appStart, appStop } from 'app';
 import { expect } from 'chai';
 import { Express } from 'express';
 import { describe } from 'mocha';
-import mongoUnit from 'mongo-unit';
 import request from 'supertest';
 import SettingModel, { AppConfig } from 'models/Setting';
+import { loadMongo, wipeMongo } from 'test/fixtures/mongodb/data-default';
 
 describe('appConfig', () => {
   let app: Express;
@@ -18,7 +18,7 @@ describe('appConfig', () => {
 
   beforeEach(async () => {
     ENV_GOOGLE_CLIENT_ID_RESTORE = process.env.GOOGLE_CLIENT_ID;
-    await mongoUnit.load(require('test/fixtures/mongodb/data-default.js'));
+    await loadMongo();
     app = await createApp();
     await appStart();
   });
@@ -29,8 +29,8 @@ describe('appConfig', () => {
     } else {
       delete process.env['GOOGLE_CLIENT_ID'];
     }
+    await wipeMongo();
     await appStop();
-    await mongoUnit.drop();
   });
 
   it(`serves googleClientId appConfig when no env`, async () => {

@@ -8,7 +8,6 @@ import createApp, { appStart, appStop } from 'app';
 import { expect } from 'chai';
 import { Express } from 'express';
 import { describe } from 'mocha';
-import mongoUnit from 'mongo-unit';
 import request from 'supertest';
 
 describe('health', () => {
@@ -21,7 +20,6 @@ describe('health', () => {
 
   afterEach(async () => {
     await appStop();
-    await mongoUnit.drop();
   });
 
   it(`returns healthy`, async () => {
