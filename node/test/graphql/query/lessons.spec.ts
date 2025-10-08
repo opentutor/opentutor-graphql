@@ -7,21 +7,21 @@ The full terms of this copyright and license should always be found in the root 
 import createApp, { appStart, appStop } from 'app';
 import { expect } from 'chai';
 import { Express } from 'express';
-import mongoUnit from 'mongo-unit';
+import { loadMongo, wipeMongo } from 'test/fixtures/mongodb/data-default';
 import request from 'supertest';
 
 describe('lessons', () => {
   let app: Express;
 
   beforeEach(async () => {
-    await mongoUnit.load(require('test/fixtures/mongodb/data-default.js'));
+    await loadMongo();
     app = await createApp();
     await appStart();
   });
 
   afterEach(async () => {
+    await wipeMongo();
     await appStop();
-    await mongoUnit.drop();
   });
 
   it('gets a default page of lessons', async () => {

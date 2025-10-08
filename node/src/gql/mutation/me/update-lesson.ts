@@ -56,6 +56,7 @@ export const UpdateLessonInputType = new GraphQLInputObjectType({
   name: 'UpdateLessonInputType',
   fields: () => ({
     lessonId: { type: GraphQLString },
+    llmModelName: { type: GraphQLString },
     arch: { type: GraphQLString },
     name: { type: GraphQLString },
     intro: { type: GraphQLString },

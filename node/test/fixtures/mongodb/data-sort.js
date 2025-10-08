@@ -5,9 +5,11 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import mongoose from 'mongoose';
+import { MongoClient } from 'mongodb';
+import { TESTDB_NAME } from '../../fixtures';
 const { ObjectId } = mongoose.Types;
 
-module.exports = {
+export const MONGO_DATA = {
   lessons: [
     {
       _id: ObjectId('5f0cfea3395d762ca65405c1'),
@@ -49,3 +51,19 @@ module.exports = {
     },
   ],
 };
+
+export async function loadMongo() {
+  const client = new MongoClient(process.env.MONGO_URI || '', {});
+  await client.connect();
+  const db = client.db(TESTDB_NAME);
+  await db.collection('lessons').insertMany(MONGO_DATA.lessons);
+  await db.collection('users').insertMany(MONGO_DATA.users);
+  client.close();
+}
+
+export async function wipeMongo() {
+  const client = new MongoClient(process.env.MONGO_URI || '', {});
+  await client.connect();
+  const db = client.db(TESTDB_NAME);
+  await db.dropDatabase();
+}

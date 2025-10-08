@@ -40,6 +40,7 @@ export interface UpdateLesson {
   intro: string;
   dialogCategory: string;
   question: string;
+  llmModel?: string;
   media?: UpdateMedia;
   learningFormat?: string;
   expectations: UpdateLessonExpectation[];
@@ -98,6 +99,7 @@ export interface Lesson extends Document {
   lessonId: string;
   arch: string;
   name: string;
+  llmModelName?: string;
   intro: string;
   dialogCategory: string;
   question: string;
@@ -130,6 +132,7 @@ export const LessonSchema = new Schema<Lesson, LessonModel>(
     lessonId: { type: String, required: true, unique: true },
     arch: { type: String },
     name: { type: String },
+    llmModelName: { type: String },
     intro: { type: String },
     dialogCategory: { type: String },
     question: { type: String },
