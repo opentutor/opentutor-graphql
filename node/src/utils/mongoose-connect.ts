@@ -6,7 +6,6 @@ The full terms of this copyright and license should always be found in the root 
 */
 import mongoose from 'mongoose';
 import requireEnv from './require-env';
-mongoose.set('useCreateIndex', true);
 
 /**
  * Connect mongoose using env variables:
@@ -14,11 +13,7 @@ mongoose.set('useCreateIndex', true);
  */
 export default async function mongooseConnect(uri: string): Promise<void> {
   const mongoUri = uri || requireEnv('MONGO_URI');
-  await mongoose.connect(mongoUri, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  });
-  mongoose.set('useCreateIndex', true);
+  await mongoose.connect(mongoUri, {});
   if (process.env['NODE_ENV'] !== 'test') {
     console.log(
       'mongoose: connection successful ' + mongoUri.replace(/^.*@/g, '')

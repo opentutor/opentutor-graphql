@@ -8,7 +8,7 @@ import createApp, { appStart, appStop } from 'app';
 import { expect } from 'chai';
 import { Express } from 'express';
 import { describe } from 'mocha';
-import mongoUnit from 'mongo-unit';
+import { loadMongo, wipeMongo } from 'test/fixtures/mongodb/data-default';
 import request from 'supertest';
 import { getToken } from 'test/helpers';
 
@@ -16,14 +16,14 @@ describe('lesson', () => {
   let app: Express;
 
   beforeEach(async () => {
-    await mongoUnit.load(require('test/fixtures/mongodb/data-default.js'));
+    await loadMongo();
     app = await createApp();
     await appStart();
   });
 
   afterEach(async () => {
+    await wipeMongo();
     await appStop();
-    await mongoUnit.drop();
   });
 
   it(`returns an error if not logged in`, async () => {
@@ -119,6 +119,7 @@ describe('lesson', () => {
             lessonId
             arch
             name
+            llmModelName
             intro
             dialogCategory
             question
@@ -151,6 +152,7 @@ describe('lesson', () => {
     expect(response.body.data.me.lesson).to.eql({
       lessonId: 'lesson1',
       name: 'lesson name',
+      llmModelName: 'llm_model_name',
       intro: 'intro text',
       dialogCategory: 'default',
       question: 'question?',

@@ -94,8 +94,8 @@ export interface Session extends Document {
 
 export const SessionSchema = new Schema<Session, SessionModel>(
   {
-    sessionId: { type: String, unique: true, required: '{PATH} is required!' },
-    lessonId: { type: String, required: '{PATH} is required!' },
+    sessionId: { type: String, unique: true },
+    lessonId: { type: String },
     sessionStatus: { type: String },
     lessonName: { type: String },
     lessonCreatedBy: { type: String },

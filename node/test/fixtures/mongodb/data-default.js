@@ -5,12 +5,14 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import mongoose from 'mongoose';
+import { MongoClient } from 'mongodb';
+import { TESTDB_NAME } from '../../fixtures';
 const { ObjectId } = mongoose.Types;
 
-module.exports = {
+export const MONGO_DATA = {
   lessons: [
     {
-      _id: ObjectId('5f0cfea3395d762ca65405c1'),
+      _id: new ObjectId('5f0cfea3395d762ca65405c1'),
       lessonId: 'lesson1',
       name: 'lesson name',
       media: {
@@ -21,6 +23,7 @@ module.exports = {
           { name: 'end', value: '100' },
         ],
       },
+      llmModelName: 'llm_model_name',
       learningFormat: 'surveySays',
       intro: 'intro text',
       dialogCategory: 'default',
@@ -52,11 +55,11 @@ module.exports = {
         },
       ],
       conclusion: ['conclusion text'],
-      createdBy: ObjectId('5f0cfea3395d762ca65405d1'),
+      createdBy: new ObjectId('5f0cfea3395d762ca65405d1'),
       createdByName: 'Admin',
     },
     {
-      _id: ObjectId('5f0cfea3395d762ca65405c2'),
+      _id: new ObjectId('5f0cfea3395d762ca65405c2'),
       lessonId: 'lesson2',
       name: 'name',
       intro: 'intro',
@@ -74,11 +77,11 @@ module.exports = {
         },
       ],
       conclusion: ['conclusion'],
-      createdBy: ObjectId('5f0cfea3395d762ca65405d3'),
+      createdBy: new ObjectId('5f0cfea3395d762ca65405d3'),
       createdByName: 'Author',
     },
     {
-      _id: ObjectId('5f0cfea3395d762ca65405c3'),
+      _id: new ObjectId('5f0cfea3395d762ca65405c3'),
       lessonId: 'lesson3',
       name: 'name',
       intro: 'intro',
@@ -98,7 +101,7 @@ module.exports = {
       conclusion: ['conclusion'],
     },
     {
-      _id: ObjectId('5f0cfea3395d762ca65405c4'),
+      _id: new ObjectId('5f0cfea3395d762ca65405c4'),
       lessonId: 'lesson4',
       name: 'name',
       intro: 'intro',
@@ -118,7 +121,7 @@ module.exports = {
       conclusion: ['conclusion'],
     },
     {
-      _id: ObjectId('5f0cfea3395d762ca65405c5'),
+      _id: new ObjectId('5f0cfea3395d762ca65405c5'),
       lessonId: 'lesson5',
       name: 'name',
       intro: 'intro',
@@ -138,7 +141,7 @@ module.exports = {
       conclusion: ['conclusion'],
     },
     {
-      _id: ObjectId('5f0cfea3395d762ca65405c6'),
+      _id: new ObjectId('5f0cfea3395d762ca65405c6'),
       lessonId: 'lesson6',
       name: 'name',
       intro: 'intro',
@@ -158,12 +161,12 @@ module.exports = {
       conclusion: ['conclusion'],
     },
     {
-      _id: ObjectId('5f0cfea3395d762ca65405c7'),
+      _id: new ObjectId('5f0cfea3395d762ca65405c7'),
       lessonId: '_deleted_lesson',
       deleted: true,
     },
     {
-      _id: ObjectId('5f0cfea3395d762ca65405c8'),
+      _id: new ObjectId('5f0cfea3395d762ca65405c8'),
       lessonId: 'lesson8',
       name: 'name',
       intro: 'intro',
@@ -208,7 +211,7 @@ module.exports = {
 
   sessions: [
     {
-      _id: ObjectId('5f20c63646f6110a6a5b2131'),
+      _id: new ObjectId('5f20c63646f6110a6a5b2131'),
       sessionId: 'session 1',
       lessonId: 'lesson1',
       username: 'username1',
@@ -250,7 +253,7 @@ module.exports = {
       ],
     },
     {
-      _id: ObjectId('5f20c63646f6110a6a5b2132'),
+      _id: new ObjectId('5f20c63646f6110a6a5b2132'),
       sessionId: 'session 2',
       lessonId: 'lesson1',
       username: 'username2',
@@ -270,7 +273,7 @@ module.exports = {
       },
       userResponses: [
         {
-          _id: ObjectId('5f20c63646f6110a6a5b2135'),
+          _id: new ObjectId('5f20c63646f6110a6a5b2135'),
           text: 'answer1',
           expectationScores: [
             {
@@ -288,7 +291,7 @@ module.exports = {
       ],
     },
     {
-      _id: ObjectId('5f20c63646f6110a6a5b2149'),
+      _id: new ObjectId('5f20c63646f6110a6a5b2149'),
       lessonId: 'lesson2',
       sessionId: 'session2.5',
       sessionStatus: 'LAUNCHED',
@@ -308,14 +311,14 @@ module.exports = {
       userResponses: [],
     },
     {
-      _id: ObjectId('5f20c63646f6110a6a5b2133'),
+      _id: new ObjectId('5f20c63646f6110a6a5b2133'),
       lessonId: 'lesson2',
       sessionId: 'session 3',
       sessionStatus: 'STARTED',
       lastGradedAt: '2020-07-28T00:00:00.000Z',
       userResponses: [
         {
-          _id: ObjectId('5f20c63646f6110a5a5b2135'),
+          _id: new ObjectId('5f20c63646f6110a5a5b2135'),
           text: 'a good answer',
           expectationScores: [
             {
@@ -328,7 +331,7 @@ module.exports = {
       ],
     },
     {
-      _id: ObjectId('5f20c63646f6110a6a5b2134'),
+      _id: new ObjectId('5f20c63646f6110a6a5b2134'),
       lessonId: 'lesson1',
       sessionId: 'session 4',
       sessionStatus: 'STARTED',
@@ -347,7 +350,7 @@ module.exports = {
       ],
     },
     {
-      _id: ObjectId('5f20c63646f6110a6a5b2135'),
+      _id: new ObjectId('5f20c63646f6110a6a5b2135'),
       lessonId: 'lesson1',
       sessionId: 'session 5',
       lastGradedAt: '2020-07-28T00:00:00.000Z',
@@ -366,14 +369,14 @@ module.exports = {
       ],
     },
     {
-      _id: ObjectId('5f20c63646f6110a6a5b2136'),
+      _id: new ObjectId('5f20c63646f6110a6a5b2136'),
       lessonId: 'lesson3',
       sessionId: 'session 6',
       lastGradedAt: '2020-07-28T00:00:00.000Z',
       sessionStatus: 'COMPLETED',
       userResponses: [
         {
-          _id: ObjectId('5f20c63646f6110a6a5b2131'),
+          _id: new ObjectId('5f20c63646f6110a6a5b2131'),
           text: 'good',
           expectationScores: [
             {
@@ -383,7 +386,7 @@ module.exports = {
           ],
         },
         {
-          _id: ObjectId('5f20c63646f6110a6a5b2132'),
+          _id: new ObjectId('5f20c63646f6110a6a5b2132'),
           text: 'good',
           expectationScores: [
             {
@@ -393,7 +396,7 @@ module.exports = {
           ],
         },
         {
-          _id: ObjectId('5f20c63646f6110a6a5b2133'),
+          _id: new ObjectId('5f20c63646f6110a6a5b2133'),
           text: 'bad',
           expectationScores: [
             {
@@ -403,7 +406,7 @@ module.exports = {
           ],
         },
         {
-          _id: ObjectId('5f20c63646f6110a6a5b2134'),
+          _id: new ObjectId('5f20c63646f6110a6a5b2134'),
           text: 'bad',
           expectationScores: [
             {
@@ -415,7 +418,7 @@ module.exports = {
       ],
     },
     {
-      _id: ObjectId('5f20c63646f6110a6a5b2137'),
+      _id: new ObjectId('5f20c63646f6110a6a5b2137'),
       lessonId: 'lesson4',
       sessionId: 'session 7',
       sessionStatus: 'COMPLETED',
@@ -514,7 +517,7 @@ module.exports = {
       ],
     },
     {
-      _id: ObjectId('5f20c63646f6110a6a5b2138'),
+      _id: new ObjectId('5f20c63646f6110a6a5b2138'),
       lessonId: 'lesson5',
       sessionId: 'session 8',
       lastGradedAt: '2020-07-28T00:00:00.000Z',
@@ -613,7 +616,7 @@ module.exports = {
       ],
     },
     {
-      _id: ObjectId('5f20c63646f6110a6a5b2139'),
+      _id: new ObjectId('5f20c63646f6110a6a5b2139'),
       lessonId: 'lesson6',
       sessionId: 'session 9',
       sessionStatus: 'COMPLETED',
@@ -712,7 +715,7 @@ module.exports = {
       ],
     },
     {
-      _id: ObjectId('5f20c63646f6110a6a5b2130'),
+      _id: new ObjectId('5f20c63646f6110a6a5b2130'),
       sessionId: 'session 10',
       lessonId: '_deleted_lesson',
       deleted: true,
@@ -721,22 +724,41 @@ module.exports = {
 
   users: [
     {
-      _id: ObjectId('5f0cfea3395d762ca65405d1'),
+      _id: new ObjectId('5f0cfea3395d762ca65405d1'),
       name: 'Admin',
       email: 'admin@opentutor.com',
       userRole: 'admin',
     },
     {
-      _id: ObjectId('5f0cfea3395d762ca65405d2'),
+      _id: new ObjectId('5f0cfea3395d762ca65405d2'),
       name: 'Content Manager',
       email: 'manager@opentutor.com',
       userRole: 'contentManager',
     },
     {
-      _id: ObjectId('5f0cfea3395d762ca65405d3'),
+      _id: new ObjectId('5f0cfea3395d762ca65405d3'),
       name: 'Editor',
       email: 'editor@opentutor.com',
       userRole: 'author',
     },
   ],
 };
+
+export async function loadMongo() {
+  const client = new MongoClient(process.env.MONGO_URI || '', {});
+  await client.connect();
+  const db = client.db(TESTDB_NAME);
+  await db.collection('lessons').insertMany(MONGO_DATA.lessons);
+  await db.collection('sessions').insertMany(MONGO_DATA.sessions);
+  await db.collection('users').insertMany(MONGO_DATA.users);
+  client.close();
+}
+
+export async function wipeMongo() {
+  const client = new MongoClient(process.env.MONGO_URI || '', {});
+  await client.connect();
+  const db = client.db(TESTDB_NAME);
+  await db.dropDatabase();
+}
+
+export default MONGO_DATA;

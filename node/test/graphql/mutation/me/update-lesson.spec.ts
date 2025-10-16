@@ -8,7 +8,7 @@ import createApp, { appStart, appStop } from 'app';
 import { expect } from 'chai';
 import { describe } from 'mocha';
 import { Express, json, response } from 'express';
-import mongoUnit from 'mongo-unit';
+import { loadMongo, wipeMongo } from 'test/fixtures/mongodb/data-default';
 import request from 'supertest';
 import { getToken } from 'test/helpers';
 
@@ -60,14 +60,14 @@ describe('updateLesson', () => {
   let app: Express;
 
   beforeEach(async () => {
-    await mongoUnit.load(require('test/fixtures/mongodb/data-default.js'));
+    await loadMongo();
     app = await createApp();
     await appStart();
   });
 
   afterEach(async () => {
+    await wipeMongo();
     await appStop();
-    await mongoUnit.drop();
   });
 
   it(`throws an error if not logged in`, async () => {
@@ -425,6 +425,7 @@ describe('updateLesson', () => {
     const lesson = JSON.stringify({
       lessonId: 'newlesson',
       createdBy: '5f0cfea3395d762ca65405d1',
+      llmModelName: 'llm_model_name',
       name: 'new name',
       intro: 'new intro',
       dialogCategory: 'sensitive',
@@ -462,6 +463,7 @@ describe('updateLesson', () => {
         me {
           lesson(lessonId: "newlesson") { 
             lessonId
+            llmModelName
             name
             intro
             dialogCategory
@@ -481,6 +483,7 @@ describe('updateLesson', () => {
     expect(newLesson.body.data.me.lesson).to.eql({
       lessonId: 'newlesson',
       name: 'new name',
+      llmModelName: 'llm_model_name',
       intro: 'new intro',
       dialogCategory: 'sensitive',
       question: 'new question',

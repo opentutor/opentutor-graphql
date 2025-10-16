@@ -17,7 +17,7 @@ export interface ArgsConfig {
 
 function toObjectIdOrThrow(id: string, argName: string): Types.ObjectId {
   try {
-    return Types.ObjectId(`${id}`);
+    return new Types.ObjectId(`${id}`);
   } catch (err) {
     throw new Error(`failed to parse arg '${argName}': ${err.message}`);
   }

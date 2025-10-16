@@ -8,7 +8,7 @@ import createApp, { appStart, appStop } from 'app';
 import { expect } from 'chai';
 import { Express } from 'express';
 import { describe } from 'mocha';
-import mongoUnit from 'mongo-unit';
+import { loadMongo, wipeMongo } from 'test/fixtures/mongodb/data-default';
 import request from 'supertest';
 import * as YAML from 'yaml';
 import { getToken } from 'test/helpers';
@@ -18,14 +18,14 @@ describe('expectation data all', () => {
   let app: Express;
 
   beforeEach(async () => {
-    await mongoUnit.load(require('test/fixtures/mongodb/data-default.js'));
+    await loadMongo();
     app = await createApp();
     await appStart();
   });
 
   afterEach(async () => {
+    await wipeMongo();
     await appStop();
-    await mongoUnit.drop();
   });
 
   it(`throws an error if not logged in`, async () => {
