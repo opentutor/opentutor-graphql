@@ -19,6 +19,7 @@ const GQL_UPDATE_LESSON_FULL = {
         lessonId
         name
         intro
+        usePump
         dialogCategory
         question
         expectations {
@@ -373,6 +374,7 @@ describe('updateLesson', () => {
       lessonId: 'newlesson',
       name: 'new name',
       intro: 'new intro',
+      usePump: true,
       dialogCategory: 'sensitive',
       question: 'new question',
       conclusion: ['new conclusion'],
@@ -403,6 +405,7 @@ describe('updateLesson', () => {
       lessonId: 'newlesson',
       name: 'new name',
       intro: 'new intro',
+      usePump: true,
       dialogCategory: 'sensitive',
       question: 'new question',
       expectations: [
