@@ -14,6 +14,7 @@ export const MONGO_DATA = {
     {
       _id: new ObjectId('5f0cfea3395d762ca65405c1'),
       lessonId: 'lesson1',
+      usePump: true,
       name: 'lesson name',
       media: {
         url: 'some/video.mp4',

@@ -120,6 +120,7 @@ describe('lesson', () => {
             arch
             name
             llmModelName
+            usePump
             intro
             dialogCategory
             question
@@ -153,6 +154,7 @@ describe('lesson', () => {
       lessonId: 'lesson1',
       name: 'lesson name',
       llmModelName: 'llm_model_name',
+      usePump: true,
       intro: 'intro text',
       dialogCategory: 'default',
       question: 'question?',
