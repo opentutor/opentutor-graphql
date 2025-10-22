@@ -57,7 +57,7 @@ export const UpdateLessonInputType = new GraphQLInputObjectType({
   fields: () => ({
     lessonId: { type: GraphQLString },
     llmModelName: { type: GraphQLString },
-    usePump: {type: GraphQLBoolean },
+    usePump: { type: GraphQLBoolean },
     arch: { type: GraphQLString },
     name: { type: GraphQLString },
     intro: { type: GraphQLString },

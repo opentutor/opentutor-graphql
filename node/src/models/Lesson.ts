@@ -134,7 +134,7 @@ export const LessonSchema = new Schema<Lesson, LessonModel>(
     arch: { type: String },
     name: { type: String },
     llmModelName: { type: String },
-    usePump: {type: Boolean},
+    usePump: { type: Boolean },
     intro: { type: String },
     dialogCategory: { type: String },
     question: { type: String },

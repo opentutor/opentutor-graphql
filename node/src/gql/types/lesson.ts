@@ -57,7 +57,7 @@ export const LessonType = new GraphQLObjectType({
     id: { type: GraphQLID },
     lessonId: { type: GraphQLString },
     llmModelName: { type: GraphQLString },
-    usePump: {type: GraphQLBoolean },
+    usePump: { type: GraphQLBoolean },
     arch: { type: GraphQLString },
     name: { type: GraphQLString },
     intro: { type: GraphQLString },
