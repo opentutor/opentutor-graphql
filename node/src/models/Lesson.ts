@@ -100,6 +100,7 @@ export interface Lesson extends Document {
   arch: string;
   name: string;
   llmModelName?: string;
+  usePump?: boolean;
   intro: string;
   dialogCategory: string;
   question: string;
@@ -133,6 +134,7 @@ export const LessonSchema = new Schema<Lesson, LessonModel>(
     arch: { type: String },
     name: { type: String },
     llmModelName: { type: String },
+    usePump: { type: Boolean },
     intro: { type: String },
     dialogCategory: { type: String },
     question: { type: String },
